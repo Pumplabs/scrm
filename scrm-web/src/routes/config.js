@@ -45,12 +45,7 @@ const IncumbencyTransfer = loadable(() => import('pages/IncumbencyTransfer/index
 // 离职继承
 const DimissionInherit = loadable(() => import('pages/DimissionInherit'))
 
-// 任务宝
-const FissionActivity = loadable(() => import('pages/TaskManage/FissionActivity'))
-// 任务宝新增
-const FissionActivityAddOrEditPage = loadable(() =>
-  import('pages/TaskManage/FissionActivity/AddOrEditPage')
-)
+
 // 轨迹素材
 const TrackMaterial = loadable(() => import('pages/SaleOperations/TrackMaterial'))
 // 新增文章
@@ -63,18 +58,7 @@ const MaterialTags = loadable(() => import('pages/SaleOperations/MaterialTags'))
 const OrdinaryMaterial = loadable(() =>
   import('pages/SaleOperations/OrdinaryMaterial')
 )
-// 群SOP
-const GroupSop = loadable(() => import('pages/TaskManage/GroupSop'))
-// sop新增
-const GroupSopAddOrEditPage = loadable(() =>
-  import('pages/TaskManage/GroupSop/AddOrEditPage')
-)
-// 客户SOP
-const CustomerSop = loadable(() => import('pages/TaskManage/CustomerSop'))
-// 新增编辑客户SOP
-const CustomerSopAddOrEditPage = loadable(() =>
-  import('pages/TaskManage/CustomerSop/AddOrEditPage')
-)
+
 // 欢迎语设置
 const WelcomeSetting = loadable(() => import('pages/WelcomeSetting'))
 // 话术
@@ -234,30 +218,8 @@ const config = [
         path: 'saleOperation/ordinaryMaterial',
         element: <OrdinaryMaterial />,
       },
-      {
-        path: 'groupSop/list',
-        element: <GroupSop />,
-      },
-      {
-        path: 'groupSop/list/add',
-        element: <GroupSopAddOrEditPage />,
-      },
-      {
-        path: 'groupSop/list/edit/:id',
-        element: <GroupSopAddOrEditPage />,
-      },
-      {
-        path: 'customerSop/list',
-        element: <CustomerSop />,
-      },
-      {
-        path: 'customerSop/list/add',
-        element: <CustomerSopAddOrEditPage />,
-      },
-      {
-        path: 'customerSop/list/edit/:id',
-        element: <CustomerSopAddOrEditPage />,
-      },
+
+
       {
         path: 'welcomeSetting',
         element: <WelcomeSetting />,
