@@ -1,0 +1,51 @@
+@import "style/theme.less";
+
+.part-section {
+  .action {
+    cursor: pointer;
+    color: @primary-color;
+  }
+  .part-body {
+    max-height: 120px;
+    overflow-y: auto;
+  }
+}
+.radio-content {
+  padding-top: 14px;
+}
+.filters-box {
+  background: #fafafa;
+  padding: 10px 12px;
+  border-radius: 4px;
+  .filter-tip {
+    position: relative;
+    padding: 6px 0px 0px 18px;
+    word-break: break-all;
+    width: 50%;
+    .info-icon {
+      position: absolute;
+      left: 0px;
+      top: 10px;
+      color: @primary-color;
+    }
+  }
+  .filter-tip-section {
+    position: relative;
+  }
+  .look-group-action {
+    position: absolute;
+    left: 50%;
+    margin-left: 8px;
+    bottom: 0px;
+    color: @primary-color;
+    cursor: pointer;
+  }
+}
+
+
+.all-item {
+  border-radius: 4px;
+  border: 1px solid #eaeaea;
+  padding: 8px 16px;
+  display: inline-block;
+}

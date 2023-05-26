@@ -1,0 +1,30 @@
+@import "style/theme.less";
+
+.rule-item {
+  position: relative;
+  padding-right: 300px;
+  margin-bottom: 12px;
+
+  .preview-container {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+  }
+
+  .form-section {
+    background: #fafafa;
+    padding: 16px;
+    border-radius: 4px;
+  }
+
+  .rule-item-remove-action {
+    position: absolute;
+    right: 320px;
+    top: 16px;
+    font-size: 16px;
+    z-index: 1;
+    &:hover {
+      color: @primary-color;
+    }
+  }
+}

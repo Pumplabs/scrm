@@ -1,0 +1,81 @@
+.container {
+  // background: #fff;
+  position: relative;
+  img {
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+  }
+  .box {
+    position: absolute;
+    z-index: 1;
+    display: inline-block;
+    user-select: none;
+    -webkit-user-drag: none;
+    .box-point {
+      display: none;
+    }
+    &.move {
+      cursor: move;
+      border: 2px solid #6ccfff;
+      position: relative;
+      .box-point {
+        display: block;
+        width: 8px;
+        height: 8px;
+        border: 1px solid #ddd;
+        background: #fff;
+        border-radius: 50%;
+        position: absolute;
+        &.point-11 {
+          left: 0px;
+          top: 0px;
+          margin-left: -4px;
+          margin-top: -4px;
+        }
+        &.point-12 {
+          left: 50%;
+          top: 0px;
+          margin-left: -4px;
+          margin-top: -4px;
+        }
+        &.point-13 {
+          left: 100%;
+          top: 0px;
+          margin-left: -4px;
+          margin-top: -4px;
+        }
+        &.point-21 {
+          left: 0px;
+          top: 50%;
+          margin-left: -4px;
+          margin-top: -4px;
+        }
+        &.point-23 {
+          left: 100%;
+          top: 50%;
+          margin-top: -4px;
+          margin-left: -4px;
+        }
+        &.point-31 {
+          left: 0%;
+          bottom: 0%;
+          margin-bottom: -4px;
+          margin-left: -4px;
+        }
+        &.point-32 {
+          left: 50%;
+          bottom: 0%;
+          margin-bottom: -4px;
+          margin-left: -4px;
+        }
+        &.point-33 {
+          left: 100%;
+          bottom: 0%;
+          margin-bottom: -4px;
+          margin-left: -4px;
+        }
+      }
+    }
+  }
+}

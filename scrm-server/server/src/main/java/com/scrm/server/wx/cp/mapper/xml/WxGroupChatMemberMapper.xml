@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxGroupChatMemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxGroupChatMember">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_creator_id" property="extCreatorId"/>
+        <result column="ext_chat_id" property="extChatId"/>
+        <result column="user_id" property="userId"/>
+        <result column="type" property="type"/>
+        <result column="join_time" property="joinTime"/>
+        <result column="join_scene" property="joinScene"/>
+        <result column="invitor" property="invitor"/>
+        <result column="union_id" property="unionId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , ext_corp_id, ext_creator_id, ext_chat_id, user_id, type, join_time, join_scene, invitor, union_id
+    </sql>
+    <select id="pageList" resultType="com.scrm.api.wx.cp.vo.WxGroupChatMemberVO">
+        select m.*, if(m.type = 1, s.name ,if(m.type = 2, c.name, null )) as memberName,
+        if(m.type = 1, s.avatar_url ,if(m.type = 2, c.avatar, null )) as memberAvatarUrl, s1.name as invitorName
+        from wx_group_chat_member m
+        left join wx_staff s on m.type = 1 and s.has_delete is not null and s.ext_corp_id = m.ext_corp_id and s.ext_id =
+        m.user_id
+        left join wx_customer c on m.type = 2 and c.has_delete is not null and c.ext_corp_id = m.ext_corp_id and
+        c.ext_id = m.user_id
+        left join wx_staff s1 on m.invitor = s1.ext_id and s1.ext_corp_id = m.ext_corp_id and s1.has_delete is not null
+        <where>
+            m.has_delete is not null
+            <if test="dto.extCorpId != null and dto.extCorpId !='' ">
+                and m.ext_corp_id = #{dto.extCorpId}
+            </if>
+            <if test="dto.extChatId != null and dto.extChatId !='' ">
+                and m.ext_chat_id = #{dto.extChatId}
+            </if>
+            <if test="dto.type != null ">
+                and m.type = #{dto.type}
+            </if>
+            <if test="dto.joinScene != null ">
+                and m.join_scene = #{dto.joinScene}
+            </if>
+            <if test="dto.joinTimeBegin != null ">
+                and m.join_time >= #{dto.joinTimeBegin}
+            </if>
+            <if test="dto.joinTimeEnd != null ">
+                and m.join_time &lt;= #{dto.joinTimeEnd}
+            </if>
+            <if test="dto.memberName != null and dto.memberName !='' ">
+                and m.name like concat('%',#{dto.memberName},'%')
+            </if>
+        </where>
+        order by m.join_time desc
+    </select>
+
+    <select id="queryList" resultType="com.scrm.api.wx.cp.vo.WxGroupChatMemberVO">
+        select m.*, if(m.type = 1, s.name ,if(m.type = 2, c.name, null )) as memberName,
+        if(m.type = 1, s.avatar_url ,if(m.type = 2, c.avatar, null )) as memberAvatarUrl, s1.name as invitorName
+        from wx_group_chat_member m
+        left join wx_staff s on m.type = 1 and s.has_delete is not null and s.ext_corp_id = m.ext_corp_id and s.ext_id =
+        m.user_id
+        left join wx_customer c on m.type = 2 and c.has_delete is not null and c.ext_corp_id = m.ext_corp_id and
+        c.ext_id = m.user_id
+        left join wx_staff s1 on m.invitor = s1.ext_id and s1.ext_corp_id = m.ext_corp_id and s1.has_delete is not null
+        <where>
+            m.has_delete is not null
+            <if test="dto.extCorpId != null and dto.extCorpId !='' ">
+                and m.ext_corp_id = #{dto.extCorpId}
+            </if>
+            <if test="dto.extChatId != null and dto.extChatId !='' ">
+                and m.ext_chat_id = #{dto.extChatId}
+            </if>
+            <if test="dto.type != null ">
+                and m.type = #{dto.type}
+            </if>
+            <if test="dto.joinScene != null ">
+                and m.join_scene = #{dto.joinScene}
+            </if>
+            <if test="dto.joinTimeBegin != null ">
+                and m.join_time >= #{dto.joinTimeBegin}
+            </if>
+            <if test="dto.joinTimeEnd != null ">
+                and m.join_time &lt;= #{dto.joinTimeEnd}
+            </if>
+            <if test="dto.memberName != null and dto.memberName !='' ">
+                and m.name like concat('%',#{dto.memberName},'%')
+            </if>
+        </where>
+        order by m.join_time desc
+    </select>
+    <select id="queryTodayQuitIds" resultType="java.lang.String">
+        select distinct id
+        from wx_group_chat_member
+        where ext_corp_id = #{extCorpId} and ext_chat_id = #{extChatId} and TO_DAYS(quit_time) = TO_DAYS(NOW())
+    </select>
+
+
+</mapper>

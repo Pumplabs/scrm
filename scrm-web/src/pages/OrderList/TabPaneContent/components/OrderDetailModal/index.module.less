@@ -1,0 +1,29 @@
+@import "style/theme.less";
+
+.files-ul {
+  width: 240px;
+  .file-item {
+    position: relative;
+    padding: 2px 32px 2px 4px;
+    background-color: @info-bg;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    &:nth-last-of-type(1) {
+      margin-bottom: 0px;
+    }
+    .file-name {
+      white-space: nowrap;
+    }
+    .download-icon {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      &:hover {
+        cursor: pointer;
+        color: @primary-color;
+      }
+    }
+  }
+}

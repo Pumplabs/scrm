@@ -1,0 +1,36 @@
+
+.color-picker {
+  @size: 20px;
+  .color-item {
+    display: inline-block;
+    width: @size;
+    height: @size;
+    border-radius: 2px;
+    border: 1px solid #000;
+    vertical-align: bottom;
+  }
+  .color-name {
+    margin-left: 4px;
+    display: inline-block;
+    line-height: @size + 2px;
+  }
+}
+.color-picker-footer {
+  padding-top: 8px;
+  text-align: right;
+  position: relative;
+  .color-info {
+    position: absolute;
+    left: 0px;
+    top: 8px;
+    line-height: 24px;
+  }
+  .color-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+}

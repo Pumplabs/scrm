@@ -1,0 +1,44 @@
+@import "style/theme.less";
+.drawer-content {
+  .other-info {
+    position: relative;
+    padding-right: 232px;
+    .article-cover {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      img {
+        margin-bottom: 4px;
+      }
+    }
+    .cover-name {
+      color: @text-color-secondary;
+      text-align: center;
+    }
+  }
+}
+
+.card-section {
+  .card-header {
+    padding-top: 16px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 18px;
+    color: @heading-color;
+    padding-left: 12px;
+    position: relative;
+    line-height: 22px;
+    &::before {
+      content: "";
+      display: block;
+      width: 5px;
+      height: 12px;
+      position: absolute;
+      left: 0px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: @primary-color;
+    }
+  }
+}

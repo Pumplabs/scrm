@@ -1,0 +1,45 @@
+@import "style/theme.less";
+.selected-list {
+  border: 1px solid #eaeaea;
+  .selected-list-header {
+    height: 32px;
+    line-height: 32px;
+    position: relative;
+    padding: 0px 20px 0px 10px;
+  }
+  .selected-header-name {
+    color: @heading-color;
+  }
+  .selected-header-extra {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: @primary-color;
+    cursor: pointer;
+  }
+  .selected-count {
+    font-weight: 600;
+    font-size: 18px;
+    padding: 0px 4px;
+  }
+  .selected-list-body {
+    height: calc(100vh - 160px);
+    overflow-y: auto;
+    padding: 12px 10px;
+  }
+}
+
+.seleced-list-item {
+  position: relative;
+  padding: 6px 20px 6px 6px;
+  border-bottom: 1px solid #eaeaea;
+  margin-bottom: 4px;
+}
+.list-item-action {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}

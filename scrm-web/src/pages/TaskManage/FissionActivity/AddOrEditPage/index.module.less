@@ -1,0 +1,81 @@
+@import "style/theme.less";
+.page {
+  .big-section();
+  padding: 16px;
+  background: #fff;
+  position: relative;
+  .page-steps {
+    margin-bottom: 16px;
+  }
+  .page-footer {
+   text-align: center;
+    padding-top: 16px;
+    border-top: 1px solid #eaeaea;
+  }
+  .page-body {
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+  }
+}
+.poster-thumb {
+  position: absolute;
+  right: 20px;
+  // top: 10px;
+  top: 0px;
+}
+
+// 阶段任务
+.stage-task-item {
+  border: 1px solid #eaeaea;
+  margin-bottom: 10px;
+  .stage-task-item-header {
+    height: 40px;
+    line-height: 40px;
+    border-bottom: 1px solid #eaeaea;
+    padding-left: 12px;
+    position: relative;
+    .stage-task-item-actions {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .stage-task-item-action {
+      margin-right: 8px;
+      cursor: pointer;
+      color: @primary-color;
+      font-size: 18px;
+    }
+  }
+  
+  .stage-task-item-body {
+    padding: 16px;
+  }
+}
+
+// 阶段任务提示
+.task-tip {
+  margin-bottom: 4px;
+  .tip-icon {
+    color: @primary-color;
+    margin-right: 4px;
+    font-size: 14px;
+  }
+  .total-count {
+    font-weight: 600;
+    color: @primary-color;
+    padding: 0px 2px;
+  }
+  .current-count {
+    font-weight: 600;
+    color: @primary-color;
+    padding: 0px 2px;
+  }
+}
+
+.stage-onlyread-item {
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  padding-top: 10px;
+}

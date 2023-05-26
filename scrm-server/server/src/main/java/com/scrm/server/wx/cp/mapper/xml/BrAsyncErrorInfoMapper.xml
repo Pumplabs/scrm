@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrAsyncErrorInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.BrAsyncErrorInfo">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="params" property="params" />
+        <result column="type" property="type" />
+        <result column="created_at" property="createdAt" />
+        <result column="error_msg" property="errorMsg" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, params, type, created_at, error_msg
+    </sql>
+
+</mapper>

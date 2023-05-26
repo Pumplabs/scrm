@@ -1,0 +1,7 @@
+server:
+  port: 9900
+spring:
+  application:
+    name: scrm-wx-cp
+  profiles:
+    active: local

@@ -1,0 +1,31 @@
+@import "style/theme.less";
+
+.list-item {
+  position: relative;
+  padding: 8px 8px 8px 28px;
+  margin-bottom: 6px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+
+  &.list-item-disabled {
+    cursor: not-allowed;
+  }
+  &:nth-last-of-type(1) {
+    margin-bottom: 0px;
+  }
+
+  &:hover {
+    background-color: fade(@primary-color, 5%);
+  }
+
+  .list-item-radio {
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    margin-right: 0px;
+  }
+
+  &.list-item-active {
+    background-color: fade(@primary-color, 5%);
+  }
+}

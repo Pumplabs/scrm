@@ -1,0 +1,36 @@
+@import "style/theme.less";
+
+.tag-ele {
+  margin: 0px 6px 6px 0px;
+  font-size: 12px;
+}
+
+.content {
+  padding: 0px @body-spacing;
+  overflow-y: auto;
+
+  .selected-section {
+    margin-bottom: 16px;
+  }
+}
+
+.panel-group {
+  background-color: @body-color;
+  padding: 0px;
+  .my-collapse-title {
+    color: #000;
+    font-size: 14px;
+  }
+
+  .panel-tags {
+    background-color: #fff;
+    border-radius: @border-radius-base;
+    padding: 10px 10px 6px 10px;
+  }
+}
+
+.infinite-list {
+  @header: 64px;
+  .ios-substract(height, 100vh, @header);
+  .ios-substract(max-height, 100vh, @header);
+}

@@ -1,0 +1,103 @@
+@import 'style/vars.less';
+
+.page-row {
+  height: 100%;
+}
+
+.dep-card {
+  margin-right: 16px;
+  background: #fff;
+  padding: 0px 12px;
+  border-radius: 6px;
+  box-shadow: 0 3px 6px -4px #0000001f, 0 6px 16px #00000014, 0 9px 28px 8px #0000000d;
+  height: calc(100vh - 30px);
+   .aysncIcon {
+     margin-left: 4px;
+     cursor: pointer;
+   }
+   .anticon-sync {
+    color: @primary-color;
+  }
+  .dep-card-header {
+    height: 48px;
+    position: relative;
+    border-bottom: 1px solid @border-color;
+  }
+
+  .dep-card-title {
+    font-weight: 600;
+    line-height: 48px;
+    font-size: 16px;
+  }
+
+  .dep-card-actions {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .dep-card-actionBtn {
+    display: inline-block;
+    line-height: 28px;
+    font-size: 14px;
+    border-radius: 2px;
+    border: 1px solid #eee;
+    padding: 0px 8px;
+    margin-right: 8px;
+    cursor: pointer;
+    
+    border-color: @primary-color;
+    color: @primary-color;
+    
+    &:hover {
+      border-color: @primary-color;
+      color: @primary-color;
+    }
+
+    &[disabled] {
+      border-color: #d9d9d9;
+      color: #999;
+      background-color: #f5f5f5;
+    }
+  }
+
+  .dep-card-actionBtn:nth-last-of-type(1) {
+    margin-right: 0px;
+  }
+
+  .dep-card-body {
+    padding-top: 8px;
+    height: calc(100% - 80px);
+    overflow-y: auto;
+  }
+
+  .treetitle-wrap:hover {
+    .treenode-actions {
+      display: block;
+    }
+  }
+
+  .treenode-actions {
+    display: none;
+    float: right;
+  }
+}
+
+.companyNode {
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  .companyIcon {
+    margin-right: 8px;
+  }
+
+  &.selected {
+    border-color: @primary-color;
+    color: @primary-color;
+  }
+
+  .companyName {}
+}

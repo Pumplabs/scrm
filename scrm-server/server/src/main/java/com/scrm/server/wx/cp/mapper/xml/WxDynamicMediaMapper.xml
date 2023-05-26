@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxDynamicMediaMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxDynamicMedia">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="customer_id" property="customerId" />
+        <result column="media_id" property="mediaId" />
+        <result column="time" property="time" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="deleted_at" property="deletedAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, customer_id, media_id, time, created_at, updated_at, deleted_at
+    </sql>
+    <select id="countByMediaId" resultType="com.scrm.server.wx.cp.dto.DynamicMediaCountDTO">
+        select media_info_id mediaInfoId, count(1) countSum
+        from wx_dynamic_media
+        where ext_corp_id = #{extCorpId}
+        and created_at >= #{startTime}
+        group by media_info_id
+        order by countSum desc
+        limit #{showCount}
+    </select>
+
+</mapper>

@@ -1,0 +1,68 @@
+@import "style/theme.less";
+
+.memberListItem {
+  position: relative;
+  background: #fff;
+  border: 1px solid @gray;
+  padding: 27px 24px 27px 79px;
+  margin-bottom: 8px;
+  .list-item-color(@mainColor, @textColor:#fff) {
+    background: fade(@mainColor, 7%);
+    border-color: @mainColor;
+    .status-item{
+      background-color: @mainColor;
+      border-color: @mainColor;
+      color: @textColor;
+    }
+  }
+  .memberAvatar {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    left: 19px;
+    top: 27px;
+    border-radius: 2px;
+  }
+  .nickname {
+    font-weight: 600;
+    color: @heading-color;
+  }
+
+  .status-item {
+    background: #fff;
+    border: 3px solid @gray;
+    border-radius: 2px;
+    padding: 2px 4px;
+    display: inline-block;
+    line-height: 1;
+    font-size: 12px;
+    margin-left: 6px;
+  }
+
+  .desc-text {
+    color: @text-color;
+    margin-top: 8px;
+  }
+
+  .remind-btn {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  &.send {
+    .list-item-color(@green);
+  }
+  &.unsend {
+    .list-item-color(@yellow);
+  }
+  &.fail {
+    @color: @red;
+    .list-item-color(@red);
+  }
+}
+
+.memberListItem:nth-last-of-type(1) {
+  margin-bottom: 0px;
+}
+

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.StaffMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.Staff">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_id" property="extId"/>
+        <result column="role_id" property="roleId"/>
+        <result column="role_type" property="roleType"/>
+        <result column="name" property="name"/>
+        <result column="address" property="address"/>
+        <result column="alias" property="alias"/>
+        <result column="avatar_url" property="avatarUrl"/>
+        <result column="email" property="email"/>
+        <result column="gender" property="gender"/>
+        <result column="status" property="status"/>
+        <result column="mobile" property="mobile"/>
+        <result column="qr_code_url" property="qrCodeUrl"/>
+        <result column="telephone" property="telephone"/>
+        <result column="enable" property="enable"/>
+        <result column="signature" property="signature"/>
+        <result column="external_position" property="externalPosition"/>
+        <result column="external_profile" property="externalProfile"/>
+        <result column="extattr" property="extattr"/>
+        <result column="customer_count" property="customerCount"/>
+        <result column="dept_ids" property="deptIds"/>
+        <result column="welcome_msg_id" property="welcomeMsgId"/>
+        <result column="is_authorized" property="isAuthorized"/>
+        <result column="enable_msg_arch" property="enableMsgArch"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="has_delete" property="hasDelete"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, ext_id, role_id, role_type, name, address, alias, avatar_url, email, gender, status, mobile, qr_code_url, telephone, enable, signature, external_position, external_profile, extattr, customer_count, dept_ids, welcome_msg_id, is_authorized, enable_msg_arch, created_at, updated_at, has_delete
+    </sql>
+
+    <select id="findOne" resultType="com.scrm.api.wx.cp.entity.Staff">
+        select * from wx_staff
+        where id = #{id}
+    </select>
+    <select id="findByExtCorpIdAndExtId" resultType="com.scrm.api.wx.cp.entity.Staff">
+        select * from wx_staff
+        where ext_corp_id =#{extCorpId} and ext_id = #{extId}
+        order by has_delete is null, created_at desc limit 1
+    </select>
+
+</mapper>

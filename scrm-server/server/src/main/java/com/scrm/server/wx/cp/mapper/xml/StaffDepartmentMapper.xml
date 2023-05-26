@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.StaffDepartmentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.StaffDepartment">
+        <id column="staff_id" property="staffId"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_staff_id" property="extStaffId"/>
+        <result column="ext_department_id" property="extDepartmentId"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="is_leader" property="isLeader"/>
+        <result column="order" property="order"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        ext_corp_id
+        , ext_staff_id, ext_department_id, staff_id, department_id, is_leader, order
+    </sql>
+
+    <select id="queryDepartmentStaffNum" resultType="java.lang.Long">
+        select count( distinct d.staff_id)
+        from wx_staff_department d join wx_staff s on d.staff_id = s.id and s.has_delete is not null and s.ext_corp_id = #{extCorpId}
+        <where>
+            <if test="extDepartmentIds != null and extDepartmentIds.size() > 0">
+                ext_department_id in
+                <foreach collection="extDepartmentIds" close=")" open="(" separator=","  item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>

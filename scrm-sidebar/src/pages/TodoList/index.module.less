@@ -1,0 +1,32 @@
+@import "style/theme.less";
+.todo-page-wrap {
+  background-color: #fff;
+}
+
+.todo-page {
+  height: 100%;
+  background-color: #fff;
+}
+
+.todo-radio {
+  display: flex;
+  justify-content: center;
+  // margin-bottom: @body-spacing;
+  position: sticky;
+  padding: 22px 0px;
+  top: 0px;
+  z-index: 2;
+  width: 100%;
+  background-color: #fff;
+}
+
+.todo-page-body {
+  @outside: 48px+20px+32px;
+  .ios-substract(max-height, 100vh, @outside);
+  .ios-substract(height, 100vh, @outside);
+  overflow-y: auto;
+}
+
+.list-content {
+  padding: 0px @body-spacing;
+}

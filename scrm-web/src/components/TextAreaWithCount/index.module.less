@@ -1,0 +1,33 @@
+@import "style/theme.less";
+
+.inputWrap {
+  position: relative;
+  padding-bottom: 20px;
+  border: 1px solid #d9d9d9;
+
+  .inputEle {
+    height: 220px;
+    border-bottom: none;
+
+    &:hover {
+      border-bottom: none;
+    }
+
+    &:focus {
+      border-bottom: none;
+      box-shadow: none;
+    }
+  }
+
+  .tips {
+    width: 100%;
+    position: absolute;
+    bottom: 2px;
+    right: 0px;
+    padding-right: 16px;
+    text-align: right;
+    
+    border-top: none;
+    color: #999;
+  }
+}

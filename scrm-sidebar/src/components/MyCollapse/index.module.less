@@ -1,0 +1,35 @@
+@import "style/theme.less";
+
+.my-collapse {
+  :global {
+    .adm-list-body {
+      --border-top:none;
+      background-color: transparent;
+
+      .adm-collapse-panel-content {
+        border-radius: @border-radius-base;
+      }
+
+      .adm-list-item {
+        --border-inner: none;
+        border-top: none;
+        --border-top: none;
+        --border-none: none;
+      }
+    }
+
+    .adm-collapse-panel-header {
+      background-color: @body-color;
+      padding: 0px;
+      font-size: 14px;
+
+      :hover {
+        color: #000;
+      }
+
+      .adm-list-item-content-main {
+        font-size: 14px;
+      }
+    }
+  }
+}

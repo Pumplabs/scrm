@@ -1,0 +1,148 @@
+@import "style/theme.less";
+
+.customer-item {
+  background: @info-bg;
+  border-radius: 4px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+
+  .customer-item-content {
+    margin-bottom: 10px;
+    position: relative;
+    padding-right: 40px;
+    min-height: 24px;
+  }
+
+  .creator-info {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-height: 20px;
+  }
+
+  .customer-item-footer {
+    line-height: 20px;
+    position: relative;
+    padding: 0px 20px 0px 0px;
+  }
+
+  .customer-item-status {
+    background: fade(#FFA39E, 40%);
+    border: 1px solid #F5222D;
+    color: #F5222D;
+    position: absolute;
+    line-height: 14px;
+    font-size: 12px;
+    display: block;
+    right: 0px;
+    top: 0px;
+    padding: 4px 6px;
+    border-radius: 2px;
+  }
+
+  .customer-item-action {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    cursor: pointer;
+    font-size: 16px;
+
+    &:hover {
+      color: @primary-color;
+    }
+  }
+
+  .creator-img {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+  }
+}
+
+.stage-list {
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.stage-list-float-item {
+  display: inline-block;
+  margin-right: 16px;
+
+  &:nth-last-of-type(1) {
+    margin-right: 0px;
+  }
+}
+
+.stage-list-item {
+  width: 320px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+
+  .stage-list-item-header {
+    height: 40px;
+    line-height: 40px;
+    padding: 0px 20px 0px 10px;
+    position: relative;
+    color: #fff;
+    border-radius: 4px 4px 0px 0px;
+  }
+
+  .stage-list-item-name {
+    font-size: 16px;
+  }
+
+  .stage-list-item-extra {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+  }
+
+  .stage-list-item-add-action {
+    cursor: pointer;
+  }
+
+  .stage-list-item-body {
+    padding: 12px;
+    overflow-y: auto;
+    height: calc(100vh - 280px);
+  }
+}
+
+.confirm-modal {
+  .confirm-modal-header {
+    margin-bottom: 8px;
+  }
+
+  .confirm-modal-icon {
+    color: @warning-color;
+    font-size: 22px;
+    margin: 0px 16px -2px 0px;
+  }
+
+  .ant-modal-confirm-title {
+    overflow: hidden;
+    color: #000000d9;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  .confirm-modal-text {
+    color: #000000d9;
+    font-size: 14px;
+    margin: 9px 0px 0px 38px;
+  }
+  .confirm-modal-cancel-btn {
+    margin-right: 8px;
+  }
+  .confirm-modal-footer {
+    padding-top: 24px;
+    text-align: right;
+  }
+}

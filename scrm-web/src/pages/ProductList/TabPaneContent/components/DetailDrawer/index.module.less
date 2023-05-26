@@ -1,0 +1,19 @@
+@import "style/theme.less";
+.attr-ul {
+  .attr-name {
+    &::after {
+      content: ":";
+      display: inline-block;
+      margin: 0px 4px;
+      color: @heading-color;
+    }
+  }
+}
+.product-img {
+  max-width: 100px;
+  height: 100px;
+  margin: 0px 6px 6px 0px;
+}
+.article-content {
+  color: @text-color;
+}

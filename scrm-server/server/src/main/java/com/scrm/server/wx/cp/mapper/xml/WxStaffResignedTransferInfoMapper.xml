@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxStaffResignedTransferInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxStaffResignedTransferInfo">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="status" property="status" />
+        <result column="takeover_time" property="takeoverTime" />
+        <result column="customer_id" property="customerId" />
+        <result column="takeover_staff_id" property="takeoverStaffId" />
+        <result column="handover_staff_id" property="handoverStaffId" />
+        <result column="create_time" property="createTime" />
+        <result column="creator" property="creator" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, status, takeover_time, customer_id, takeover_staff_id, handover_staff_id, create_time, creator
+    </sql>
+
+</mapper>

@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+@font-face {
+  font-family: 'HarmonyBold';
+  src: url("./assets/font/HarmonyOS_Sans_Bold.ttf");
+}

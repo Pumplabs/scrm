@@ -1,0 +1,21 @@
+@import "style/theme.less";
+.radio {
+  display: flex;
+  .radio-item {
+    border: 1px solid @primary-color;
+    border-left: none;
+    color: @primary-color;
+    padding: 4px 12px;
+    &.active-radio-item {
+      background-color: @primary-color;
+      color: #fff;
+    }
+    &:nth-of-type(1) {
+      border-radius: 4px 0px 0px 4px;
+      border-left: 1px solid @primary-color;
+    }
+    &:nth-last-of-type(1) {
+      border-radius: 0px 4px 4px 0px;
+    }
+  }
+}

@@ -1,0 +1,64 @@
+package com.scrm.server.wx.cp.entity;
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableId;
+import org.springframework.format.annotation.DateTimeFormat;
+
+/**
+ * 产品分类
+ * @author xxh
+ * @since 2022-07-17
+ */
+@Data
+@Accessors(chain = true)
+@ApiModel(value = "产品分类")
+@TableName("br_product_type")
+public class BrProductType implements Serializable{
+
+    private static final long serialVersionUID=1L;
+
+    @ApiModelProperty(value = "主键")
+    @TableId
+    private String id;
+
+    @ApiModelProperty(value = "外部企业ID")
+    private String extCorpId;
+
+    @ApiModelProperty(value = "分类名称")
+    private String name;
+
+    @ApiModelProperty(value = "描述")
+    private String description;
+
+    @ApiModelProperty(value = "创建时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createdAt;
+
+    @ApiModelProperty(value = "修改时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updatedAt;
+
+    @ApiModelProperty(value = "创建员工id")
+    private String creator;
+
+    @ApiModelProperty(value = "编辑员工id")
+    private String editor;
+
+    @ApiModelProperty(value = "删除时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @TableLogic
+    private Date deletedAt;
+
+}

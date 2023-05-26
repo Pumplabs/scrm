@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrMediaCountDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.BrMediaCountDetail">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="type" property="type" />
+        <result column="type_id" property="typeId" />
+        <result column="send_count" property="sendCount" />
+        <result column="ext_staff_id" property="extStaffId" />
+        <result column="ext_customer_id" property="extCustomerId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, type, type_id, send_count, ext_staff_id, ext_customer_id, create_time, update_time
+    </sql>
+
+</mapper>

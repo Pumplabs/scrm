@@ -1,0 +1,25 @@
+.chart-tip {
+  position: absolute;
+  z-index: 1;
+  visibility: hidden;
+  max-width: 50%;
+  background-color: #fff;
+  color: #333;
+  padding: 5px 15px;
+  border-radius: 2px;
+  box-shadow: 0 0 2px #aaa;
+  transform-origin: bottom;
+
+  .chart-tip-arrow {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    left: 50%;
+    bottom: -4px;
+    transform: translateX(-50%) rotate(45deg);
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 5px;
+  }
+}

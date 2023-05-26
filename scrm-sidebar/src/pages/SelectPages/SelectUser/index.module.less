@@ -1,0 +1,37 @@
+@import "style/theme.less";
+.search-section {
+  padding: @body-spacing;
+}
+.selected-ul-wrap {
+  background-color: #fff;
+  overflow-y: auto;
+  @outside: @body-spacing * 2 + 60px + 32px + 40px;
+  .ios-substract(height, 100vh, @outside);
+  .user-list-li {
+    padding: 0px 16px;
+  }
+}
+
+.customer-item {
+  display: flex;
+  align-items: center;
+}
+
+.radio-ele {
+  margin-right: 6px;
+}
+.staff-wrap-item {
+  display: flex;
+}
+.staff-item {
+  display: flex;
+  align-items: center;
+  word-break: break-all;
+  .staff-item-icon {
+    @size: 40px;
+    width: @size;
+    height: @size;
+    border-radius: 4px;
+    margin-right: 12px;
+  }
+}

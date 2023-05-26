@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrOrderMapper">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, customer_ext_id, manager_staff_ext_id, product_ids, discount, order_amount, collection_amount, description, attachment_ids, status, order_code, opportunity_id, editor, creator, created_at, updated_at, deleted_at
+    </sql>
+
+</mapper>

@@ -1,0 +1,57 @@
+@import "src/styles/theme.less";
+
+.power-user-item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid red;
+  align-items: flex-start;
+  padding: 8px;
+
+  &:nth-last-of-type(1) {
+    border-bottom: none;
+  }
+
+  .power-user-avatar {
+    display: flex;
+    align-items: center;
+
+    img {
+      width: 32px;
+      height: 32px;
+      margin-right: 8px;
+      border-radius: 8px;
+    }
+  }
+
+  .power-user-status {
+    text-align: right;
+    .power-status {
+      display: inline-block;
+      color: #fff;
+      padding: 2px 12px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+
+      &.power-success-status {
+        background-color: @primary-color;
+      }
+
+      &.power-fail-status {
+        background-color: #9E9B9B;
+      }
+    }
+    .error-text {
+      font-size: 12px;
+      color: #7E7A7A;
+      display: flex;
+      align-items: center;
+      justify-content: end;
+    }
+    .info-icon {
+      margin-right: 4px;
+      width: 14px;
+      height: 14px;
+      vertical-align: middle;
+    }
+  }
+}

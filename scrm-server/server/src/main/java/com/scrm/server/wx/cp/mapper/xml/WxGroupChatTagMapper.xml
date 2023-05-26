@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxGroupChatTagMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxGroupChatTag">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="ext_creator_id" property="extCreatorId" />
+        <result column="group_chat_tag_group_id" property="groupChatTagGroupId" />
+        <result column="name" property="name" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="deleted_at" property="deletedAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, ext_creator_id, group_chat_tag_group_id, name, created_at, updated_at, deleted_at
+    </sql>
+    <select id="getMaxOrder" resultType="java.lang.Long">
+        select max(`order`) from wx_group_chat_tag  where has_delete is null and ext_corp_id = #{extCorpId} and group_chat_tag_group_id = #{groupChatTagGroupId}
+    </select>
+
+</mapper>

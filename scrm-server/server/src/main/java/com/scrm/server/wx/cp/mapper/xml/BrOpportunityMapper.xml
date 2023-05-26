@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrOpportunityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.BrOpportunity">
+        <id column="id" property="id" />
+        <result column="group_id" property="groupId" />
+        <result column="name" property="name" />
+        <result column="desp" property="desp" />
+        <result column="priority" property="priority" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="creator" property="creator" />
+        <result column="editor" property="editor" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="owner" property="owner" />
+        <result column="stage_id" property="stageId" />
+        <result column="expect_money" property="expectMoney" />
+        <result column="deal_chance" property="dealChance" />
+        <result column="expect_deal_date" property="expectDealDate" />
+        <result column="fail_reason_id" property="failReasonId" />
+        <result column="fail_reason" property="failReason" />
+        <result column="customer_ext_id" property="customerExtId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, group_id, name, desp, priority, created_at, updated_at, creator, editor, deleted_at, ext_corp_id, owner, stage_id, expect_money, deal_chance, expect_deal_date, fail_reason_id, fail_reason, customer_ext_id
+    </sql>
+    <select id="pageList" resultType="com.scrm.server.wx.cp.entity.BrOpportunity">
+        select o.id, o.group_id, o.name, o.desp, o.priority, o.created_at, o.updated_at, o.creator, o.editor, o.deleted_at,
+        o.ext_corp_id, o.owner, o.stage_id, o.expect_money,o.deal_chance, o.expect_deal_date, o.fail_reason_id, o.fail_reason, o.customer_ext_id
+        from br_opportunity o
+        left join br_opportunity_cooperator m on m.opportunity_id = o.id
+        <where>
+            m.deleted_at is null and o.deleted_at is null
+            <if test="dto.currentUserId != null and dto.currentUserId != '' and dto.currentExtUserId != null and dto.currentExtUserId != ''">
+                and
+                (
+                o.creator = #{dto.currentUserId} or o.owner=#{dto.currentExtUserId} or
+                m.cooperator_id=#{dto.currentExtUserId}
+                )
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and o.name like concat('%', #{dto.name}, '%')
+            </if>
+            <if test="dto.groupId != null and dto.groupId != ''">
+                and o.group_id =#{dto.groupId}
+            </if>
+            <if test="dto.extCorpId != null and dto.extCorpId != ''">
+                and o.ext_corp_id =#{dto.extCorpId}
+            </if>
+            <if test="dto.stageId != null">
+                and o.stage_id=#{dto.stageId}
+            </if>
+            <if test="dto.stageIdList != null  and dto.stageIdList.size() > 0">
+                and o.stage_id in
+                <foreach collection="dto.stageIdList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.notStageIdList != null  and dto.notStageIdList.size() > 0">
+                and o.stage_id not in
+                <foreach collection="dto.notStageIdList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.priority != null">
+                and o.priority=#{dto.priority}
+            </if>
+            <if test="dto.owner != null and dto.owner != ''">
+                and o.owner=#{dto.owner}
+            </if>
+            <if test="dto.createdAtStart != null">
+                and o.created_at &gt;= #{dto.createdAtStart}
+            </if>
+            <if test="dto.createdAtEnd != null">
+                and o.created_at &lt;= #{dto.createdAtEnd}
+            </if>
+            group by o.id
+            order by o.created_at desc
+        </where>
+
+    </select>
+    <select id="queryList" resultType="com.scrm.server.wx.cp.entity.BrOpportunity">
+        select o.id, o.group_id, o.name, o.desp, o.priority, o.created_at, o.updated_at, o.creator, o.editor, o.deleted_at,
+        o.ext_corp_id, o.owner, o.stage_id, o.expect_money, o.deal_chance, o.expect_deal_date, o.fail_reason_id, o.fail_reason, o.customer_ext_id
+        from br_opportunity o
+        left join br_opportunity_cooperator m on m.opportunity_id = o.id
+        <where>
+            m.deleted_at is null and o.deleted_at is null
+            <if test="dto.currentUserId != null and dto.currentUserId != '' and dto.currentExtUserId != null and dto.currentExtUserId != ''">
+                and
+                (
+                o.creator = #{dto.currentUserId} or o.owner=#{dto.currentExtUserId} or m.cooperator_id=#{dto.currentExtUserId}
+                )
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and o.name like concat('%', #{dto.name}, '%')
+            </if>
+            <if test="dto.groupId != null and dto.groupId != ''">
+                and o.group_id =#{dto.groupId}
+            </if>
+            <if test="dto.extCorpId != null and dto.extCorpId != ''">
+                and o.ext_corp_id =#{dto.extCorpId}
+            </if>
+            <if test="dto.stageId != null">
+                and o.stage_id=#{dto.stageId}
+            </if>
+            group by o.id
+            order by o.created_at desc
+        </where>
+    </select>
+
+</mapper>

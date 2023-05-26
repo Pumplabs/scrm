@@ -1,0 +1,71 @@
+@import "style/theme.less";
+
+.tag-color(@color) {
+  background-color: fade(@color, 50%);
+  color: @color;
+}
+
+.tag-item {
+  &.follow-tag {
+    @color: @yellow;
+    .tag-color(@color);
+  }
+
+  &.update-opp-tag {
+    @color: @green;
+    .tag-color(@color);
+  }
+
+  &.update-task-tag {
+    @color: @blue;
+    .tag-color(@color);
+  }
+}
+
+.operation-section {
+  position: relative;
+  padding-right: 120px;
+  .staff-name {
+    color: @heading-color;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  .action-name {
+    margin-right: 4px;
+    color: @heading-color;
+  }
+
+  .target-name {
+    color: @heading-color;
+    font-weight: 600;
+  }
+  .follow-time {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+}
+
+.content-main {
+
+  .done-task-icon {
+    font-size: 18px;
+    color: @primary-color;
+    margin-right: 4px;
+
+    :global {
+      path:nth-of-type(1) {
+        fill: @primary-color;
+      }
+
+      path:nth-of-type(2) {
+        fill: #FFE6FB;
+      }
+
+      path:nth-of-type(3) {
+        fill: @primary-color;
+      }
+    }
+  }
+}

@@ -1,0 +1,75 @@
+@import "style/theme.less";
+.momentItemWrap {
+  padding-top: 0px;
+}
+.momentContentHeader {
+  padding: 0px !important;
+}
+.momentItemBody {
+  padding-top: 0px;
+}
+
+.task-item-info {
+  position: relative;
+  padding-right: 120px;
+  .deadline {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+  .done-time {
+    color: @green;
+  }
+  .undone-time {
+    color:@text-color-secondary;
+  }
+  .overdue-time {
+    color: @red;
+  }
+}
+.info-item {
+  .info-item-label {
+    color: @text-color-secondary;
+    &::after {
+      content: ":";
+      margin: 0px 6px 0px 4px;
+    }
+  }
+  .info-item-content {
+    color: @text-color-secondary;
+  }
+}
+.task-list {
+  padding: 8px 0px;
+}
+.task-list-item {
+  position: relative;
+  padding: 10px 10px 10px 40px;
+  background-color: #fff;
+  margin-bottom: 14px;
+  border-radius: @border-radius-base;
+  &:nth-last-of-type(1) {
+    margin-bottom: 0px;
+  }
+  .task-icon-wrap {
+    position: absolute;
+    left: 10px;
+    top: 16px;
+  }
+  .task-done-icon {
+    font-size: 24px;
+    color: @primary-color;
+  }
+  .task-item-icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid @primary-color;
+  }
+  .task-item-name {
+    font-size: 16px;
+    color: @heading-color;
+    margin-bottom: 4px;
+  }
+}

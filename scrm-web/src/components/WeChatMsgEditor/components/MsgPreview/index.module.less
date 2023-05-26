@@ -1,0 +1,46 @@
+.showcaseSection {
+  width: 274px;
+  height: 535px;
+  background-image: url("../../../../assets/images/phone.jpg");
+  background-size: 100% 100%;
+  padding: 100px 28px;
+  .msgContainer {
+    height: 330px;
+    overflow: auto; 
+  }
+}
+.msgItemWrap {
+  position: relative;
+  @avatarSpace: 30px;
+  padding-left: @avatarSpace;
+  margin-bottom: 8px;
+  min-height: 24px;
+  .userIcon {
+    position: absolute;
+    top: 4px;
+    left: 0px;
+    width: 24px;
+    color: #1890ff;
+    border-radius: 2px;
+  }
+  &.sendMsgItemWrap {
+    padding-left: 0px;
+    padding-right: @avatarSpace;
+    .userIcon {
+      left: unset;
+      right: 0px;
+    }
+  }
+  .msgContent {
+    background: #fff;
+    padding: 8px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
+  .app-msgContent {
+    padding-bottom: 0px;
+  }
+  &:nth-last-of-type(1) {
+    margin-bottom: 0px;
+  }
+}

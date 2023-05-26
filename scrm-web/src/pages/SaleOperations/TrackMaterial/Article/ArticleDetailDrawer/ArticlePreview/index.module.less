@@ -1,0 +1,35 @@
+@import "style/theme.less";
+.article-preview {
+  position: relative;
+  border-bottom: 1px solid #eaeaea;
+  min-height: 500px;
+  .article-header {
+    margin-bottom: 8px;
+    .article-title {
+      color: @heading-color;
+      font-size: 18px;
+      line-height: 22px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .article-info {
+      color: @text-color-secondary;
+      .article-info-text {
+        margin-right: 4px;
+        &:nth-last-of-type(1) {
+          margin-right: 0px;
+        }
+      }
+    }
+  }
+
+  .article-content {
+    color: @text-color;
+  }
+  .article-summary {
+    padding: 6px;
+    background: #fafafa;
+    margin-bottom: 6px;
+  }
+}

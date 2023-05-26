@@ -1,0 +1,63 @@
+@import "style/theme.less";
+.group-side {
+  background-color: @info-bg;
+  @header: 52px;
+  .group-side-header {
+    height: @header;
+    padding: 0px 32px 0px 12px;
+    line-height: @header;
+    position: relative;
+    border-bottom: 1px solid #eaeaea;
+  }
+  .group-side-title {
+    color: @heading-color;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .group-side-extra {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+  }
+  .add-btn {
+    color: @primary-color;
+    cursor: pointer;
+  }
+  .group-side-body {
+    height: calc(100vh - @header - 32px);
+    padding: 16px 10px;
+    overflow-y: auto;
+  }
+  .group-ul {
+    height: 100%;
+    overflow-y: auto;
+  }
+  .group-item {
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    &:nth-last-of-type(1) {
+      margin-bottom: 0px;
+    }
+    &.group-active-item {
+      background-color: @primary-color;
+      color: #fff;
+    }
+    &.group-has-actions {
+      position: relative;
+      padding-right: 24px;
+      .actions-icon {
+        position: absolute;
+        right: 6px;
+        top: 10px;
+      }
+    }
+    &:hover {
+      background-color: @primary-color;
+      color: #fff;   
+    }
+  }
+}

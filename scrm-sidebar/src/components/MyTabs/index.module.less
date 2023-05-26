@@ -1,0 +1,45 @@
+@import "style/theme.less";
+.tabs {
+  display: flex;
+  .tabs-nav {
+    width: 94px;
+    min-width: 94px;
+    height: 100%;
+    display: block;
+    white-space: nowrap;
+    border-right: 1px solid #eaeaea;
+  }
+  .nav-ul {
+    padding-left: 12px;
+    flex: 1;
+  }
+  .nav-item {
+    width: 100%;
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+    word-break: break-all;
+    white-space: break-spaces;
+    border-right: 2px solid transparent;
+    .bar-animated {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      width: 2px;
+      background-color: @primary-color;
+    }
+    &:hover {
+      color: @primary-color;
+    }
+    &.active {
+      cursor: pointer;
+      color: @primary-color;
+      border-color: @primary-color;
+    }
+  }
+  .panle-content {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

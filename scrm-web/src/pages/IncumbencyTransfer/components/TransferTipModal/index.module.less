@@ -1,0 +1,39 @@
+@import 'style/vars.less';
+.msg-actions {
+  position: absolute;
+  right: 0px;
+  .msg-action {
+    margin-right: 6px;
+    color:@primary-color;
+    cursor: pointer;
+    &[disabled] {
+      color:#ddd;
+      cursor: not-allowed;
+    }
+  }
+  .msg-action:nth-last-of-type(1) {
+    margin-right: 0px;
+  }
+}
+.msg-selection {
+  padding: 16px;
+  background: #f7f7f7;
+  .msg-content {
+    @size: 24px;
+    position: relative;
+    padding-left:  @size + 8px;
+    .user-avatar {
+      width:  @size;
+      height:  @size;
+      border-radius: 2px;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+    }
+    .msg-text {
+      background: #fff;
+      border-radius: 2px;
+      padding: 10px;
+    }
+  }
+}

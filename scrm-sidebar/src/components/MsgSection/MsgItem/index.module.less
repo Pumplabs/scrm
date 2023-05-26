@@ -1,0 +1,95 @@
+@import "style/theme.less";
+
+
+.msg-cell {
+  font-size: 12px;
+
+  .count-statics {
+    color: rgb(82, 196, 26);
+  }
+}
+
+.linkMsg-cell {
+  position: relative;
+  padding-left: 46px;
+  @coverSize: 40px;
+  min-height: @coverSize;
+
+  .linkMsg-cover {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+  }
+
+  .link-img {
+    width: @coverSize;
+    height: @coverSize;
+    border-radius: 2px;
+  }
+
+  .link-icon {
+    width: @coverSize;
+    height: @coverSize;
+    background: #ededed;
+    text-align: center;
+    line-height: @coverSize;
+    font-size: 24px;
+    border-radius: 2px;
+  }
+
+  .link-info {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .link-text {
+    white-space: nowrap;
+  }
+
+  .link-title {
+    color: @text-color;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .link-desc {
+    color: @text-color-secondary;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.imgCell {
+  .imgCell-img {
+    @size: 60px;
+    max-width: @size;
+    max-height: @size;
+  }
+}
+.app-cell {
+  .app-cover {
+    width: 60px;
+  }
+}
+.content-cell {
+  margin-bottom: 6px;
+}
+.content-cell:nth-last-of-type(1) {
+  margin-bottom: 0px;
+}
+.expand-btn {
+  color: @primary-color;
+  cursor: pointer;
+}
+.video-cell {
+  display: flex;
+  .video-icon {
+    padding-right: 12px;
+    font-size: 40px;
+  }
+  .video-name {
+    color: @heading-color;
+  }
+}

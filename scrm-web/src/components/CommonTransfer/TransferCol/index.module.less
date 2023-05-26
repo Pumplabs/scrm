@@ -1,0 +1,110 @@
+@import "style/theme.less";
+@import "style/vars.less";
+@borderColor: #eee;
+:global {
+  .ant-form-item-has-error {
+    .wy-transfer {
+      border-color: @error-color;
+      .ant-input-affix-wrapper-status-error {
+        border-color: @borderColor !important;
+      }
+      .ant-input-prefix {
+        color: @text-color !important;
+      }
+    }
+  }
+}
+.transferCol {
+  @borderColor: #eee;
+  border: 1px solid @borderColor;
+  border-radius: 4px;
+  width: calc(50% - 5px);
+  display: inline-block;
+  height: 100%;
+  background: #fff;
+
+  &:nth-of-type(1) {
+    margin-right: 5px;
+  }
+
+  &:nth-of-type(2) {
+    margin-left: 5px;
+  }
+
+  .transferHeader {
+    height: @headerHeight;
+    border-bottom: 1px solid @borderColor;
+    padding-left: 12px;
+    position: relative;
+  }
+
+  .transferTitle {
+    line-height: @headerHeight;
+  }
+
+  .transferExtra {
+    position: absolute;
+    max-width: 50%;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: @primary-color;
+  }
+
+  .transferContent {
+    overflow: auto;
+    height: 200px;
+    .list-item {
+      padding: 0px 12px;
+      height: 32px;
+      line-height: 32px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+
+      &:hover {
+        background: fade(@primary-color, 20%);
+
+        .removeIcon {
+          color: #666;
+        }
+      }
+
+      &.active-item {
+        background: fade(@primary-color, 20%);
+      }
+      &.right-list-item {
+        padding: 0px 20px 0px 10px;
+        border-bottom: 1px solid #eaeaea;
+      }
+    }
+
+    .itemName {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .removeIcon {
+      font-size: 12px;
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #999;
+    }
+
+    &.emptyContent {
+      padding-top: 20px;
+    }
+  }
+
+  .transferFooter {
+    border-top: 1px solid @borderColor;
+    // border-top: none;
+  }
+}

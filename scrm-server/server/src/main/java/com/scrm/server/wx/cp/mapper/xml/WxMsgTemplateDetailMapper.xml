@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxMsgTemplateDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxMsgTemplateDetail">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="mass_msg_id" property="massMsgId" />
+        <result column="staff_id" property="staffId" />
+        <result column="customer_id" property="customerId" />
+        <result column="send_status" property="sendStatus" />
+        <result column="ext_msg_id" property="extMsgId" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="deleted_at" property="deletedAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, mass_msg_id, staff_id, customer_id, send_status, ext_msg_id, created_at, updated_at, deleted_at
+    </sql>
+
+</mapper>

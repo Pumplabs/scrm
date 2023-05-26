@@ -1,0 +1,81 @@
+@import "style/theme.less";
+
+.advance-comp {
+  background: #fbfbfb;
+  border-radius: 2px;
+  border: 1px solid #ebebeb;
+  padding: 12px 12px 0px 12px;
+
+  .add-tag-btn {
+    font-size: 12px;
+    margin-right: 8px;
+  }
+}
+
+.tag-ele {
+  .tag-color();
+}
+.filter-item {
+  padding-left: 80px;
+  position: relative;
+
+  .filter-item-label {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    color: @text-color;
+    width: 80px;
+    text-align: right;
+
+    &::after {
+      content: ":";
+      padding: 0px 4px;
+    }
+  }
+
+  .filter-item-cotent {}
+
+  .filter-item-extra {
+    color: @text-color-secondary;
+    font-size: 12px;
+    padding-top: 8px;
+  }
+
+  margin-bottom: 16px;
+}
+
+.tagSelect {
+  position: relative;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  width: 220px;
+  height: 30px;
+  line-height: 28px;
+  background: #fff;
+  padding: 0px 30px 0px 12px;
+
+  .tagSelect-content {
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .tagSelect-placeholder {
+    color: @text-color-secondary;
+  }
+
+  .tagSelect-arrow {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: @text-color-secondary;
+  }
+
+  .tagSelect-clear {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: @text-color-secondary;
+  }
+}

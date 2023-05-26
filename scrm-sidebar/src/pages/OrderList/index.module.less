@@ -1,0 +1,50 @@
+@import "style/theme.less";
+
+.page {
+  @header: 48px;
+  background-color: #fff;
+  min-height: 100vh;
+  .page-body {
+    padding-top: @header;
+  }
+  .tabs-info {
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: @header;
+    z-index: 1;
+    width: 100%;
+    padding: 16px 0px @body-spacing 0px;
+    background-color: #fff;
+  }
+  .search-section {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    width: 100%;
+    background-color: @body-color;
+    height: @header;
+    padding: 8px;
+  }
+
+  .selected-ul-wrap {
+    padding: 0px @body-spacing @body-spacing @body-spacing;
+    :global {
+      .adm-list-body {
+        background-color: @info-bg;
+      }
+    }
+  }
+}
+
+.icon-wrap {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .add-icon-btn {
+    font-size: 32px;
+    color: @primary-color;
+  }
+}

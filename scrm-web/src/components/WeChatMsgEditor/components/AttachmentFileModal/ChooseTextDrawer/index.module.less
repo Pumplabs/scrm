@@ -1,0 +1,45 @@
+@import "style/theme.less";
+
+.list-item {
+  border: 1px solid #eaeaea;
+  margin-bottom: 10px;
+
+  &.list-item-active {
+    border: 1px solid @primary-color;
+  }
+
+  .list-item-header {
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-bottom: 1px solid #eaeaea;
+    padding: 4px 4px 4px 30px;
+    .list-item-radio {
+      position: absolute;
+      left: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-right: 0px;
+      z-index: 1;
+    }
+
+    .list-item-title {
+      word-break: keep-all;
+      white-space: nowrap;
+      color: @heading-color;
+      font-weight: 600;
+    }
+  }
+  .list-item-content {
+    padding: 6px 8px;
+  }
+}
+
+.text-item {
+  color: @text-color-secondary;
+  max-height: 90px;
+  overflow: hidden;
+  .paragraph-text {
+    color: @text-color-secondary;
+  }
+}

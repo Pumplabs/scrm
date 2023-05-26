@@ -1,0 +1,58 @@
+@import "style/theme.less";
+@posterWidth: 720px;
+@posterHeight: 1280px;
+@canvasRatio: 0.25;
+@imgWidth: 220px;
+.posterwh(@extrWidth: 0px, @extrHeight: 0px) {
+  width: @posterWidth * @canvasRatio + @extrWidth;
+  height: @posterHeight * @canvasRatio + @extrHeight;
+}
+.picturewh(@extrWidth: 0px, @extrHeight: 0px) {
+  width: @imgWidth + @extrWidth;
+  height: (@imgWidth * 9) / 16px + @extrHeight;
+}
+
+.list-item {
+  position: relative;
+  border: 1px solid #eaeaea;
+  border-radius: @border-radius-base;
+  overflow: hidden;
+  width: @imgWidth;
+  &.list-poster-item {
+    width: @posterWidth * @canvasRatio;
+  }
+  &.list-check-item {
+    .list-item-name {
+      background-color: fade(@primary-color, 5%);
+    }
+  }
+  .list-item-radio {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    z-index: 1;
+  }
+}
+
+.material-img-item {
+  width: @imgWidth + 2px;
+  &.material-poster-item {
+    width: @posterWidth * @canvasRatio + 2px;
+  }
+  .list-item-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-top: 1px solid @border-color;
+    padding: 2px 4px;
+    .list-item-name-text {
+      word-break: keep-all;
+      white-space: nowrap;
+    }
+  }
+}
+.img-item {
+  &.poster-img {
+   .posterwh();
+  }
+  .picturewh();
+}

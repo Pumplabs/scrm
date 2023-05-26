@@ -1,0 +1,68 @@
+@import "style/theme.less";
+
+.page {
+  @footerHeight: 50px;
+  .ios-padding(padding-bottom, @footerHeight);
+  // position: relative;
+  display: flex;
+  flex-direction: column;
+  // overflow: hidden;
+
+  .page-body {
+    flex: 1;
+  }
+
+  .page-footer {
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    .ios-padding(padding-bottom);
+    border-top: 1px solid #d9d9d9;
+    background-color: #fff;
+    .ios-padding(height, @footerHeight);
+    // bottom: env(safe-area-inset-bottom);
+    .menu-ul {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .menu-item {
+      flex: 1;
+      height: 100%;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      color: #BBBBBB;
+
+      &.menu-active-item,
+      &:hover {
+        color: @primary-color;
+        .workbench-icon {
+          path {
+            fill: @primary-color !important;
+          }
+        }
+      }
+      .workbench-icon {
+        width: 18px;
+        height: 18px;
+        margin: 0 auto;
+        path {
+          fill: #BBBBBB !important;
+        }
+      }
+      .menu-icon {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+
+      .menu-name {
+        font-size: 12px;
+        line-height: 12px;
+      }
+    }
+  }
+}

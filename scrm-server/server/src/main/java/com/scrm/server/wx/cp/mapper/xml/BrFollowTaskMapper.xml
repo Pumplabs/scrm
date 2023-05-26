@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrFollowTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.BrFollowTask">
+        <result column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="follow_id" property="followId" />
+        <result column="name" property="name" />
+        <result column="owner" property="owner" />
+        <result column="created_at" property="createdAt" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="finish_at" property="finishAt" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, follow_id, name, owner, created_at, deleted_at, finish_at
+    </sql>
+
+</mapper>

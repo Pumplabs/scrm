@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxGroupChatStatisticsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxGroupChatStatistics">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="ext_chat_id" property="extChatId" />
+        <result column="total" property="total" />
+        <result column="total" property="total" />
+        <result column="customer_num" property="customerNum" />
+        <result column="join_member_num" property="joinMemberNum" />
+        <result column="quit_member_num" property="quitMemberNum" />
+        <result column="active_member_num" property="activeMemberNum" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_date" property="createDate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, ext_chat_id, total, customer_num, join_member_num, quit_member_num, active_member_num, update_time, create_date
+    </sql>
+
+</mapper>

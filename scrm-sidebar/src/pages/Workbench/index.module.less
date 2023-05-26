@@ -1,0 +1,176 @@
+@import "style/theme.less";
+
+.index-section {
+  background-color: #f2f1f5;
+  .index-header {
+    background-color: @headerBgColor;
+    color: #fff;
+    padding: 18px 0px 14px 0px;
+    .coffee-icon {
+      width: 45px;
+      height: 45px;
+      margin-right: 24px;
+    }
+    .user-name-section {
+      font-size: 22px;
+      margin-bottom: 8px;
+      padding-left: 26px;
+    }
+    .date-info {
+      font-size: 16px;
+      line-height: 1;
+      text-align: center;
+    }
+    .week-date {
+      margin-right: 8px;
+    }
+  }
+  .index-body {
+    padding: @body-spacing;
+  }
+  .teamwork,.overview {
+    margin-bottom: 20px;
+  }
+  .teamwork-list {
+    :global {
+      .adm-list-body {
+        border-radius: @border-radius-base;
+      }
+    }
+  }
+  .actions-ul {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #fff;
+    padding: 14px 12px;
+    border-radius: @border-radius-base;
+    flex-wrap: wrap;
+    .action-item {
+      text-align: center;
+      cursor: pointer;
+      &.customer-action-item {
+        .action-item-icon-wrap {
+          background-color: #F0BF42;
+        }
+      }
+      &.group-action-item {
+        .action-item-icon-wrap {
+          background-color: @blue;
+        }
+      }
+      &.circle-action-item {
+        .action-item-icon-wrap {
+          background-color: #57A65B;
+        }
+      }
+      &.follow-action-item {
+        .action-item-icon-wrap {
+          background-color: #DD4377;
+        }
+      }
+      &.product-action-item {
+        .action-item-icon-wrap {
+          background-color: @green;
+        }
+      }
+      &.opp-action-item {
+        .action-item-icon-wrap {
+          background-color:@red;
+        }
+      }
+      &.order-action-item {
+        .action-item-icon-wrap {
+          background-color: @blue;
+        }
+      }
+    }
+    .action-item-icon-wrap {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+     
+      display: inline-block;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .action-item-icon {
+      width: 32px;
+      height: 32px;
+     
+    }
+    .action-item-name {
+      font-size: 12px;
+      line-height: 12px;
+      color: @heading-color;
+    }
+  }
+}
+
+.customer-stat-section {
+  background-color: #fff;
+  padding: 0px 12px;
+  border-radius: @border-radius-base;
+  .stat-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 14px 0px 20px 0px;
+  }
+  .stat-title {
+    color: #000;
+    font-size: 28px;
+    line-height: 28px;
+  }
+  .stat-count {
+    color: @primary-color;
+    font-size: 28px;
+    font-weight: 600;
+  }
+  .stat-section-body {
+    display: flex;
+    padding: 30px 0px 24px 0px;
+    .stat-item {
+      div {
+        display: inline-block;
+        text-align: center;
+      }
+      .stat-item-count {
+        font-size: 24px;
+        line-height: 24px;
+        margin-bottom: 22px;
+        font-weight: 600;
+      }
+      .stat-item-name {
+        color: @text-color-secondary;
+      }
+    }
+    .stat-increase-item {
+      flex: 1;
+      .stat-item-count {
+        color:#57A65B;
+      }
+    }
+    .stat-decrease-item {
+      .stat-item-count {
+        color: #F0BF42;
+      }
+    }
+  }
+}
+
+.stat-section {
+  .stat-section-header {
+    margin-bottom: 14px;
+  }
+}
+.market-section {
+  margin-bottom: 12px;
+}
+.sale-section {
+  // margin-bottom: 12px;
+}

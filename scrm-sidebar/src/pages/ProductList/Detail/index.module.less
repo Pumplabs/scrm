@@ -1,0 +1,76 @@
+@import "style/theme.less";
+.product-detail-page {
+  padding: @body-spacing;
+  background-color: #fff;
+  min-height: 100vh;
+  overflow-y: auto;
+  .product-base-info {
+    padding-top: 22px;
+  }
+  .product-header {
+    display: flex;
+    justify-content: space-between;
+    color: @heading-color;
+    font-weight: 600;
+    margin-bottom: 22px;
+    .product-name {
+      max-width: 60%;
+      word-break: break-all;
+    }
+    .product-price {
+      max-width: 40%;
+      padding-left: 12px;
+      word-break: break-all;
+    }
+  }
+  .coin-icon {
+    margin-right: 4px;
+  }
+  .product-category-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 26px;
+  }
+  .category-item {
+    color: @text-color-secondary;
+    background-color: @gray;
+    padding: 3px 13px;
+    display: inline-block;
+    border-radius: 4px;
+  }
+  .view-item {
+    color: @text-color-secondary;
+  }
+  .product-attrs {
+    margin-bottom: 22px;
+  }
+}
+.swiper-item {
+  height: 187px;
+  background-color: @info-bg;
+  text-align: center;
+  img {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.info-list {
+  .info-list-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    line-height: 22px;
+    margin-bottom: 18px;
+    &:nth-last-of-type(1) {
+      margin-bottom: 0px;
+    }
+  }
+  .info-list-item-name {
+    color: @heading-color;
+  }
+  .info-list-item-value {
+    color: @text-color-secondary;
+  }
+}

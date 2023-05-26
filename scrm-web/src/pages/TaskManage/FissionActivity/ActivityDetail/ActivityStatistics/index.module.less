@@ -1,0 +1,58 @@
+@import "style/theme.less";
+.cell-action {
+  color: @primary-color;
+  cursor: pointer;
+}
+.read-action {
+  color: fade(@primary-color, 50%);
+  cursor: not-allowed;
+}
+.invite-modal {
+  .data-section {
+    margin-bottom: 12px;
+    .data-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: @heading-color;
+      margin-bottom: 8px;
+    }
+  }
+  .data-section:nth-last-of-type(1) {
+    margin-bottom: 0px;
+  }
+  .invite-talbe {
+    :global {
+      .ant-table-title {
+        padding-top: 0px;
+      }
+    }
+  }
+  .invite-statics {
+    text-align: right;
+  }
+  .invite-statics-item {
+    margin-right: 10px;
+    &:nth-last-of-type(1) {
+      margin-right: 0px;
+    }
+    &.success {
+      .invite-statics-item-value {
+        color: @success-color;
+      }
+    }
+    &.fail {
+      .invite-statics-item-value {
+        color: @error-color;
+      }
+    }
+  }
+  .invite-statics-item-label::after {
+    content: ":";
+    padding: 0px 2px;
+  }
+  .invite-statics-item-value {
+    font-weight: 600;
+    font-size: 16px;
+    color: @primary-color;
+  }
+}

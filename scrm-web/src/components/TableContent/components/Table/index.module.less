@@ -1,0 +1,56 @@
+.table-toolbar {
+  text-align: right;
+}
+
+.table {
+  
+  &.table-notitle {
+    :global {
+      .ant-table-title {
+        display: flex;
+        padding: 0px 6px 20px 0px;
+      }
+    }
+  }
+  &.hasname-table {
+    :global {
+      .ant-table-title {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+
+  :global {
+    .ant-table-tbody, .ant-table-thead {
+      font-size: 14px;
+    }
+    .ant-table-cell-fix-right {
+      background-color: #fff !important;
+    }
+  }
+
+  .cell-action {
+    cursor: pointer;
+    color: @primary-color;
+    white-space: nowrap;
+    &.cell-disabled-action {
+      color: #999;
+      cursor: not-allowed;
+    }
+  }
+
+  .dropdownArrow {
+    color: @primary-color;
+    margin-left: 4px;
+    font-size: 12px;
+  }
+  .more-action {
+    color: @primary-color;
+    margin-left: 4px;
+  }
+}
+
+.actionMenuItem {
+  color: @primary-color;
+}

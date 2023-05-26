@@ -1,0 +1,1 @@
+export const CORP_ID = "xxxxxxxxxxxx"

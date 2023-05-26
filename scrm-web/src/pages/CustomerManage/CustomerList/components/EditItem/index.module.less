@@ -1,0 +1,23 @@
+@import "style/theme.less";
+
+.edit-item {
+  position: relative;
+  padding-right: 24px;
+  cursor: pointer;
+  display: inline-block;
+  word-break: break-all;
+
+  &:hover {
+    .edit-icon {
+      display: block;
+      color: @primary-color;
+    }
+  }
+
+  .edit-icon {
+    display: none;
+    position: absolute;
+    right: 4px;
+    top: 4px;
+  }
+}

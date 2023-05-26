@@ -1,0 +1,44 @@
+.company-tab {
+  .list-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 20px;
+    position: relative;
+
+    &.count-1 {
+      padding-right: 22px;
+    }
+    &.count-2 {
+      padding-right: 32px;
+    }
+
+    &.count-3 {
+      padding-right: 32px;
+    }
+
+    &.count-4 {
+      padding-right: 42px;
+    }
+
+    .group-count {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      font-size: 12px;
+
+      &::before {
+        content: "(";
+        margin-right: 2px;
+      }
+
+      &::after {
+        content: ")";
+        margin-left: 2px;
+      }
+    }
+
+    .group-name {
+      word-break: keep-all;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+@import "style/theme.less";
+
+.color(@color, @bgColor: fade(@color, 38%)) {
+  background-color: @bgColor;
+  border-color: @color;
+  color: @color;
+}
+.status-item {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 14px;
+  line-height: 14px;
+  border-radius: 10px;
+  border: 1px solid #fff;
+  color: #fff;
+  &.sale-status {
+    .color(@green);
+  }
+  &.off-status {
+    .color(@yellow);
+  }
+  &.draft-status {
+    .color(@tip-color, @gray);
+  }
+}

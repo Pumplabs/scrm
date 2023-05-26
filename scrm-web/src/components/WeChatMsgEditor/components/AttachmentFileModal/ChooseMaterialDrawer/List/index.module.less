@@ -1,0 +1,41 @@
+.list {
+  position: relative;
+  padding-bottom: 32px;
+
+  .list-content {
+    overflow-y: auto;
+  }
+
+  .input {
+    margin-bottom: 12px;
+  }
+
+  .list-pager {
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    width: 100%;
+    background-color: #fff;
+    text-align: right;
+  }
+}
+
+:global {
+  .my-material-drawer-list {
+
+    .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper,
+    .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper:hover {
+      border-color: @borderColor  !important;
+    }
+
+    .ant-input-affix-wrapper-status-error:not(.ant-input-affix-wrapper-disabled):not(.ant-input-affix-wrapper-borderless).ant-input-affix-wrapper {
+      box-shadow: 0 0 0 2px fade(@primary-color, 20%);
+    }
+
+    .ant-input-prefix {
+      color: @text-color  !important;
+    }
+  }
+
+
+}

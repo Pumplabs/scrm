@@ -1,0 +1,58 @@
+@import "style/theme.less";
+
+.todo-item {
+  .todo-item-header {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    position: relative;
+    padding-right: 80px;
+    .todo-type {
+      display: inline-block;
+      color: #fff;
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      padding: 0px 12px;
+      font-size: 12px;
+      border-radius: 4px;
+      line-height: 22px;
+      font-weight: 400;
+      &.todo-customer-type {
+        @color: #F0BF42;
+        background-color: fade(@color, 70%);
+      }
+      &.todo-group-type {
+        background-color: fade(#57A65B, 70%);
+      }
+      &.todo-opp-type {
+        background-color: fade(#57A65B, 70%);
+      }
+    }
+    .task-name {
+      color: #000;
+    }
+  }
+  .todo-item-footer {
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.info-item {
+  display: inline-block;
+  color: @text-color-secondary;
+  font-size: 12px;
+  .info-label {
+    &::after {
+      content: ":";
+      color: @text-color-secondary;
+      margin: 0px 2px;
+    }
+    margin-right: 4px;
+  }
+
+  .info-content {
+    display: inline-block;
+  }
+}

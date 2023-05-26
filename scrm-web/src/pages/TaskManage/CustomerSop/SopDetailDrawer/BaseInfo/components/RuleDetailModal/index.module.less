@@ -1,0 +1,33 @@
+@import "style/theme.less";
+
+.execute-stat {
+  height: 32px;
+
+  .stat-name {
+    float: left;
+  }
+
+  .stat-content {
+    float: right;
+  }
+
+  .result-item {
+    display: inline-block;
+    margin-right: 8px;
+
+    &:nth-last-of-type(1) {
+      margin-right: 0px;
+    }
+
+    .result-item-name {
+      margin-right: 6px;
+    }
+
+    .result-item-count {
+      font-family: 'HarmonyBold';
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0px 2px;
+    }
+  }
+}

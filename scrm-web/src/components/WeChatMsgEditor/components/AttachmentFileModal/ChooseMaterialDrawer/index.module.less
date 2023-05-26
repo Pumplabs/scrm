@@ -1,0 +1,19 @@
+@import "style/theme.less";
+
+.material-tabs {
+  :global {
+    .ant-tabs-nav {
+      &::before {
+        border: none;
+      }
+    }
+  }
+}
+
+
+.list-content {
+  // 抽屉顶部：55， 底部54，padding: 28 tabs: 46 tabs-marginBottom: 16 radio: 22
+  @outside: 55px+54px+28px+46px+16+22px+40px+60px;
+  height: calc(100vh - @outside);
+  overflow-y: auto;
+}

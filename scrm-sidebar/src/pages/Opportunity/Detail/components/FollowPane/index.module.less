@@ -1,0 +1,35 @@
+@import "style/theme.less";
+
+.follow-infinite-list {
+  padding: 0px;
+}
+
+.follow-infinite-item {
+  &:nth-of-type(1) {
+    // padding-top: 0px;
+    :global {
+      .adm-list-item-content-main {
+        padding-top: 0px;
+      }
+    }
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  .user-avatar {
+    margin-right: 4px;
+  }
+}
+
+.follow-item-header {
+  display: flex;
+  justify-content: space-between;
+  .follow-time {
+    display: inline-block;
+    max-width: 40%;
+    word-break: break-all;
+  }
+}

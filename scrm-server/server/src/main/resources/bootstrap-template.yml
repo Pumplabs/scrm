@@ -1,0 +1,235 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    druid:
+      url: ####数据库连接
+      username:  ####
+      password:  ####
+      # 初始连接数
+      initialSize: 5
+      # 最小连接池数量
+      minIdle: 10
+      # 最大连接池数量
+      maxActive: 20
+      # 配置获取连接等待超时的时间
+      maxWait: 60000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 配置一个连接在池中最大生存的时间，单位是毫秒
+      maxEvictableIdleTimeMillis: 900000
+      # 配置检测连接是否有效
+      validationQuery: select 'x'
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      webStatFilter:
+        enabled: true
+      statViewServlet:
+        enabled: true
+        # 设置白名单，不填则允许所有访问
+        allow:
+        url-pattern: /druid/*
+      filter:
+        stat:
+          enabled: true
+          # 慢SQL记录
+          log-slow-sql: true
+          slow-sql-millis: 1000
+          merge-sql: true
+        wall:
+          config:
+            multi-statement-allow: true
+
+  # 文件上传
+  servlet:
+    multipart:
+      # 单个文件大小
+      max-file-size: 10MB
+      # 设置总上传的文件大小
+      max-request-size: 20MB
+  
+  rabbitmq:
+    host: #### server ip
+    port: #### 5672
+    username: ####username
+    password: ####username
+    # 是否开启
+    listener:
+      type: simple
+      simple:
+        auto-startup: true
+        retry:
+          enabled: true
+          max-attempts: 5 # 重试次数
+          max-interval: 10000 # 重试最大间隔时间
+          initial-interval: 2000 # 初始重试间隔时间
+          multiplier: 2 # 间隔时间乘子，间隔时间 * 乘子 = 下一次的间隔时间
+# 开发环境配置
+server:
+  servlet:
+    # 应用的访问路径
+    context-path: /api
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+    threads:
+      # tomcat最大线程数，默认为200
+      max: 800
+      # Tomcat启动初始化的线程数，默认值25
+      min-spare: 30
+
+# redis
+redis:
+  ip: ####redis://ip
+  host: ####
+  port: ####
+  password: ####
+# 腾讯云
+tq:
+  cos:
+    # 改了存储桶要改企微应用宝那里海报文件夹的权限为私有写公有读，新增默认是私有读，会读不到海报的
+    bucket: ####
+    secretId: ####
+    secretKey: ####
+    region: ####
+    queueId: ####
+# 日志配置
+logging:
+  level:
+    com.scrm: debug
+    org.springframework: warn
+
+# PageHelper分页插件
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+  params: count=countSql
+
+# Swagger配置
+swagger:
+  # 是否开启swagger
+  enabled: true
+  # 请求前缀
+  pathMapping:
+
+# 防止XSS攻击
+xss:
+  # 过滤开关
+  enabled: true
+  # 排除链接（多个用逗号分隔）
+  excludes: /system/notice
+  # 匹配链接
+  urlPatterns: /system/*,/monitor/*,/tool/*
+
+# mybatisplus配置
+mybatis-plus:
+  mapper-locations: classpath:/com/scrm/server/wx/cp/mapper/xml/*.xml
+  type-aliases-package: com.scrm.server
+  global-config:
+    db-config:
+      logic-delete-field: flag  # 全局逻辑删除的实体字段名(since 3.3.0,配置后可以忽略不配置步骤2)
+      logic-delete-value: now(6) # 逻辑已删除值
+      logic-not-delete-value: 'null' # 逻辑未删除值
+
+
+
+# 可信域名
+domainName: ####
+# api 代理，填写企微白名单ip，方便调试，生产环境换成企微接口的url https://qyapi.weixin.qq.com
+baseApiUrl: ####
+# 项目相关配置
+scrm:
+  # * 企业ID，https://work.weixin.qq.com/wework_admin/frame#profile
+  extCorpID: ####
+  # 企业名称
+  corpName: #### BlueFlower
+  # * 企业微信通讯录API Secret https://work.weixin.qq.com/wework_admin/frame#apps/contactsApi
+  contactSecret: ####
+  # * 企业微信客户联系API Secret https://work.weixin.qq.com/wework_admin/frame#customer/analysis
+  customerSecret: ####
+  # * 企业自建主应用ID https://work.weixin.qq.com/wework_admin/frame#apps
+  mainAgentID: ####
+  # * 企业自建主应用Secret
+  mainAgentSecret: ####
+  # * 客户联系的回调token，下面那个长度超限制
+  shortCallbackToken: ####
+  # * 客户联系的回调AesKey
+  customerAesKey: ####
+  # * 同步通讯录回调地址的token，客户联系共用此配置，https://work.weixin.qq.com/wework_admin/frame#apps/contactsApi，https://work.weixin.qq.com/wework_admin/frame#customer/analysis
+  callbackToken: ####
+  # * 同步通讯录回调地址的AesKey, 客户联系共用此配置
+  callbackAesKey: ####
+
+  # 微信开放平台的appId
+  mpAppId: #####
+  # 微信开放平台的密钥
+  mpAppSecret: ####
+  # 微信开放平台的token
+  mpAppToken: ####
+  # 微信开放平台的AesKey
+  mpAppAesKey: ####
+
+  # 名称
+  name: max-scrm-server
+  # 版本
+  version: 0.8.2
+  # 版权年份
+  copyrightYear: 2022
+  # 实例演示开关
+  demoEnabled: true
+  # 获取ip地址开关
+  addressEnabled: false
+  # 前端登录回调地址
+  loginRedirectUrl: /scrm-wx-cp/api/staff-login/login-callback
+  # 客户详情地址
+  customerDetailUrl: /sidebar/customerDetail
+  #群欢迎语
+  groupChatWelcomeUrl: /sidebar/groupWelComeTip?wid=
+  # 轨迹素材地址
+  mediaInfoUrl: /preview.html
+  # 销售日报地址
+  saleReportUrl: /sidebar/saleReport?id=
+  # 企微应用宝，参与活动地址
+  fissionEventUrl: /h5-poster
+  # windows上传文件保存路径
+  windowsFilePath: #### D:\scrm\
+  # linux上传文件保存路径
+  linuxFilePath: #### /data/scrm/
+  # 文件下载地址
+  downloadUrl: /api/common/downloadByFileId
+  # 临时授权回调
+  tempAuthCallbackUrl: /auth-success.html
+  # 登录回调
+  loginCallback: /app/login-middle
+  # 登录方式
+  loginType: member
+  # 跟进的地址
+  followDetailUrl: /sidebar/followDetail
+
+
+#xxl-job配置
+xxl:
+  job:
+    accessToken: ####
+    admin:
+      addresses: ####http://xxxx:xxxx/xxl-job-admin
+      username: ####
+      password: ####
+    executor:
+      # 执行器名称
+      appname: scrm-job-executor
+      # 执行器注册地址
+      address:
+      ip:
+      port: 9999
+      # 任务执行日志存放地址
+      logpath: #### /var/log/scrm/xxl-job/jobhandler
+      # 日志保留时间
+      logretentiondays: 30

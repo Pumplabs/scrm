@@ -1,0 +1,59 @@
+@import "style/theme.less";
+
+.data-overview {
+  .data-index-section {
+    .count-item {
+      font-family: 'HarmonyBold';
+      color: @heading-color;
+      font-weight: 600;
+      font-size: 20px;
+    }
+
+    margin-bottom: 20px;
+  }
+
+  .radio-group {
+    margin-right: 12px;
+  }
+
+  .time-item-label {
+    margin-right: 4px;
+
+    &::after {
+      content: ":";
+      display: inline-block;
+      margin: 0px 4px;
+    }
+  }
+
+  .time-item {
+    display: inline-block;
+  }
+
+  .detail-actions {
+    margin-bottom: 12px;
+    position: relative;
+  }
+  .detail-export-btn {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.data-section {
+  margin-bottom: 20px;
+
+  &:nth-last-of-type(1) {
+    margin-bottom: 0px;
+  }
+
+  .data-section-title {
+    color: @heading-color;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+}

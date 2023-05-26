@@ -1,0 +1,39 @@
+@import "style/theme.less";
+
+.desc-item {
+  @labelWidth: 80px;
+  @height: 22px;
+  margin-bottom: 12px;
+  min-height: @height;
+  &.inline-mode {
+    position: relative;
+    padding-left: @labelWidth;
+    .desc-item-label {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      width: @labelWidth;
+      text-align: right;
+      line-height: @height;
+      &::after {
+        content: ":";
+        padding: 0px 4px;
+      }
+    }
+    .desc-item-content {
+      padding-left: 8px;
+    }
+  }
+
+  .desc-item-label {
+    color: @text-color-secondary;
+  }
+
+  .desc-item-content {
+    min-height: @height;
+  }
+
+  &:nth-last-of-type(1) {
+    margin-bottom: 0px;
+  }
+}

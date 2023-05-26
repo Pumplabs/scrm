@@ -1,0 +1,39 @@
+.wrapList {
+  overflow-y: auto;
+
+}
+.list {
+  :global {
+    .adm-list-body {
+      border-top-color: transparent;
+      background: none;
+    }
+  }
+}
+.list-item {
+  padding-left: 0px;
+  &:nth-of-type(1) {
+    border-top-color: transparent;
+  }
+  :global {
+    .adm-list-item-content {
+      padding-right: 0px;
+    }
+    .adm-list-item-content-main {
+      overflow: hidden;
+    }
+  }
+}
+.empty-result {
+  padding-top: 60px;
+}
+.placeholder {
+  padding: 24px;
+  text-align: center;
+  color: var(--adm-color-weak);
+
+  .loadingWrapper {
+    font-size: 24px;
+    margin-bottom: 0px;
+  }
+}

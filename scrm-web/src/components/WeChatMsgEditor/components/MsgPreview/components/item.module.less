@@ -1,0 +1,81 @@
+.linkItem {
+  overflow: hidden;
+
+  .linkName {
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .linkContext {
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    position: relative;
+    padding-right: 46px;
+    height: 40px;
+  }
+
+  .linkCover {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: 40px;
+    height: 40px;
+  }
+
+}
+
+.miniAppItem {
+  .appTitle {
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .miniAppContent {
+    padding-bottom: 4px;
+  }
+
+  .miniAppHeader {
+    margin-bottom: 4px;
+    position: relative;
+    padding-left: 26px;
+    color: #999;
+  }
+  .appLogo {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+  }
+  .appFooter {
+    line-height: 26px;
+    border-top: 1px solid #eaeaea;
+    padding-left: 20px;
+    position: relative;
+  }
+  .appIcon {
+    width: 14px;
+    margin-right: 8px;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0px;
+  }
+  .miniAppCover {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}

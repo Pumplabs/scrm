@@ -1,0 +1,35 @@
+@import "style/theme.less";
+.detail-card {
+  padding: 0px @body-spacing @body-spacing @body-spacing;
+  .detail-card-title {
+    color: @heading-color;
+    font-weight: 600;
+  }
+ .detail-card-header {
+   text-align: center;
+   position: sticky;
+   top: 0px;
+   z-index: 1;
+   left: 0px;
+   padding: @body-spacing;
+   line-height: 20px;
+   background-color: @body-color;
+ }
+ .left-action {
+   position: absolute;
+   left: 0px;
+   top: 50%;
+   transform: translateY(-50%);
+   font-size: 16px;
+   cursor: pointer;
+ }
+ .right-action {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+ }
+ .detail-card-body {
+   background: #fff;
+ }
+}

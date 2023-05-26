@@ -1,0 +1,30 @@
+@import "style/theme.less";
+@breadcrumbHeight: 22px + 16px + 10px;
+.pageContent {
+  .breadcrumb {
+    line-height: @breadCrumbHeight;
+  }
+  .breadcrumb-section {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    font-size: 22px;
+    line-height: 22px;
+    font-weight: 500;
+    color: @heading-color;
+  }
+  .breadcrumb-section-with-backBtn {
+    padding-left: 30px;
+  }
+  .backBtn {
+    position: absolute;
+    left: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+  &.pageContent-with-breadcrumb {
+    padding-top:@breadcrumbHeight;
+    position: relative;
+  }
+}

@@ -1,0 +1,33 @@
+@import "style/theme.less";
+.table-footer {
+  background-color: @info-bg;
+  padding: 10px;
+  display: inline-block;
+  width: 320px;
+  .info-item {
+    margin-bottom: 12px;
+    .info-item-name {
+      margin-right: 8px;
+      color: @heading-color;
+      display: inline-block;
+      width: 120px;
+      text-align: right;
+      &::after {
+        content: ":";
+        display: inline-block;
+        margin: 0px 4px;
+      }
+    }
+    .info-item-content {
+      color: @text-color;
+      display: inline-block;
+    }
+  }
+}
+.product-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  .product-item-text {
+    white-space: nowrap;
+  }
+}

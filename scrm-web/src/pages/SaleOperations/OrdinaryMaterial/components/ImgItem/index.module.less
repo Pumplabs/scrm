@@ -1,0 +1,120 @@
+@import "style/theme.less";
+@posterWidth: 720px;
+@posterHeight: 1280px;
+@imgWidth: 260px;
+
+.img-ele {
+  width: @imgWidth;
+  height: (@imgWidth * 9) / 16px;
+  @posterRatio: 0.4;
+  &.poster-img {
+    width: @posterWidth * @posterRatio;
+    height: @posterHeight * @posterRatio;
+  }
+  @media screen and (max-width:1280px) {
+    @posterRatio: 0.35;
+
+    &.poster-img {
+      width: @posterWidth * @posterRatio;
+      height: @posterHeight * @posterRatio;
+    }
+  }
+}
+
+.img-item {
+  width: @imgWidth + 2px;
+  border: 1px solid #eaeaea;
+  cursor: pointer;
+  @posterRatio: 0.4;
+  &.img-poster-item {
+    width: @posterWidth * @posterRatio + 2px;
+  }
+  @media screen and (max-width:1280px) {
+    @posterRatio: 0.35;
+
+    &.img-poster-item {
+      width: @posterWidth * @posterRatio + 2px;
+    }
+  }  
+}
+
+.item-footer {
+  border-top: 1px solid #eaeaea;
+  padding: 6px 8px;
+
+  .item-name {
+    color: @heading-color;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .basic-info {
+    padding: 0px 40px 0px 36px;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .user-icon {
+      border-radius: 50%;
+      position: absolute;
+      left: 0px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .right-actions {
+      position: absolute;
+      right: 0px;
+      bottom: 0px;
+    }
+
+    .user-name {
+      color: #000;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .user-info {
+      display: inline-block;
+      margin-right: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+      vertical-align: bottom;
+    }
+
+    .create-time {
+      font-size: 12px;
+    }
+
+    .action-ele:hover {
+      color: @primary-color;
+      cursor: pointer;
+    }
+
+    .edit-action {
+      margin-right: 4px;
+      &:hover {
+        color: @primary-color;
+      }
+    }
+    .remove-action {
+      &:hover {
+        color: @primary-color;
+      }
+    }
+
+    .send-stat {
+      color: @heading-color;
+      font-size: 12px;
+    }
+
+    .send-icon {
+      margin-right: 4px;
+    }
+  }
+}

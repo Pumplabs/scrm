@@ -1,0 +1,44 @@
+@import "style/theme.less";
+
+.rule-result {
+  .result-count {
+    font-family: 'HarmonyBold';
+    font-size: 18px;
+    padding: 0px 2px;
+  }
+
+  .detail-action {
+    color: @primary-color;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+
+  .info-label {
+    color: @text-color-secondary;
+    margin-right: 4px;
+    font-size: 12px;
+    &::after {
+      content: ":";
+      padding: 0px 4px;
+      color: @text-color-secondary;
+    }
+  }
+  .result-icon {
+    margin-right: 4px;
+  }
+
+  .success-icon {
+    color: @success-color;
+  }
+
+  .warning-icon {
+    color: @warning-color;
+  }
+
+  .fail-icon {
+    color: @error-color;
+  }
+  .separator-code {
+    margin: 0px 2px;
+  }
+}

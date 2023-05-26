@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrTodoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.BrTodo">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="create_time" property="createTime" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="update_time" property="updateTime" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="business_id" property="businessId" />
+        <result column="status" property="status" />
+        <result column="type" property="type" />
+        <result column="creator" property="creator" />
+        <result column="owner_ext_id" property="ownerExtId" />
+        <result column="business_id1" property="businessId1" />
+        <result column="deadline_time" property="deadlineTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, create_time, ext_corp_id, update_time, deleted_at, business_id, status, type, creator, owner_ext_id, business_id1, deadline_time
+    </sql>
+
+</mapper>

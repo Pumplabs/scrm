@@ -1,0 +1,33 @@
+@import "style/theme.less";
+
+.moment-item {
+  background-color: #fff;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  padding: 12px 16px;
+  &.moment-item-with-footer {
+    .moment-item-body {
+      margin-bottom: 12px;
+    }
+  }
+  .moment-tag {
+    display: inline-block;
+    line-height: 26px;
+    padding: 0px 16px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .moment-item-header {
+    position: relative;
+    .moment-item-extra {
+      position: absolute;
+      right: 0px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+  .moment-item-desc {
+    margin-bottom: 14px;
+  }
+}

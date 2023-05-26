@@ -1,0 +1,46 @@
+@import 'style/theme.less';
+
+@userSideBar: 60px;
+@menuSideBar: 240px;
+@menuCollapsedBar: 80px;
+
+.layout {
+  .layout-side {
+    width: @userSideBar + @menuSideBar;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    height: 100vh;
+    display: flex;
+    z-index: 1;
+    border-right: 1px solid #eaeaea;
+  }
+  &.need-userside {
+    padding-left: @userSideBar;
+    .layout-side {
+      width: @userSideBar;
+    }
+  }
+  &.need-userside.need-menuside {
+    padding-left: @userSideBar + @menuSideBar;
+    .layout-side {
+      width: @userSideBar + @menuSideBar;
+    }
+  }
+
+  .layout-content-wrap {
+    padding: 16px;
+  }
+
+  .layout-content {
+    background: #fff;
+  }
+}
+
+.layout-collapsed {
+  padding-left: @userSideBar + @menuCollapsedBar;
+
+  .layout-side {
+    width: @userSideBar + @menuCollapsedBar;
+  }
+}

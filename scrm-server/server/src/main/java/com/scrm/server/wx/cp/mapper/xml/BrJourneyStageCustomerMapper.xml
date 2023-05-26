@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrJourneyStageCustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.BrJourneyStageCustomer">
+        <id column="id" property="id" />
+        <result column="customer_ext_id" property="customerExtId" />
+        <result column="journey_stage_id" property="journeyStageId" />
+        <result column="creator" property="creator" />
+        <result column="created_at" property="createdAt" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="ext_corp_id" property="extCorpId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, customer_ext_id, journey_stage_id, creator, created_at, deleted_at, ext_corp_id
+    </sql>
+
+    <select id="pageList" resultType="com.scrm.server.wx.cp.entity.BrJourneyStageCustomer">
+        select sc.*
+        from br_journey_stage_customer sc
+        join br_journey_stage s on sc.journey_stage_id = s.id and s.deleted_at is null
+        join wx_customer c on c.ext_id = sc.customer_ext_id and c.has_delete is not null
+        where sc.deleted_at is null
+        <if test="dto.extCorpId != null and dto.extCorpId != ''">
+            and sc.ext_corp_id = #{dto.extCorpId}
+        </if>
+        <if test="dto.journeyId != null and dto.journeyId != ''">
+            and s.journey_id = #{dto.journeyId}
+        </if>
+        <if test="dto.journeyStageId != null and dto.journeyStageId != ''">
+            and s.id = #{dto.journeyStageId}
+        </if>
+        <if test="dto.journeyStageName != null and dto.journeyStageName != ''">
+            and s.name = concat('%',#{dto.journeyStageName},'%')
+        </if>
+        order by sc.created_at desc
+    </select>
+    <select id="queryList" resultType="com.scrm.server.wx.cp.entity.BrJourneyStageCustomer">
+        select sc.*
+        from br_journey_stage_customer sc
+        join br_journey_stage s on sc.journey_stage_id = s.id and s.deleted_at is null
+        join wx_customer c on c.ext_id = sc.customer_ext_id and c.has_delete is not null
+        where sc.deleted_at is null
+        <if test="extCorpId != null and extCorpId != ''">
+            and sc.ext_corp_id = #{extCorpId}
+        </if>
+        <if test="journeyId != null and journeyId != ''">
+            and s.journey_id = #{journeyId}
+        </if>
+        <if test="journeyStageId != null and journeyStageId != ''">
+            and s.id = #{journeyStageId}
+        </if>
+        <if test="customerId != null and customerId != ''">
+            and c.id = #{customerId}
+        </if>
+        order by sc.created_at desc
+    </select>
+
+</mapper>

@@ -1,0 +1,24 @@
+@import "style/theme.less";
+
+.select-option {
+  @avatarSize: 32px;
+  position: relative;
+  padding: 0px 0px 8px @avatarSize + 6px;
+  border-bottom: 1px solid #eaeaea;
+  line-height: 1;
+
+  .user-avatar {
+    width: @avatarSize;
+    height: @avatarSize;
+    border-radius: 3px;
+    position: absolute;
+    left: 0px;
+  }
+
+  .user-depName {
+    font-size: 12px;
+    font-weight: 400;
+    color: @text-color;
+    margin-top: 8px;
+  }
+}

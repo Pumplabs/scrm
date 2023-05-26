@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrJourneyStageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.BrJourneyStage">
+        <id column="id" property="id" />
+        <result column="journey_id" property="journeyId" />
+        <result column="name" property="name" />
+        <result column="remark" property="remark" />
+        <result column="sort" property="sort" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="creator" property="creator" />
+        <result column="editor" property="editor" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="ext_corp_id" property="extCorpId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, journey_id, name, remark, sort, created_at, updated_at, creator, editor, deleted_at, ext_corp_id
+    </sql>
+
+    <select id="getStatisticsInfo" resultType="com.scrm.server.wx.cp.vo.BrJourneyStageStatisticsInfoVO">
+        select j.id, j.journey_id, j.name, j.remark, j.sort, COUNT(c.id) customer_num
+        from br_journey_stage j
+        join br_journey_stage_customer c on j.ext_corp_id = c.ext_corp_id  and  j.id = c.journey_stage_id and c.deleted_at is null
+        join wx_customer wc on wc.ext_id = c.customer_ext_id and wc.has_delete is not null
+        where j.deleted_at is null
+          and j.journey_id = #{journeyId}
+          and j.ext_corp_id  = #{extCorpId}
+        group by j.id
+        order by j.sort
+    </select>
+
+</mapper>

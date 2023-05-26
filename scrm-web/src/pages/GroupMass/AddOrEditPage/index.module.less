@@ -1,0 +1,101 @@
+@import "style/theme.less";
+
+.add-page {
+  @preViewWidth: 300px;
+  background: #fff;
+  padding: 24px 16px 16px 16px;
+  border-radius: 6px;
+
+  .page-header {
+    height: 48px;
+    font-size: 16px;
+    color: @heading-color;
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 16px;
+    margin-right: @preViewWidth;
+    font-weight: 600;
+  }
+
+  .form-section {
+    padding-right: @preViewWidth;
+  }
+
+  .look-action {
+    cursor: pointer;
+    color: @primary-color;
+  }
+
+  .add-page-footer {
+    padding: 16px 0px;
+    text-align: center;
+    border-top: 1px solid #eee;
+  }
+
+  .cancel-btn {
+    margin-right: 12px;
+  }
+
+  .operationProcess {
+    padding: 20px;
+    background-color: #fbfbfb;
+    border-radius: 4px;
+    margin-bottom: 16px;
+
+    .process-header {
+      position: relative;
+      height: 30px;
+    }
+
+    .process-name {
+      font-size: 16px;
+      color: @heading-color;
+    }
+
+    .process-extra {
+      position: absolute;
+      right: 0px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+    }
+
+    .process-body {
+      color: @text-color-secondary;
+    }
+
+    .expand-process-example {
+      transition: all 0.2s;
+      height: 320px;
+    }
+
+    .hide-process-example {
+      transition: all 0.2s;
+      height: 0;
+    }
+
+    .process-expand-icon {
+      transform: rotate(180deg);
+      transition: all 0.2s;
+    }
+
+    .process-hide-icon {
+      transform: rotate(0deg);
+      transition: all 0.2s;
+    }
+  }
+
+  // .sendAccount {
+  //   padding: 0px 4px;
+
+  //   &::before {
+  //     content: "[";
+
+  //     padding-right: 2px;
+  //   }
+
+  //   &::after {
+  //     content: "]";
+  //     padding-left: 2px;
+  //   }
+  // }
+}

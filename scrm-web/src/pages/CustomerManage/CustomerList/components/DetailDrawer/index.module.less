@@ -1,0 +1,31 @@
+@import "style/theme.less";
+
+.edit-tag-action {
+  cursor: pointer;
+  color: @primary-color;
+}
+
+.journey-item {
+  margin-bottom: 12px;
+
+  .journey-item-name {
+    font-weight: 500;
+    color: @heading-color;
+    font-size: 14px;
+    margin-right: 6px;
+  }
+}
+
+.customer-remark {
+  color: @text-color;
+
+  .remark-label {
+    margin-right: 4px;
+  }
+
+  .remark-tag {
+    white-space: break-spaces;
+    word-break: break-all;
+    .tag-color();
+  }
+}

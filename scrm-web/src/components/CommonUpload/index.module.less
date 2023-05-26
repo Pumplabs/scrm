@@ -1,0 +1,37 @@
+
+@import "style/theme.less";
+
+:global {
+  .ant-form-item-has-error {
+    .wy-upload {
+      border-color: @error-color;
+    }
+    .wx-upload-img-btn {
+      border-color: @error-color;
+    }
+    .ant-upload.ant-upload-select-picture-card {
+      border-color: @error-color;
+    }
+  }
+}
+
+.upload {
+}
+.upload-picture-inline {
+.editTextBtn {
+  color: #1890ff;
+}
+ :global {
+   .ant-upload-list-item {
+     padding: 0px;
+   }
+  .ant-upload-list-picture-card-container + .ant-upload-select-picture-card {
+    width: auto;
+    vertical-align: bottom;
+    background: none;
+    border: none;
+    padding-top: 86px;
+    line-height: 0px;
+  }
+ }
+} 

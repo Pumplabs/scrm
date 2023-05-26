@@ -1,0 +1,73 @@
+.attchmentList {
+  .mediaItem {
+    position: relative;
+    padding: 0px 20px 0px (14px + 12px);
+    line-height: 30px;
+    min-height: 30px;
+    border-bottom: 1px solid #d9d9d9;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .mediaItem:nth-last-of-type(1) {
+    margin-bottom: 0;
+  }
+
+  // 操作按钮
+  .mediaAction {
+    cursor: pointer;
+    position: absolute;
+    top: 8px;
+    color: @primary-color;
+  }
+  .removeIcon {
+    left: 12px;
+  }
+
+  .editIcon {
+    right: 4px;
+  }
+   
+  .typeName {
+    &::before {
+      content: "【";
+      display: inline-block;
+    }
+    &::after {
+      content: "】";
+      display: inline-block;
+    }
+  }
+  .prefixLabel {
+    // position: absolute;
+    // left: 26px;
+    &::after {
+      content: ":";
+      display: inline-block;
+      padding: 0px 4px;
+    }
+  }
+  .content {
+    word-break: break-all;
+  }
+}
+.attchmentContainer {
+  .actionBar {
+    // border-bottom: 1px solid #eee;
+    line-height: 30px;
+    padding-left: 12px;
+    color: @primary-color;
+
+    .addIcon {
+      margin-right: 4px;
+    }
+  }
+}
+
+.attchment-toolbar {
+  padding: 10px;
+  .link-btn {
+    color: @primary-color;
+  }
+}

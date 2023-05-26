@@ -1,0 +1,44 @@
+@import "src/styles/theme.less";
+.tabs {
+  background-color: @section-bgColor;
+  padding: 10px 20px;
+  ul,li {
+    padding: 0px;
+    margin: 0px;
+  }
+  li {
+    list-style: none;
+  }
+  .tab-name-list {
+    display: flex;
+    .tab-name-item {
+      color:#666;
+      flex: 1;
+      border-bottom: 1px solid #666;
+      padding-bottom: 12px;
+      text-align: center;
+      &.active-name-item {
+        border-bottom-color: @primary-color;
+        border-bottom-width: 2px;
+        color:@primary-color; 
+      }
+    }
+  }
+  .tab-content {
+    &::after {
+      display: block;
+      content: "";
+      height: 0px;
+      overflow: hidden;
+      clear:both;
+      visibility: hidden;
+    }
+    .hide-tab-panle {
+      display: none;
+    }
+  }
+}
+.tabpane {
+  float: left;
+  width: 100%;
+}

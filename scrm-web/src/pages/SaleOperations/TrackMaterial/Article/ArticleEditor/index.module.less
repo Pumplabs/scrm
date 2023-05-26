@@ -1,0 +1,54 @@
+.article-editor {
+  @word-count-space: 40px;
+
+  .article-body {
+    position: relative;
+  }
+
+  .article-body-word-count {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    color: @text-color;
+  }
+
+  .word-count {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    color: @text-color;
+    .divider-code {
+      padding: 0px 2px;
+    }
+  }
+
+  .content-editor {
+
+    :global {
+      .w-e-text-container {
+        min-height: 400px;
+        height: calc(100vh - 328px) !important;
+      }
+    }
+  }
+}
+
+:global {
+  .ant-form-item-has-error {
+    .article-editor {
+
+      .article-title-wrap-has-error,
+      .article-author-wrap-has-error {
+        border-bottom-color: #ff4d4f;
+      }
+
+      .article-body--has-error {
+
+        .w-e-text-container,
+        .w-e-toolbar {
+          border-color: #ff4d4f;
+        }
+      }
+    }
+  }
+}

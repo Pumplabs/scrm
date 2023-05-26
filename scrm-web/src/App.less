@@ -1,0 +1,44 @@
+@import "antd/es/style/index-pure.less";
+@import 'antd/dist/antd.less';
+@import "style/theme.less";
+
+html,
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+li {
+  margin: 0;
+  padding: 0px;
+}
+
+li {
+  list-style: none;
+}
+#root {
+  min-width: 1200px;
+  overflow-x: auto;
+}
+#root,
+html,
+body {
+  height: 100%;
+}
+
+.clear::after {
+  display: block;
+  content: "";
+  overflow: hidden;
+  clear: both;
+  zoom: 1;
+  visibility: hidden;
+}

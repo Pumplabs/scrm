@@ -1,0 +1,27 @@
+@siderWidth: 240px;
+@headerHeight: 48px;
+@breadCrumbHeight: 32px;
+
+.ios-substract(@attr, @value: 0px, @subtractValue: 0px) {
+  @{attr}: @value - @subtractValue;
+  @{attr}: calc(@value - @subtractValue - constant(safe-area-inset-bottom));
+  @{attr}: calc(@value - @subtractValue - env(safe-area-inset-bottom));
+}
+
+.ios-padding(@attr, @value: 0px) {
+  @{attr}: @value;
+  @{attr}: calc(@value + constant(safe-area-inset-bottom));
+  @{attr}: calc(@value + env(safe-area-inset-bottom));
+}
+
+// @rootSize: (1 / 3)
+@rootSize: 3.75vw;
+
+
+@green: #57A65B;
+@red: #D6503F;
+@yellow: #F0BF42;
+@blue: #5483ED;
+@gray: #EFEDED;
+@tip-color: #7E7A7A;
+@pink: #DD4377;

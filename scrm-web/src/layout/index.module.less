@@ -1,0 +1,127 @@
+@import "../style/theme.less";
+@pageContentPaddingBottom: 28px;
+@pageContentBg: #fff;
+
+:local {
+  .header-logo {
+    width: @siderWidth;
+    color: #fff;
+    font-size: 28px;
+    float: left;
+    line-height: @headerHeight;
+    height: @headerHeight;
+    text-align: center;
+  }
+
+  .layout-header-content {
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    padding-right: 200px;
+  }
+
+  .layout-header-right {
+    height: @headerHeight;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    color: #fff;
+    line-height: @headerHeight;
+    padding-right: 24px;
+  }
+
+  .userInfoRow {
+    cursor: pointer;
+  }
+
+  .user-avator {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin: -2px 8px 0px 0px;
+    background-color: #fff;
+  }
+
+  .layout-content-container {
+    height: calc(100vh - @headerHeight);
+    overflow: auto;
+  }
+
+  .layout-content {
+    display: flex;
+    min-height: 100%;
+  }
+
+  .page-content {
+    flex: 1;
+    background-color: @pageContentBg;
+    padding: 16px 16px 16px 16px;
+  }
+
+  .route-content {
+    @wrapHeight: @headerHeight + @breadCrumbHeight + @pageContentPaddingBottom;
+    min-height: calc(100vh - @wrapHeight);
+  }
+
+  .page-footer {
+    line-height: @pageContentPaddingBottom;
+    height: @pageContentPaddingBottom;
+    text-align: center;
+  }
+
+  // 面包屑
+  .breadcrumb {
+    line-height: @breadCrumbHeight;
+  }
+
+  // 菜单
+  .menu-group {
+    padding: 20px 0px 12px 0px;
+    border-bottom: 1px solid #e7e7e7;
+
+    .menu-group-header {
+      height: 32px;
+      font-size: 14px;
+    }
+
+    .menu-item-ul {
+      padding-left: 4px;
+    }
+
+    .menu-group-name {
+      color: @heading-color;
+      font-weight: 600;
+    }
+
+    .menu-item {
+      width: 50%;
+      float: left;
+      font-size: 14px;
+      line-height: 32px;
+      height: 32px;
+
+      &.selected-menu-item {
+        .menu-item-name {
+          background: fade(@primary-color, 10%);
+          cursor: pointer;
+          border-radius: 4px;
+        }
+      }
+    }
+
+    .menu-item-name {
+      color: @text-color;
+      padding: 5px 6px;
+
+      a {
+        color: @text-color;
+      }
+
+      &:hover {
+        background: fade(@primary-color, 10%);
+        cursor: pointer;
+        border-radius: 4px;
+      }
+    }
+  }
+}

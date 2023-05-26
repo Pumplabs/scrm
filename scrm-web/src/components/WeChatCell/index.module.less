@@ -1,0 +1,71 @@
+@import "style/theme.less";
+@middleSize: 60px;
+@smallSize: 40px;
+.wechat-cell {
+  position: relative;
+  white-space: break-spaces;
+  word-break: break-all;
+ .wechat-text {
+  &.company-source {
+    color: @yellow;
+  }
+  &.wechat-source {
+    color: @green;
+  }
+  display: inline-block;
+  vertical-align: top;
+  &.has-extra {
+    position: relative;
+  }
+  .wechat-extra {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+  }
+  .wechat-name {
+    color: @heading-color;
+  }
+  .cell-source {
+    display: inline-block;
+  }
+  .company-source {
+    color: #faad14;
+  }
+  .wechat-source {
+    color: green;
+  }
+ }
+}
+.wechat-cell-small {
+  padding-left: @smallSize + 10px;
+  min-height: @smallSize;
+  .wechat-cell-img {
+    width: @smallSize;
+    height: @smallSize;
+    border-radius: 2px;
+    margin-right: 6px;
+  }
+  .wechat-text {
+    min-height: @smallSize;
+    .cell-source  {
+      padding-top: @smallSize - 22px * 2;
+    }
+  }
+  
+}
+
+.wechat-cell-middle {
+  padding-left:  @middleSize + 10px;
+  min-height: @middleSize;
+  .wechat-cell-img {
+    width:  @middleSize;
+    height:  @middleSize;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+  .wechat-text {
+    .cell-source {
+      padding-top: @middleSize - 20px * 2;
+    }
+  }
+}

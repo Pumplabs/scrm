@@ -1,0 +1,10 @@
+const CONFIG = {
+    HOST: "your domain",
+    PORT: "7443",
+    HTTPS: 'true',
+
+    // 如果选择用https，则配置证书的路径
+    SSL_CRT_FILE: "./cert/server.crt",
+    SSL_KEY_FILE: "./cert/server.key"
+}
+module.exports = CONFIG

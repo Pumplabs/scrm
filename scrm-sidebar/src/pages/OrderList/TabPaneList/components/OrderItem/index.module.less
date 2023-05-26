@@ -1,0 +1,84 @@
+@import "style/theme.less";
+
+.order-item {
+  padding: 12px;
+  background-color: @info-bg;
+  border-radius: @border-radius-base;
+  margin-bottom: 12px;
+
+  .order-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+
+    .customer-text {
+      max-width: 60%;
+      word-break: break-all;
+    }
+
+    .order-price {
+      max-width: 40%;
+      word-break: break-all;
+      font-size: 16px;
+      color: @heading-color;
+    }
+  }
+
+  .order-item-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 8px;
+
+    // .order-status {
+    //   display: inline-block;
+    //   padding: 4px 16px;
+    //   background-color: @green;
+    //   border-radius: @border-radius-base;
+    //   color: #fff;
+    //   font-size: 12px;
+    //   line-height: 20px;
+    // }
+  }
+
+  .collect-box {
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .collect-label {
+    font-size: 12px;
+    margin-right: 8px;
+    color: @text-color-secondary;
+  }
+
+  .collect-count {
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 22px;
+    color: @primary-color;
+  }
+
+  .create-info {
+    font-size: 10px;
+    line-height: 14px;
+    color: @text-color-secondary;
+    margin-bottom: 12px;
+  }
+
+  .creator {
+    margin-right: 8px;
+  }
+
+  .order-item-footer {
+    border-top: 1px solid @border-color;
+    padding: 9px 2px 0px 2px;
+  }
+
+  .money-icon {
+    margin-right: 4px;
+  }
+  .order-code {
+    font-size: 10px;
+  }
+}

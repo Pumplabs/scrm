@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <% if (process.env.IS_PRODUCTION_DEV) { %>
+    <script src="https://unpkg.com/vconsole@3.14.6/dist/vconsole.min.js"></script>
+    <script>
+      var vConsole = new VConsole()
+    </script>
+  <% } %>
+  <% if (process.env.NODE_ENV === 'development') { %>
+    <script>
+      window.isMock = true
+    </script>
+    <% } %>
+</head>
+<body>
+  <div id="loading-text">正在加载中...</div>
+</body>
+</html>

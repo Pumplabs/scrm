@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxResignedStaffCustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.WxResignedStaffCustomer">
+        <id column="id" property="id"/>
+        <result column="is_hand_over" property="isHandOver"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="status" property="status"/>
+        <result column="takeover_time" property="takeoverTime"/>
+        <result column="customer_ext_id" property="customerExtId"/>
+        <result column="takeover_staff_ext_id" property="takeoverStaffExtId"/>
+        <result column="handover_staff_ext_id" property="handoverStaffExtId"/>
+        <result column="dimission_time" property="dimissionTime"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="allocate_time" property="allocateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , is_hand_over, ext_corp_id, status, takeover_time, customer_ext_id, takeover_staff_ext_id, handover_staff_ext_id, dimission_time, creator, create_time, allocate_time
+    </sql>
+    <select id="pageCustomerResignedInheritance" resultType="com.scrm.server.wx.cp.vo.WxResignedStaffCustomerInfoVO">
+        SELECT
+        ext_corp_id,
+        handover_staff_ext_id,
+        dimission_time,
+        count(*) waitAssignCustomerNum
+        FROM
+        wx_resigned_staff_customer
+        WHERE
+        STATUS = 5
+        <if test="dto.extCorpId != null and dto.extCorpId != ''">
+            and ext_corp_id = #{dto.extCorpId}
+        </if>
+        <if test="dto.dimissionBeginTime != null">
+            and dimission_time >= #{dto.dimissionBeginTime}
+        </if>
+        <if test="dto.dimissionEndTime != null">
+            and dimission_time &lt;= #{dto.dimissionEndTime}
+        </if>
+        GROUP BY
+        ext_corp_id,
+        handover_staff_ext_id,
+        dimission_time
+        order by dimission_time desc
+
+    </select>
+
+</mapper>

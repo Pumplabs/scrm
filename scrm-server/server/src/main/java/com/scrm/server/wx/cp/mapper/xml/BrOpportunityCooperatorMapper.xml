@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.BrOpportunityCooperatorMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.server.wx.cp.entity.BrOpportunityCooperator">
+        <id column="id" property="id" />
+        <result column="cooperator_id" property="cooperatorId" />
+        <result column="opportunity_id" property="opportunityId" />
+        <result column="creator" property="creator" />
+        <result column="created_at" property="createdAt" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="can_update" property="canUpdate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cooperator_id, opportunity_id, creator, created_at, deleted_at, ext_corp_id, can_update
+    </sql>
+
+</mapper>

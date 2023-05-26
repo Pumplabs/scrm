@@ -1,0 +1,28 @@
+@import "style/theme.less";
+
+.group-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  .group-cover {
+    margin-right: 12px;
+  }
+
+  .group-content {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .group-name {
+    word-break: keep-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .group-extra-info {
+    color: @text-color-secondary;
+    font-size: 12px;
+  }
+}

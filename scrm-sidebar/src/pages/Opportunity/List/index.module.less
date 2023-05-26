@@ -1,0 +1,60 @@
+@import "style/theme.less";
+
+.search-bar {
+  --background: @border-color !important;
+}
+.page {
+  // padding: 0px @body-spacing @body-spacing;
+  background-color: #fff;
+
+  .search-section {
+    padding: 10px @body-spacing;
+    background-color: @info-bg;
+    position: sticky;
+    top: 0px;
+    z-index: 1;
+    left: 0px;
+  }
+}
+
+.page-stat {
+  padding: 9px @body-spacing;
+  font-size: 14px;
+  color: @heading-color;
+
+  .page-num {
+    font-weight: 600;
+    margin: 0px 4px;
+  }
+}
+
+.page-body {
+  padding: 0px @body-spacing;
+  height: calc(100vh - 94px);
+  overflow-y: auto;
+
+  :global {
+    .adm-list-item-content-main {
+      padding: 0px;
+    }
+  }
+
+  .ul-list-item {
+    margin-bottom: 10px;
+
+    &:nth-last-of-type(1) {
+      margin-bottom: 0px;
+    }
+  }
+}
+
+.page-footer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .add-icon-btn {
+    font-size: 32px;
+    color: @primary-color;
+  }
+}

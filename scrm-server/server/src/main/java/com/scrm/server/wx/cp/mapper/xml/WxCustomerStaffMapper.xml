@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxCustomerStaffMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxCustomerStaff">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_creator_id" property="extCreatorId"/>
+        <result column="ext_staff_id" property="extStaffId"/>
+        <result column="ext_customer_id" property="extCustomerId"/>
+        <result column="remark" property="remark"/>
+        <result column="description" property="description"/>
+        <result column="create_time" property="createTime"/>
+        <result column="remark_corp_name" property="remarkCorpName"/>
+        <result column="add_way" property="addWay"/>
+        <result column="oper_user_id" property="operUserId"/>
+        <result column="state" property="state"/>
+        <result column="is_notified" property="isNotified"/>
+        <result column="signature" property="signature"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="has_delete" property="hasDelete"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, ext_creator_id, ext_staff_id, ext_cust
+            omer_id, remark, create_time, remark_corp_name, remark_mobiles, add_way, oper_user_id, state, is_notified, internal_tag_ids, signature, created_at, updated_at, has_delete
+    </sql>
+    <select id="countGroupByStaffExtId" resultType="com.scrm.server.wx.cp.vo.WxCustomerStaffCountVO">
+        SELECT m.ext_staff_id AS extStaffId,
+               count(*)       AS total
+        FROM wx_customer_staff m
+                 JOIN wx_staff s
+                      ON m.ext_staff_id = s.ext_id
+                          AND m.ext_corp_id = s.ext_corp_id
+                          AND m.has_delete IS not NULL
+                          AND s.has_delete IS not NULL
+        WHERE s.ext_corp_id = #{extCorpId}
+        GROUP BY s.ext_id
+    </select>
+
+    <select id="getCountGroup" resultType="com.scrm.server.wx.cp.vo.WxCustomerStaffCountVO">
+        SELECT m.ext_staff_id AS extStaffId,
+               count(*)       AS total
+        FROM wx_customer_staff m
+                 JOIN wx_staff s
+                      ON m.ext_staff_id = s.ext_id
+                          AND m.ext_corp_id = s.ext_corp_id
+                          AND m.has_delete IS not NULL
+                          AND s.has_delete IS not NULL
+        WHERE s.ext_corp_id = #{extCorpId}
+          and m.ext_staff_id = #{extStaffId}
+        GROUP BY s.ext_id
+    </select>
+
+    <select id="listByCondition" resultType="com.scrm.api.wx.cp.entity.WxCustomerStaff">
+        SELECT id, ext_staff_id, ext_customer_id, create_time, has_delete, is_deleted_staff
+        from wx_customer_staff
+        where ext_corp_id = #{extCorpId}
+        and state = #{state}
+        <if test="start != null">
+            and create_time &gt;= #{start}
+        </if>
+        <if test="end != null">
+            and create_time &lt;= #{end}
+        </if>
+    </select>
+    <select id="countByDate" resultType="java.lang.Integer">
+        select count(1)
+        from wx_customer_staff
+        where ext_corp_id = #{extCorpId}
+          and ext_staff_id = #{extStaffId}
+          and state = #{state}
+          and create_time like date_format(#{date}, '%Y-%m-%d%')
+    </select>
+    <select id="getPullNewStatisticsInfo" resultType="com.scrm.api.wx.cp.vo.WxCustomerPullNewStatisticsInfoVO">
+        select count(1) as newCustomerTotal, ext_staff_id as extStaffId
+        from wx_customer_staff
+        where ext_corp_id = #{extCorpId}
+        <if test="beginDate != null">
+            and create_time &gt;= #{beginDate}
+        </if>
+        <if test="endDate != null">
+            and create_time &lt; #{endDate}
+        </if>
+        group by ext_staff_id
+        order by newCustomerTotal desc
+        limit #{topNum}
+    </select>
+    <select id="findHasDelete" resultType="com.scrm.api.wx.cp.entity.WxCustomerStaff">
+        select *
+        from wx_customer_staff
+        where ext_corp_id = #{extCorpId}
+          and ext_staff_id = #{extStaffId}
+          and ext_customer_id = #{extCustomerId}
+        order by create_time desc limit 1;
+    </select>
+    <select id="findById" resultType="com.scrm.api.wx.cp.entity.WxCustomerStaff">
+        select *
+        from wx_customer_staff
+        where id = #{id}
+    </select>
+    <select id="countByExtCorpId" resultType="java.lang.Long">
+        select count(1)
+        from wx_customer_staff
+        <where>
+            <if test="extCorpId != null and extCorpId != ''">
+                and ext_corp_id = #{extCorpId}
+            </if>
+            <if test="staffExtId != null and staffExtId != ''">
+                and ext_staff_id = #{staffExtId}
+            </if>
+            <if test="begin != null">
+                and create_time >= #{begin}
+            </if>
+            <if test="end != null">
+                and create_time &lt; #{end}
+            </if>
+        </where>
+
+    </select>
+
+
+</mapper>

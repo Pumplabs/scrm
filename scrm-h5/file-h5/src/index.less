@@ -1,0 +1,104 @@
+@rootSize: 3.75vw;
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+p,
+h6, ul, li {
+  margin: 0px;
+  padding: 0px;
+}
+ul, li {
+  list-style: none;
+}
+body {
+  padding: (12 / @rootSize);
+  height: 100%;
+  word-wrap: break-word;
+}
+
+body.link {
+  overflow: hidden;
+}
+iframe {
+  border: none;
+  height: 100%;
+}
+video {
+  width: 100%;
+  margin-top: 60px;
+  /* height: 420px; */
+}
+img {
+  width: 100%;
+}
+.container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: (20 /@rootSize);
+}
+/* 视频-s */
+.video-title {
+  font-size: (22 /@rootSize);
+  line-height: 1.4;
+  color: #222;
+  margin-bottom: (14 /@rootSize);
+}
+.video-description {
+  font-size: (14 /@rootSize);
+  color: #666;
+  line-height: (18 /@rootSize);
+  margin-bottom: (10 /@rootSize);
+}
+/* 视频-e */
+/* 文章-s */
+.article-title {
+  font-size: (22 /@rootSize);
+  line-height: 1.4;
+  margin-bottom: (14 /@rootSize);
+  color: #333;
+}
+.article-abstract {
+  color: #222;
+  font-size: (16 /@rootSize);
+  line-height: 1.75em;
+  padding: (6 /@rootSize);
+  background: #fafafa;
+  margin-bottom: (6 /@rootSize);
+}
+.article-body {
+  font-size: (14 /@rootSize);
+}
+/* 文章-end */
+.empty {
+  padding-top: (100 /@rootSize);
+  text-align: center;
+}
+.empty-emoji {
+  margin-bottom: (10 /@rootSize);
+  font-size: (24 /@rootSize);
+}
+.source-error {
+  display: none;
+  text-align: center;
+  padding-top: (80 /@rootSize);
+}
+.source-error .source-error-top {
+  margin-bottom: (24 /@rootSize);
+}
+.source-error .icon {
+  font-size: (20 /@rootSize);
+  display: inline-block;
+  width: (36 /@rootSize);
+  height: (36 /@rootSize);
+  line-height: (36 /@rootSize);
+  border-radius: 50%;
+  background: #1890ff;
+  text-align: center;
+  color: #fff;
+  font-weight: 600;
+}

@@ -1,0 +1,37 @@
+@import "style/theme.less";
+.imgs-ul {
+  &::after {
+    content: "";
+    display: block;
+    overflow: hidden;
+    visibility: hidden;
+    height: 0px;
+    clear: both;
+  }
+  .imgs-li {
+    float: left;
+    margin: 0px 12px 12px 0px;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    position: relative;
+    &.imgs-li-disabled {
+      cursor: not-allowed;
+    }
+    &.imgs-check-li {
+      border-color: @primary-color;
+    }
+    &:nth-of-type(3n) {
+      margin-right: 0px;
+    }
+    .radio-ele {
+      position: absolute;
+      padding: 0px;
+      right: 8px;
+      top: 8px;
+      z-index: 1;
+    }
+    .img-item {
+      border-radius: 4px 4px 0px 0px;
+    }
+  }
+}

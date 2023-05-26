@@ -1,0 +1,47 @@
+.Draggable {
+  position: relative;
+  transition: transform 250ms ease;
+
+  &.handle {
+    > button {
+      --action-background: rgba(255, 255, 255, 0.1);
+
+      > svg {
+        margin-right: 5px;
+      }
+
+      > button {
+        margin-right: -10px;
+      }
+    }
+  }
+  &.dragging {
+    z-index: 1;
+    transition: none;
+
+    * {
+      cursor: grabbing;
+    }
+  }
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
+      scale(1);
+  }
+  100% {
+    transform: translate3d(var(--translate-x, 0), var(--translate-y, 0), 0)
+      scale(var(--scale));
+    box-shadow: var(--box-shadow);
+  }
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.SysRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.common.entity.SysRole">
+        <id column="id" property="id"/>
+        <result column="role_name" property="roleName"/>
+        <result column="role_key" property="roleKey"/>
+        <result column="role_sort" property="roleSort"/>
+        <result column="data_scope" property="dataScope"/>
+        <result column="menu_check_strictly" property="menuCheckStrictly"/>
+        <result column="dept_check_strictly" property="deptCheckStrictly"/>
+        <result column="status" property="status"/>
+        <result column="creator" property="creator"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="editor" property="editor"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="remark" property="remark"/>
+        <result column="deleted_at" property="deletedAt"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly, status, creator, created_at, editor, updated_at, remark, deleted_at
+    </sql>
+
+    <select id="getMaxSort" resultType="java.lang.Integer">
+        select max(`role_sort`)
+        from sys_role
+        where deleted_at is null
+    </select>
+
+</mapper>

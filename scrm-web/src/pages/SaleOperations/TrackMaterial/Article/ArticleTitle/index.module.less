@@ -1,0 +1,32 @@
+.article-header {
+  @word-count-space: 40px;
+  .article-title {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 30px;
+    border: none;
+    resize: none;
+  
+    &:hover,
+    &:focus {
+      border: none;
+      box-shadow: none;
+    }
+  }
+  
+  .article-title-wrap {
+    border-bottom: 1px solid #eaeaea;
+    padding-right: @word-count-space;
+    position: relative;
+  }
+
+  .word-count {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    color: @text-color;
+    .divider-code {
+      padding: 0px 2px;
+    }
+  }
+}

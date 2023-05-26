@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.DepartmentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.Department">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_id" property="extId"/>
+        <result column="name" property="name"/>
+        <result column="ext_parent_id" property="extParentId"/>
+        <result column="order" property="order"/>
+        <result column="welcome_msg_id" property="welcomeMsgId"/>
+        <result column="staff_num" property="staffNum"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="has_delete" property="hasDelete"/>
+    </resultMap>
+
+    <!-- 树形结构查询映射结果 -->
+    <resultMap id="TreeResultMap" type="com.scrm.api.wx.cp.vo.DepartmentTreeVO">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_id" property="extId"/>
+        <result column="name" property="name"/>
+        <result column="ext_parent_id" property="extParentId"/>
+        <result column="order" property="order"/>
+        <result column="welcome_msg_id" property="welcomeMsgId"/>
+        <result column="staff_num" property="staffNum"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="has_delete" property="hasDelete"/>
+        <collection property="children"  javaType="ArrayList" column="{extCorpId=ext_corp_id,extParentId=ext_id}"
+                    select="com.scrm.server.wx.cp.mapper.DepartmentMapper.queryChildren"/>
+    </resultMap>
+
+    <!-- 树形结构查询映射结果 -->
+    <resultMap id="TreeResultWithStaffMap" type="com.scrm.api.wx.cp.vo.DepartmentTreeVO">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_id" property="extId"/>
+        <result column="name" property="name"/>
+        <result column="ext_parent_id" property="extParentId"/>
+        <result column="order" property="order"/>
+        <result column="welcome_msg_id" property="welcomeMsgId"/>
+        <result column="staff_num" property="staffNum"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="has_delete" property="hasDelete"/>
+        <collection property="children"  javaType="ArrayList" column="{extCorpId=ext_corp_id,extParentId=ext_id}"
+                    select="com.scrm.server.wx.cp.mapper.DepartmentMapper.queryChildrenWithStaff"/>
+        <collection property="staffList" javaType="ArrayList" column="{extCorpId=ext_corp_id,extDepartmentId=ext_id}"
+                    select="com.scrm.server.wx.cp.mapper.DepartmentMapper.queryStaffByDept" ofType="com.scrm.api.wx.cp.entity.Staff"/>
+
+
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, ext_id, name, ext_parent_id, `order`, welcome_msg_id, staff_num, created_at, updated_at, has_delete
+    </sql>
+
+    <!--根部门默认为1-->
+    <select id="getTree" resultMap="TreeResultMap">
+        select <include refid="Base_Column_List"/> from wx_department where ext_corp_id = #{extCorpId} and ext_id = 1 and has_delete is not null
+        order by `order` desc;
+    </select>
+
+    <select id="queryChildren" resultMap="TreeResultMap">
+        select <include refid="Base_Column_List"/> from wx_department
+        where ext_corp_id = #{extCorpId} and ext_parent_id = #{extParentId} and has_delete is not null
+        order by `order` desc;
+    </select>
+
+    <select id="queryChildIdList" resultType="java.lang.Long">
+        select ext_id from wx_department
+        where ext_corp_id = #{extCorpId} and has_delete is not null
+        <if test="extParentIdList != null and extParentIdList.size >0">
+            and  ext_parent_id IN
+            <foreach collection="extParentIdList" item="item" index="" open="(" close=")" separator="," >
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryChildrenWithStaff" resultMap="TreeResultWithStaffMap">
+        select <include refid="Base_Column_List"/> from wx_department
+        where ext_corp_id = #{extCorpId} and ext_parent_id = #{extParentId} and has_delete is not null
+        order by `order` desc;
+    </select>
+
+    <!--根部门默认为1-->
+    <select id="getTreeWithStaffMap" resultMap="TreeResultWithStaffMap">
+        select <include refid="Base_Column_List"/> from wx_department where ext_corp_id = #{extCorpId} and ext_id = 1;
+    </select>
+
+    <select id="queryStaffByDept" resultType="com.scrm.api.wx.cp.entity.Staff">
+        select s.id, s.ext_corp_id, s.ext_id,  s.name, s.avatar_url from wx_staff s
+        left join wx_staff_department c on s.ext_id = c.ext_staff_id
+        where s.ext_corp_id = #{extCorpId} and c.ext_department_id = #{extDepartmentId}
+        and has_delete is not null;
+    </select>
+
+
+</mapper>

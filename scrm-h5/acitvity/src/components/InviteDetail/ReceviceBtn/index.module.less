@@ -1,0 +1,16 @@
+@import "src/styles/theme.less";
+.receiver-btn {
+  display: inline-block;
+  background-color: @primary-color;
+  color: #fff;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 10px;
+  user-select: none;
+  &.disabeld-btn {
+    background-color: fade(@primary-color, 45%);
+    cursor: not-allowed;
+  }
+}

@@ -1,0 +1,55 @@
+@import "style/theme.less";
+
+.customer-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items:flex-end;
+  width: 100%;
+  .customer-info {
+    flex: 1;
+    max-width: 60%;
+    padding-right: 5px;
+    word-break: break-all;
+  }
+  .customer-extra {
+    max-width: 40%;
+    padding-left: 6px;
+    text-align: right;
+  }
+  .cooperation-tag {
+    padding: 4px 13px;
+    display: inline-block;
+    background-color: @primary-color;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+    line-height: 12px;
+    margin-bottom: 8px;
+  }
+  .follow-info {
+    font-size: 12px;
+    color: @text-color-secondary;
+  }
+  .follower {
+    margin-right: 2px;
+    &::after {
+      content: ":";
+      display: inline-block;
+      margin: 0px 2px;
+    }
+  }
+  .follow-staff {
+    color: @primary-color;
+    font-weight: 600;
+  }
+  .create-time {
+    flex: 1;
+    word-break: break-all;
+    text-align: right;
+    font-size: 12px;
+    color: @text-color-secondary;
+  }
+  .create-time-str {
+    margin-right: 4px;
+  }
+}

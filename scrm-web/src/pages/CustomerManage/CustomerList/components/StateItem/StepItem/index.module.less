@@ -1,0 +1,45 @@
+@import "style/theme.less";
+
+.step-item {
+  border-radius: 6px;
+  display: flex;
+
+  .step-item-title {
+    color: @heading-color;
+    margin-bottom: 4px;
+    line-height: 22px;
+    font-size: 14px;
+  }
+
+  .step-item-left {
+    position: relative;
+    @titleHeight: 24px;
+
+    &::before {
+      content: "";
+      background-color: @primary-color;
+      width: 2px;
+      position: absolute;
+      left: 0.5em;
+      top: @titleHeight;
+      height: calc(100% - @titleHeight);
+    }
+  }
+
+  .step-item-content {
+    min-height: 48px;
+    padding-left: 12px;
+  }
+
+  &:nth-last-of-type(1) {
+    .step-item-left {
+      &::before {
+        display: none;
+      }
+    }
+
+    .step-item-content {
+      min-height: 24px;
+    }
+  }
+}

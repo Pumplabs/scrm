@@ -1,0 +1,35 @@
+@import "style/theme.less";
+.search-section {
+  padding: @body-spacing;
+}
+.selected-ul-wrap {
+  background-color: #fff;
+  overflow-y: auto;
+  @outside: @body-spacing * 2 + 60px + 32px + 40px;
+  .ios-substract(height, 100vh, @outside);
+  .customer-list-item {
+    padding: 0px 16px;
+  }
+}
+
+.customer-item {
+  display: flex;
+  align-items: center;
+  .follow-staff {
+    color: @primary-color;
+    font-weight: 600;
+    font-size: 10px;
+  }
+  .follower {
+    margin-right: 2px;
+    &::after {
+      content: ":";
+      display: inline-block;
+      margin: 0px 2px;
+    }
+  }
+}
+
+.radio-ele {
+  margin-right: 4px;
+}

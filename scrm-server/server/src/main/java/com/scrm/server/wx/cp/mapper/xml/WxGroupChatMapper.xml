@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxGroupChatMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxGroupChat">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_creator_id" property="extCreatorId"/>
+        <result column="ext_chat_id" property="extChatId"/>
+        <result column="name" property="name"/>
+        <result column="owner" property="owner"/>
+        <result column="create_time" property="createTime"/>
+        <result column="notice" property="notice"/>
+        <result column="admin_list" property="adminList"/>
+        <result column="status" property="status"/>
+        <result column="total" property="total"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , ext_corp_id, ext_creator_id, ext_chat_id, name, owner, owner_name, create_time, notice, admin_list, status, total, today_join_member_num, today_quit_member_num, owner_avatar_url, owner_role_type, created_at, updated_at, deleted_at
+    </sql>
+    <select id="pageList" resultType="com.scrm.api.wx.cp.entity.WxGroupChat">
+        select g.*
+        from wx_group_chat g
+        join wx_staff s on g.owner = s.ext_id
+        left join wx_group_chat_tag_map m on g.id = m.group_chat_id
+        left join wx_group_chat_tag t on m.group_chat_tag_id = t.id and t.has_delete is not null
+        where g.has_delete is not null and g.status in (0,3)
+        <if test="dto.extCorpId != null and dto.extCorpId != ''">
+            and g.ext_corp_id = #{dto.extCorpId}
+        </if>
+        <if test="dto.tagName != null and dto.tagName != ''">
+            and t.name like concat('%',#{dto.tagName},'%')
+        </if>
+        <if test="dto.name != null and dto.name != ''">
+            and g.name like concat('%',#{dto.name},'%')
+        </if>
+        <if test="dto.isPermission != null and dto.isPermission and !dto.isEnterpriseAdmin">
+            and g.owner = #{dto.loginStaffExtId}
+        </if>
+        <if test="dto.ownerExtIds != null and dto.ownerExtIds.size() > 0">
+            and g.owner in
+            <foreach collection="dto.ownerExtIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.tagIds != null and dto.tagIds.size() > 0 ">
+            and t.id in
+            <foreach collection="dto.tagIds" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        group by g.id
+        order by g.create_time desc
+    </select>
+    <select id="find" resultType="com.scrm.api.wx.cp.entity.WxGroupChat">
+        select *
+        from wx_group_chat
+        where ext_corp_id = #{extCorpId}
+          and ext_chat_id = #{extId}
+        order by has_delete is null, created_at desc limit 1
+    </select>
+    <select id="getPullNewStatisticsInfos" resultType="com.scrm.api.wx.cp.vo.WxGroupChatPullNewStatisticsVO">
+        select g.`owner` extStaffId, count(*) pullNewTotal
+        from wx_group_chat g
+                 left join wx_group_chat_member m on m.has_delete is not null
+            and m.ext_corp_id = #{extCorpId}
+            and m.ext_chat_id = g.ext_chat_id
+        where g.has_delete is not null
+          and g.ext_corp_id = #{extCorpId}
+          and m.type = 2
+          and m.join_time >= #{joinBeginTime} / 1000
+          and m.join_time &lt; #{joinEndTime} / 1000
+        group by g.`owner`
+        order by pullNewTotal desc
+    </select>
+
+</mapper>

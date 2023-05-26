@@ -1,0 +1,52 @@
+@import "style/theme.less";
+
+.choose-btn {
+  margin-bottom: 10px;
+}
+.mySelect-content {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-radius: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.tag-item {
+  position: relative;
+  display: inline-block;
+  background-color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  margin: 0px 10px 10px 0px;
+  cursor: pointer;
+  .tag-close {
+    position: absolute;
+    right: 0px;
+    top: -4px;
+    width: 8px;
+    height: 8px;
+    cursor: pointer;
+    z-index: 1;
+  }
+}
+
+.user-item {
+  .user-avatar {
+    @size: 28px;
+    width: @size;
+    height: @size;
+    margin-right: 4px;
+  }
+  .user-name {
+    font-size: 12px;
+  }
+}
+
+
+// 部门
+.dep-item {
+  .dep-icon {
+    font-size: 24px;
+    margin-right: 4px;
+  }
+}

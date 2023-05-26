@@ -1,0 +1,69 @@
+.input-inner {
+  padding-right: 48px;
+  position: relative;
+  background: #f1f1f1;
+  border-radius: 0px 2px 2px 0px;
+
+  .input-ele {
+    border-right: none;
+    border-radius: 2px 0px 0px 2px;
+
+    &:hover {
+      &+.input-actions {
+        border-color: #31adf5;
+      }
+    }
+
+    &:focus {
+      box-shadow: none;
+
+      &+.input-actions {
+        border-color: #31adf5;
+        box-shadow: 0 0 0 2px rgb(9 142 232 / 20%);
+      }
+    }
+  }
+}
+
+.input-actions {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  line-height: 32px;
+  font-size: 14px;
+  background: #f1f1f1;
+  border: 1px solid #d9d9d9;
+  border-left: none;
+  width: 48px;
+  height: 32px;
+  text-align: center;
+
+  &:hover {
+    border-color: #31adf5;
+  }
+
+  .action-text-btn {
+    cursor: pointer;
+    font-size: 16px;
+
+    &:hover {
+      color: @primary-color;
+    }
+  }
+
+  .action-text-btn:nth-of-type(1) {
+    margin-right: 4px;
+  }
+}
+
+.input-error {
+  border-color: #ff4d4f;
+
+  &+.input-actions {
+    border-color: #ff4d4f;
+  }
+}
+
+.input-msg {
+  color: #ff4d4f;
+}

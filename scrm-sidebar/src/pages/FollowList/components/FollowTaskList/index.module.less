@@ -1,0 +1,76 @@
+@import "style/theme.less";
+.follow-task {
+  background-color: #fff;
+  border-radius: @border-radius-base;
+  padding: 0px 10px;
+  margin-bottom: 10px;
+  .follow-task-header {
+    color:@heading-color;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid @border-color;
+    .follow-check-icon {
+      color: @primary-color;
+      font-size: 18px;
+      margin-right: 6px;
+    }
+    .divide-code {
+      margin: 0px 2px;
+    }
+  }
+  &.empty-follow-task {
+    .follow-task-header {
+      border-bottom: none;
+    }
+  }
+}
+.follow-task-ul {
+  padding: 18px 0px;
+}
+
+.follow-task-li {
+  position: relative;
+  background-color: @info-bg;
+  padding: 6px 0px 6px 40px;
+  margin-bottom: 12px;
+  border-radius: @border-radius-base;
+  &:nth-last-of-type(1) {
+    margin-bottom: 0px;
+  }
+  .check-box {
+    position: absolute;
+    top: 4px;
+    left: 8px;
+    :global {
+      .adm-checkbox-icon {
+       border-color: @primary-color;
+      }
+    }
+  }
+  .task-content {
+    .tag-color(@borderColor, @bgColor: fade(@borderColor, 60%),@textColor: #fff) {
+      --border-color: @borderColor !important;
+      --text-color: @textColor !important;
+      --background-color: @bgColor!important;
+    }
+    .task-name {
+      font-size: 14px;
+      color: @heading-color;
+      margin-bottom: 6px;
+    }
+    .user-tag {
+      .tag-color( #D9D9D9, #FAFAFA, rgba(0, 0, 0, 0.85));
+      margin-right: 6px;
+    }
+    .time-tag {
+      .tag-color(#D9D9D9, #FAFAFA, rgba(0, 0, 0, 0.85));
+      &.done-time-tag {
+        .tag-color(@green);
+      }
+      &.overdue-time-tag {
+        .tag-color(@pink);
+      }
+    }
+  }
+}

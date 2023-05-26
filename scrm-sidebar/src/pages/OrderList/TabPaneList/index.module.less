@@ -1,0 +1,32 @@
+@import "style/theme.less";
+
+.tab-pane {
+  .stat-info {
+    @topSide: 52px + 48px;
+    color: @heading-color;
+    font-size: 14px;
+    position: sticky;
+    top: @topSide;
+    z-index: 1;
+    background-color: #fff;
+  }
+
+  .order-count {
+    margin: 0px 4px;
+    font-weight: 600;
+  }
+
+  .tab-pane-content {
+    // @outsideHeight: 48px + 91px + 54px;
+    // .ios-substract(height, 100vh, @outsideHeight);
+    // overflow-y: auto;
+
+    .list-item {
+      :global {
+        .adm-list-item-content-main {
+          padding: 0px;
+        }
+      }
+    }
+  }
+}

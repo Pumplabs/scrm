@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxCustomerMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxCustomer">
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_creator_id" property="extCreatorId"/>
+        <result column="ext_id" property="extId"/>
+        <result column="name" property="name"/>
+        <result column="position" property="position"/>
+        <result column="corp_name" property="corpName"/>
+        <result column="avatar" property="avatar"/>
+        <result column="type" property="type"/>
+        <result column="gender" property="gender"/>
+        <result column="unionid" property="unionid"/>
+        <result column="external_profile" property="externalProfile"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="has_delete" property="hasDelete"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , ext_corp_id, ext_creator_id, ext_id, name, position, corp_name, avatar, type, gender, unionid, external_profile, created_at, updated_at, has_delete
+    </sql>
+    <select id="findOne" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
+        select *
+        from wx_customer
+        where id = #{id}
+        order by created_at desc
+    </select>
+
+    <select id="pageAssistList" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
+        select c.id, c.ext_corp_id, m.ext_staff_id as ext_creator_id, c.ext_id, c.name, c.position, c.corp_name,
+        c.avatar,c.type, c.gender, c.unionid, c.external_profile, m.create_time as created_at, c.updated_at, c.has_delete,
+        m.is_deleted_staff from wx_customer c
+        left join wx_customer_staff m on c.id = m.customer_id
+        left join wx_customer_staff_assist a on m.ext_corp_id = a.ext_corp_id and m.ext_staff_id = a.ext_staff_id and m.ext_customer_id = a.ext_customer_id
+        <where>
+            m.has_delete is not null and c.has_delete is not null and c.has_friend = 1
+            <if test="dto.extCorpId != null and dto.extCorpId != ''">
+                and c.ext_corp_id =#{dto.extCorpId}
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and c.name like concat('%',#{dto.name},'%')
+            </if>
+            <if test="!dto.isEnterpriseAdmin">
+                and (m.ext_staff_id = #{dto.loginStaffExtId} or a.assist_ext_staff_id = #{dto.loginStaffExtId})
+            </if>
+        </where>
+        group by m.id
+        order by IF(ISNULL(c.updated_at),1,0), m.create_time desc, m.id desc
+    </select>
+
+    <select id="list" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
+        select c.id, c.ext_corp_id, m.ext_staff_id as ext_creator_id, c.ext_id, c.name, c.position, c.corp_name,
+        c.avatar,
+        c.type, c.gender, c.unionid, c.external_profile, m.create_time as created_at, c.updated_at, c.has_delete,
+        m.is_deleted_staff from wx_customer c
+        left join wx_customer_staff m on c.id = m.customer_id
+        left join wx_staff s on m.ext_corp_id = s.ext_corp_id and binary m.ext_staff_id = s.ext_id
+        left join wx_customer_staff_tag t on m.ext_customer_id = t.ext_customer_id and t.ext_staff_id = m.ext_staff_id
+        and t.has_delete is not null
+        <where>
+            m.has_delete is not null and c.has_delete is not null and s.has_delete is not null
+            and c.has_friend = 1
+            <if test="dto.extCorpId != null and dto.extCorpId != ''">
+                and c.ext_corp_id =#{dto.extCorpId}
+            </if>
+            <if test="dto.noCustomerIds != null and dto.noCustomerIds.size()>0">
+                and c.id not in
+                <foreach collection="dto.noCustomerIds" close=")" open="(" item="noCustomerId" separator=",">
+                    #{noCustomerId}
+                </foreach>
+            </if>
+            <if test="dto.gender != null">
+                and c.gender =#{dto.gender}
+            </if>
+            <if test="dto.type != null">
+                and c.type =#{dto.type}
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and c.name like concat('%',#{dto.name},'%')
+            </if>
+            <if test="dto.staffIds != null and dto.staffIds.size()>0">
+                and s.id in
+                <foreach collection="dto.staffIds" open="(" close=")" item="staffId" separator=",">
+                    #{staffId}
+                </foreach>
+            </if>
+            <if test="dto.extCreatorId != null and dto.extCreatorId.size()>0">
+                and m.ext_staff_id in
+                <foreach collection="dto.extCreatorId" close=")" open="(" item="item" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.isPermission != null and dto.isPermission and !dto.isEnterpriseAdmin">
+                and m.ext_staff_id = #{dto.loginStaffExtId}
+            </if>
+            <if test="dto.tagExtIdList != null  and dto.tagExtIdList.size() > 0">
+                and t.ext_tag_id in
+                <foreach collection="dto.tagExtIdList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.createdAtBegin != null">
+                and m.create_time &gt;= #{dto.createdAtBegin}
+            </if>
+            <if test="dto.createdAtEnd != null">
+                and m.create_time &lt;= #{dto.createdAtEnd}
+            </if>
+        </where>
+        group by m.id
+        order by IF(ISNULL(c.updated_at),1,0), m.create_time desc, m.id desc
+    </select>
+
+    <select id="findByExtCorpIdAndExtId" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
+        select *
+        from wx_customer
+        where ext_corp_id = #{extCorpId}
+          and ext_id = #{extId}
+          and has_friend = 1
+        order by has_delete is null, created_at desc limit 1
+    </select>
+    <select id="findByCondition" resultType="java.lang.String">
+        select ext_id
+        from wx_customer
+        <where>
+            has_friend = 1
+            <if test="name != null and name != ''">
+                and name like concat('%', #{name}, '%')
+            </if>
+            <if test="hasDelete != null and hasDelete">
+                and has_delete is null
+            </if>
+            <if test="hasDelete != null and !hasDelete">
+                and has_delete is not null
+            </if>
+        </where>
+    </select>
+    <select id="findByExtIds" resultType="com.scrm.api.wx.cp.vo.WxCustomerVO">
+        select * from wx_customer
+        where ext_corp_id =#{extCorpId}
+        and ext_id in
+        <foreach collection="extIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and has_friend = 1
+    </select>
+    <select id="findByName" resultType="java.lang.String">
+        select ext_id
+        from wx_customer
+        where ext_corp_id = #{extCorpId}
+          and name like concat('%', #{name}, '%')
+          and has_friend = 1
+    </select>
+    <select id="pageCustomerList" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
+        select c.id, c.ext_corp_id, c.ext_creator_id, c.ext_id, c.name, c.position, c.corp_name, c.avatar,
+        c.type, c.gender, c.unionid, c.external_profile, c.created_at, c.updated_at, c.has_delete, c.is_deleted_staff
+        from wx_customer c
+        left join wx_customer_staff_tag t on c.ext_id = t.ext_customer_id and t.has_delete is not null
+        left join br_journey_stage_customer s on s.ext_corp_id = c.ext_corp_id and s.customer_ext_id = c.ext_id and
+        s.journey_id = #{dto.journeyId} and s.deleted_at is null
+        <where>
+            c.has_delete is not null and s.id is null
+            and c.has_friend = 1
+            <if test="dto.extCorpId != null and dto.extCorpId != ''">
+                and c.ext_corp_id =#{dto.extCorpId}
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and c.name like concat('%',#{dto.name},'%')
+            </if>
+            <if test="dto.extTagIds != null and dto.extTagIds.size()>0">
+                and t.ext_tag_id in
+                <foreach collection="dto.extTagIds" close=")" open="(" item="item" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="dto.createdAtBegin != null">
+                and c.created_at &gt;= #{dto.createdAtBegin}
+            </if>
+            <if test="dto.createdAtEnd != null">
+                and c.created_at &lt;= #{dto.createdAtEnd}
+            </if>
+        </where>
+        group by c.id
+        order by IF(ISNULL(c.updated_at),1,0), c.updated_at desc
+    </select>
+    <select id="queryList" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
+        select c.id, c.ext_corp_id, m.ext_staff_id as ext_creator_id, c.ext_id, c.name, c.position, c.corp_name,
+        c.avatar,
+        c.type, c.gender, c.unionid, c.external_profile, m.create_time as created_at, c.updated_at, c.has_delete,
+        m.is_deleted_staff from wx_customer c
+        left join wx_customer_staff m on c.id = m.customer_id
+        left join wx_staff s on m.ext_corp_id = s.ext_corp_id and binary m.ext_staff_id = s.ext_id
+        <where>
+            m.has_delete is not null and c.has_delete is not null and s.has_delete is not null
+            and c.has_friend = 1
+            <if test="dto.extCorpId != null and dto.extCorpId != ''">
+                and c.ext_corp_id =#{dto.extCorpId}
+            </if>
+            <if test="dto.gender != null">
+                and c.gender =#{dto.gender}
+            </if>
+            <if test="dto.type != null">
+                and c.type =#{dto.type}
+            </if>
+            <if test="dto.name != null and dto.name != ''">
+                and c.name like concat('%',#{dto.name},'%')
+            </if>
+            <if test="dto.createdAtBegin != null">
+                and c.created_at &gt;= #{dto.createdAtBegin}
+            </if>
+            <if test="dto.createdAtEnd != null">
+                and c.created_at &lt;= #{dto.createdAtEnd}
+            </if>
+        </where>
+        order by IF(ISNULL(c.updated_at),1,0), c.updated_at desc
+    </select>
+
+    <select id="dropDownPageList" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
+        select c.id,
+        c.ext_corp_id,
+        c.ext_creator_id,
+        c.ext_id,
+        c.name,
+        c.position,
+        c.corp_name,
+        c.avatar,
+        c.type,
+        c.gender,
+        c.unionid,
+        c.external_profile,
+        c.created_at,
+        c.updated_at,
+        c.has_delete,
+        c.is_deleted_staff
+        from wx_customer c
+        left join wx_customer_staff cs on cs.customer_id = c.id and cs.has_delete is not null
+        left join wx_customer_staff_tag t on cs.ext_customer_id = t.ext_customer_id and t.ext_staff_id = cs.ext_staff_id
+        and t.has_delete is not null
+        where c.has_delete is not null and (c.is_deleted_staff is null or c.is_deleted_staff = false)
+        and c.has_friend = 1
+        <if test="dto.extCorpId != null  and dto.extCorpId != ''">
+            and c.ext_corp_id = #{dto.extCorpId}
+        </if>
+        <if test="dto.name != null  and dto.name != ''">
+            and c.name like concat('%',#{dto.name},'%')
+        </if>
+        /*如果是查询权限数据，且不是管理员，只能看见自己的数据*/
+        <if test="(dto.isMySelf != null  and dto.isMySelf ) or (dto.isPermission != null and dto.isPermission and !dto.isEnterpriseAdmin)">
+            and cs.ext_staff_id = #{dto.loginStaffExtId}
+        </if>
+        <if test="dto.isMySelf != null  and !dto.isMySelf ">
+            and cs.ext_staff_id != #{dto.loginStaffExtId}
+        </if>
+        <if test="dto.tagExtIdList != null  and dto.tagExtIdList.size() > 0">
+            and t.ext_tag_id in
+            <foreach collection="dto.tagExtIdList" open="(" close=")" separator="," item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.createTimeBegin != null">
+            and c.created_at >= #{dto.createTimeBegin}
+        </if>
+        <if test="dto.createTimeEnd != null">
+            and c.created_at &lt;= #{dto.createTimeEnd}
+        </if>
+        group by c.id
+        order by c.created_at desc
+    </select>
+    <select id="count" resultType="java.lang.Integer">
+        select count(DISTINCT c.id)
+        from wx_customer c
+                 LEFT JOIN wx_customer_staff m ON c.ext_corp_id = m.ext_corp_id and c.ext_id = m.ext_customer_id
+        where c.ext_corp_id = #{extCorpId}
+          and c.has_delete IS NOT NULL
+          and m.has_delete IS NOT NULL
+    </select>
+
+
+</mapper>

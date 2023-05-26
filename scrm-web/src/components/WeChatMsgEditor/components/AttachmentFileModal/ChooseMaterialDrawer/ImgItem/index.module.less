@@ -1,0 +1,33 @@
+@import "style/theme.less";
+@posterWidth: 720px;
+@posterHeight: 1280px;
+@posterRatio: 0.25;
+@imgWidth: 220px;
+.img-item {
+  width: @imgWidth;
+  cursor: pointer;
+  &.poster-img-item {
+    width: @posterWidth * @posterRatio;
+  }
+  .img-ele {
+    &.poster {
+      width: @posterWidth * @posterRatio;
+      height: @posterHeight * @posterRatio;
+    }
+    width: @imgWidth;
+    height: (@imgWidth * 9) / 16px;
+    border-bottom: 1px solid #eaeaea;
+  }
+  .img-item-footer {
+    color: @heading-color;
+    padding: 6px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+   
+    .img-item-name {
+      word-break: keep-all;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}

@@ -1,0 +1,35 @@
+@import "style/theme.less";
+
+.status-item {
+  font-size: 12px;
+  border: 1px solid #000;
+  padding: 2px 4px;
+  background-color: #fff;
+  border-radius: 4px;
+  
+  .color(@mainColor, @textColor: #fff) {
+    background-color: fade(@mainColor, 75%);
+    border-color: @mainColor;
+    color: @textColor;
+  }
+
+  &.done-status {
+    .color(@blue);
+  }
+
+  &.cancel-status {
+    .color(@tip-color);
+  }
+
+  &.init-status {
+    .color(@gray, @tip-color);
+  }
+
+  &.fail-status {
+    .color(@pink);
+  }
+
+  &.wait-status {
+    .color(@blue);
+  }
+}

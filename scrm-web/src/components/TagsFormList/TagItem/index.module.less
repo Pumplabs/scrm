@@ -1,0 +1,36 @@
+@import "style/theme.less";
+
+.tagItem {
+  position: relative;
+  padding-right: 140px;
+
+  .tagItemAction {
+    position: absolute;
+    right: 0px;
+    top: 5px;
+  }
+
+  .tagItemActionItem {
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 6px;
+    color: @heading-color;
+
+    &.disabled-action {
+      cursor: not-allowed;
+      color: @text-color-secondary;
+
+      &:hover {
+        color: @text-color-secondary;
+      }
+    }
+  }
+
+  .tagItemActionItem:hover {
+    color: @primary-color;
+  }
+}
+
+.tagItem:nth-last-of-type(1) {
+  margin-bottom: 0px;
+}

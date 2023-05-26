@@ -1,0 +1,5 @@
+export { default as NotAuth } from './NotAuth'
+export { default as NotFound } from './NotFound'
+export { default as SysError } from './SysError'
+export { default as NoMenu } from './NoMenu'
+export { default as PageNoAuth } from './PageNoAuth'

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.scrm.server.wx.cp.mapper.WxCustomerInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxCustomerInfo">
+        <id column="id" property="id" />
+        <result column="ext_corp_id" property="extCorpId" />
+        <result column="ext_creator_id" property="extCreatorId" />
+        <result column="ext_customer_id" property="extCustomerId" />
+        <result column="ext_staff_id" property="extStaffId" />
+        <result column="age" property="age" />
+        <result column="email" property="email" />
+        <result column="phone_number" property="phoneNumber" />
+        <result column="qq" property="qq" />
+        <result column="address" property="address" />
+        <result column="birthday" property="birthday" />
+        <result column="weibo" property="weibo" />
+        <result column="remark_field" property="remarkField" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+    <!--<result column="deleted_at" property="deletedAt" />-->
+        <result column="gender" property="gender" />
+        <result column="corp_name" property="corpName" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, ext_corp_id, ext_creator_id, ext_customer_id, ext_staff_id, age, description, email, phone_number, qq, address, birthday, weibo, remark_field, created_at, updated_at, deleted_at
+    </sql>
+    <select id="find" resultType="com.scrm.api.wx.cp.entity.WxCustomerInfo">
+        select * from wx_customer_info
+        where ext_corp_id = #{extCorpId}
+        and ext_staff_id = #{staffExtId}
+        and ext_customer_id = #{customerExtId}
+        order by created_at desc
+        limit 1;
+    </select>
+
+</mapper>

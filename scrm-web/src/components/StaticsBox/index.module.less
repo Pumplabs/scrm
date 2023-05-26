@@ -1,0 +1,41 @@
+@import "style/theme.less";
+
+.box {
+  padding: 31px 10px;
+  border-radius: 2px;
+  border: 1px solid fade(@primary-color, 50%);
+  background: fade(@primary-color, 5%);
+
+  .boxItem {
+    float: left;
+    width: 50%;
+    border-right: 1px solid #daedff;
+    text-align: center;
+  }
+
+  .boxItem:nth-last-of-type(1) {
+    border-right: none;
+  }
+
+  .label {
+    color: @heading-color;
+    font-size: 30px;
+    font-weight: 600;
+    font-family: 'HarmonyBold';
+    line-height: 32px;
+    margin-bottom: 4px;
+  }
+
+  .desc {
+    color: @text-color-secondary;
+  }
+}
+
+.clear::after {
+  display: block;
+  content: "";
+  overflow: hidden;
+  clear: both;
+  zoom: 1;
+  visibility: hidden;
+}

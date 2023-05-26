@@ -1,0 +1,76 @@
+@import "style/theme.less";
+
+.material-statics {
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 24px;
+
+  .material-header {
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom: 12px;
+  }
+
+  .material-title {
+    position: relative;
+    color: @heading-color;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 34px;
+
+    .detail-icon {
+      position: absolute;
+      right: 0px;
+      top: 0px;
+      color: @primary-color;
+      cursor: pointer;
+    }
+  }
+
+  .num-item {
+    font-family: 'HarmonyBold';
+    font-size: 24px;
+  }
+
+  .desc-item {
+    display: inline-block;
+    margin-right: 120px;
+  }
+
+  .material-index {
+    margin-bottom: 12px;
+  }
+
+  .left-side {
+    padding-right: 16px;
+    border-right: 1px solid #eaeaea;
+  }
+
+  .right-side {
+    padding-left: 16px;
+  }
+}
+
+.chart-tip {
+  position: absolute;
+  z-index: 1;
+  visibility: hidden;
+  max-width: 50%;
+  background-color: #fff;
+  color: #333;
+  padding: 5px 15px;
+  border-radius: 2px;
+  box-shadow: 0 0 2px #aaa;
+  transform-origin: bottom;
+  .chart-tip-arrow {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    left: 50%;
+    bottom: -4px;
+    transform: translateX(-50%) rotate(45deg);
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    background-color: #fff;
+  }
+}

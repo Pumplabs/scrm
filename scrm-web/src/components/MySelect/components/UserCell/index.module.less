@@ -1,0 +1,22 @@
+.cell-item {
+  position: relative;
+  padding-left: 24px;
+  .cell-avatar {
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    &.icon-avatar {
+      font-size: 16px;
+      top: 4px;
+    }
+    &.img-avatar {
+      width: 20px;
+      height: 20px;
+    }
+  }
+  overflow: hidden;
+  text-overflow: ellipsis;
+  .cell-title {
+    white-space: nowrap;
+  }
+}

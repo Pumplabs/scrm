@@ -1,0 +1,21 @@
+@import "style/theme.less";
+
+.page {
+  background: #fff;
+  .big-section();
+  padding: 20px;
+  .form-content {
+    @right-side: 340px;
+    overflow: auto;
+    .others-form {
+      padding: 0px 10px;
+      float: right;
+      width: @right-side - 20px;
+    }
+  }
+  .page-footer {
+    border-top: 1px solid #eaeaea;
+    text-align: center;
+    padding-top: 16px;
+  }
+}

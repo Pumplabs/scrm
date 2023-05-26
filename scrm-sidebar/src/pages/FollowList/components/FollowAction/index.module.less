@@ -1,0 +1,60 @@
+@import "style/theme.less";
+
+.follow-moment-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  .footer-actions {
+    display: flex;
+    align-items: center;
+  }
+
+  .moment-del {
+    font-size: 18px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: @primary-color;
+  }
+
+  .moment-edit {
+    font-size: 18px;
+    margin-right: 8px;
+    cursor: pointer;
+    color: @text-color;
+  }
+
+  .replay-icon {
+    cursor: pointer;
+    font-size: 18px;
+    margin-right: 4px;
+    color: @text-color;
+  }
+
+  .moment-replay {
+    color: @text-color-secondary;
+  }
+}
+
+.num-item {
+  color: @primary-color;
+  font-size: 18px;
+  margin-right: 6px;
+
+  &:nth-last-of-type(1) {
+    margin-right: 0px;
+  }
+
+  .num-text {
+    margin-left: 4px;
+    font-size: 14px;
+    color: @heading-color;
+  }
+}
+
+.send-time {
+  color: @text-color-secondary;
+
+  .send-time-date {
+    margin-right: 4px;
+  }
+}

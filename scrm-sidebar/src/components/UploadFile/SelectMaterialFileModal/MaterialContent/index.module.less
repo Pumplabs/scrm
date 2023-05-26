@@ -1,0 +1,30 @@
+@import "style/theme.less";
+
+.search-bar {
+  padding: @body-spacing;
+  .search-bar-inner {
+    --background: @border-color !important;
+  }
+}
+
+.radio-tabs-wrap {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+.mix-ul {
+  @outside: 52px;
+  height: calc(70vh - @outside);
+  overflow-y: auto;
+}
+.pane-content {
+  @outside: 52px;
+  height: calc(70vh - @outside);
+  overflow-y: auto;
+
+  &.pane-content-with-tabs {
+    @outside: 52px + 48px;
+    height: calc(70vh - @outside);
+  }
+}

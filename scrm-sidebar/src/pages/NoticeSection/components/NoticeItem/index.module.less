@@ -1,0 +1,18 @@
+.notice-item {
+  &.unread {
+    .notice-item-header {
+      position: relative;
+      padding-right: 6px;
+      &::after {
+        content: "";
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: red;
+        position: absolute;
+        right: 0px;
+        top: 4px;
+      }
+    } 
+  }
+}

@@ -1,0 +1,23 @@
+@import "style/theme.less";
+.input-section {
+  border: 1px solid @border-color;
+  border-radius: @border-radius-base;
+  display: inline-block;
+  font-size: 14px;
+  position: relative;
+  cursor: pointer;
+  padding: 6px 32px 6px 12px;
+  color: @text-color-secondary;
+  .input-arrow {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .input-close-icon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}

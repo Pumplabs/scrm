@@ -1,0 +1,34 @@
+@import "style/theme.less";
+
+.status-item-color(@color, @bgColor: fade(@color, 30%)) {
+  height: 22px;
+  padding: 2px 12px;
+  color: @color;
+  border-color: @color;
+  background-color: @bgColor;
+}
+
+.status-item {
+  font-size: 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  &.init {
+    .status-item-color(@blue);
+  }
+
+  &.cancel {
+    .status-item-color(@tip-color, @gray);
+  }
+
+  &.reject {
+    .status-item-color(@red);
+  }
+
+  &.confirm {
+    .status-item-color(@yellow);
+  }
+
+  &.done {
+    .status-item-color(@green);
+  }
+}

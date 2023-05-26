@@ -1,0 +1,58 @@
+@import "style/theme.less";
+
+.text-item {
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  padding: 0px 12px;
+  &:hover {
+    border-color:@primary-color;
+    cursor: pointer;
+  }
+  .text-item-header {
+    padding: 6px 0px;
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: @heading-color;
+  }
+  .text-item-body {
+    padding: 6px 0px;
+    height: 120px;
+    color: @text-color;
+  }
+  .text-item-footer {
+    height: 36px;
+    line-height: 36px;
+    border-top: 1px solid #eaeaea;
+    position: relative;
+  }
+  .send-icon {
+    margin: 0px 2px 0px 8px;
+    font-size: 12px;
+  }
+  .text-item-action {
+    font-size: 14px;
+  }
+  .text-item-user-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    margin-top: -3px;
+    margin-right: 4px;
+  }
+  .text-item-edit-icon {
+    position: absolute;
+    right: 14px + 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: @primary-color;
+  }
+  .text-item-remove-icon {
+    position: absolute;
+    right: 0px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: @primary-color;
+  }
+}

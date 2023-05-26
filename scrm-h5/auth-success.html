@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>授权成功</title>
+</head>
+<script>
+  var timer = null
+  var secondCount = 3
+  function decodeSearchParams(str) {
+    const arr = str.split('&')
+    let opt = {}
+    arr.forEach((ele) => {
+      const [label, val] = ele.split('=')
+      opt = {
+        ...opt,
+        [label]: val,
+      }
+    })
+    return opt
+  }
+  function callbackAuth(data) {
+    var xhr = new XMLHttpRequest()
+    xhr.open('GET', '/api/suiteAuth/tempAuthCallback?' + data, false)
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState == 4) {
+        if (xhr.status == 200 || xhr.status == 304) {
+          var res = {}
+          try {
+            res = JSON.parse(xhr.response)
+          } catch (e) { }
+          if (res.code === 0) {
+            document.getElementById('success-content').style.display = 'block'
+            timer = setInterval(function () {
+              if (secondCount === 1) {
+                window.location.href = `${window.location.origin}/app/login`
+                clearInterval(timer)
+                return
+              }
+              secondCount--
+              document.getElementById('second-count').innerHTML = secondCount
+            }, 1000)
+          }
+        }
+      }
+    }
+    xhr.send()
+  }
+  window.onload = function () {
+    var locSearch = window.location.search
+    var searchText = locSearch ? locSearch.slice(1) : ''
+    var searchParams = decodeSearchParams(searchText)
+    if (
+      searchParams['auth_code'] &&
+      searchParams['expires_in'] &&
+      searchParams.state
+    ) {
+      var paramsStr = `auth_code=${searchParams['auth_code']}&expires_in=${searchParams['expires_in']}&state=${searchParams.state}`
+      callbackAuth(paramsStr)
+    } else {
+      document.getElementById('no-params-content').style.display = 'block'
+    }
+  }
+</script>
+<style>
+  * {
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .container {
+    text-align: center;
+    padding-top: 100px;
+  }
+
+  .second-count {
+    font-weight: 600;
+    color: rgb(0, 195, 215);
+  }
+
+  h6 {
+    color: #333;
+    font-size: 20px;
+    line-height: 32px;
+    margin-bottom: 20px;
+  }
+
+  .success-content,
+  .no-params-content {
+    display: none;
+  }
+
+  .success-content p {
+    font-size: 16px;
+  }
+</style>
+
+<body>
+  <div class="container" id="container">
+    <div class="success-content" id="success-content">
+      <h6>授权成功</h6>
+      <p>
+        <span id="second-count" class="second-count">3</span>
+        <span>秒后将跳转到登录页面</span>
+      </p>
+    </div>
+    <div class="no-params-content" id="no-params-content">
+      <h6>缺少必要参数</h6>
+      界面缺少必要参数:auth_code,expires_in,state
+    </div>
+  </div>
+</body>
+
+</html>

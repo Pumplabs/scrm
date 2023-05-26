@@ -1,0 +1,54 @@
+@import "style/theme.less";
+.customerListItem {
+  position: relative;
+  .list-item-color(@mainColor, @textColor:#fff) {
+    background: fade(@mainColor, 7%);
+    border-color: @mainColor;
+    .status-item{
+      background-color: @mainColor;
+      border-color: @mainColor;
+      color: @textColor;
+    }
+  }
+  background: #fff;
+  border: 1px solid @gray;
+  // .list-item-color(@green);
+  // .list-item-color(@red);
+  border-radius: 4px;
+  padding: 14px 70px 14px 14px;
+  margin-bottom: 8px;
+
+
+  .status-item {
+    background: #fff;
+    border: 3px solid @gray;
+    border-radius: 4px;
+    padding: 1px 4px;
+    display: inline-block;
+    line-height: 1;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+
+  .desc-text {
+    color: @text-color;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  &.send {
+    .list-item-color(@green);
+  }
+  &.unsend {
+    .list-item-color(@yellow);
+  }
+  &.fail {
+    @color: @red;
+    .list-item-color(@red);
+  }
+}
+
+.customerListItem:nth-last-of-type(1) {
+  margin-bottom: 0px;
+}

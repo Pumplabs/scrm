@@ -1,0 +1,32 @@
+.user-icon {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+
+  .size(@wrapSize: 32px, @imgSize: 20px) {
+    width: @wrapSize;
+    height: @wrapSize;
+
+    .icon-img {
+      width: @wrapSize;
+      height: @wrapSize;
+      border-radius: 50%;
+    }
+    &.user-default {
+      .icon-img {
+        width: @imgSize;
+        height: @imgSize;
+      }
+    }
+  }
+
+  &.user-icon-small {
+    .size();
+  }
+
+  &.user-icon-middle {
+    .size(50px, 32px);
+  }
+}

@@ -1,0 +1,48 @@
+@import "style/theme.less";
+.popup-content {
+  padding-bottom: 10px;
+
+  .popup-header {
+    @top: 20px;
+    @right: 15px;
+    padding: @top @right 20px 15px;
+    font-size: 16px;
+    position: relative;
+    .btn-text {
+      cursor: pointer;
+      &.cancel-btn {
+        position: absolute;
+        left:@right;
+        top: @top;
+        color: @text-color-secondary;
+      }
+      &.submit-btn {
+        position: absolute;
+        right:@right;
+        top: @top;
+        color: @primary-color;
+      }
+      &.btn-disabled-text {
+        color: @text-color-secondary !important;
+        cursor: not-allowed !important;
+      }
+    }
+    .popup-title {
+      text-align: center;
+      color: #000;
+    }
+  }
+  .type-list {
+    padding: 0px 15px;
+    .type-list-item {
+      background-color: @info-bg;
+      border-radius: @border-radius-base;
+      margin-bottom: 8px;
+      :global {
+        .adm-list-item-content {
+          border-top: none;
+        }
+      }
+    }
+  }
+}

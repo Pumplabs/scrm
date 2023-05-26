@@ -1,0 +1,43 @@
+@import "src/style/theme.less";
+.script-item {
+  background-color: #fff;
+  border-radius: @border-radius-base;
+  padding: 12px 12px 0px 12px;
+  width: 100%;
+  word-break: break-all;
+  border: 1px solid #eaeaea;
+  .script-item-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  .script-name {
+    color: @heading-color;
+    font-size: 14px;
+  }
+  .script-count {
+    color: @text-color-secondary;
+    font-size: 12px;
+  }
+  .quick-send {
+    cursor: pointer;
+  }
+  .msg-item {
+    border: 1px solid #eaeaea;
+    border-radius: @border-radius-base;
+    margin-bottom: 10px;
+    .msg-item-body {
+      padding: 12px;
+    }
+    .msg-item-footer {
+      height: 32px;
+      padding-right: 12px;
+      line-height: 32px;
+      text-align: right;
+      border-top: 1px solid #eaeaea;
+      .send-icon {
+        cursor: pointer;
+        color: @primary-color;
+      }
+    }
+  }
+}

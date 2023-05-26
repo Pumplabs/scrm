@@ -1,0 +1,33 @@
+@import "style/theme.less";
+.keyboard-item {
+  position: relative;
+  top: -2px;
+  margin-right: 2px;
+  color: @primary-color;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: default;
+  display: inline-block;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.braft-editor {
+  border: 1px solid #dadada;
+  background: #fff;
+  position: relative;
+  :global {
+    .bf-controlbar {
+      background: #fff;
+      box-shadow: none;
+      border-bottom: 1px solid #dadada;
+    }
+  }
+}
+.editor-word-count {
+  text-align: right;
+  padding-right: 15px;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}

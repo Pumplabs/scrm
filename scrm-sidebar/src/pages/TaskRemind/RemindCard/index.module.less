@@ -1,0 +1,114 @@
+@import "style/theme.less";
+
+.remind-card {
+  background-color: #fff;
+
+
+  .remind-body-wrap {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    height: 100vh;
+  }
+  .remind-card-body {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+.remind-card-body {
+  .remind-msg {
+    margin-bottom: 20px;
+  }
+}
+
+.card-header {
+  position: relative;
+  padding-right: 44px;
+
+  margin-bottom: 12px;
+
+  .card-title {
+    color: @heading-color;
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+  }
+
+  .card-header-extra {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+  }
+}
+
+.status-item {
+  @color: #999;
+  border: 1px solid @color;
+  color: @color;
+  font-size: 12px;
+  line-height: 12px;
+  padding: 4px;
+  display: inline-block;
+  border-radius: 2px;
+
+  &.wait-send {
+    @color: #f7bc54;
+    border-color: @color;
+    color: @color;
+  }
+
+  &.done {
+    @color: #52c41a;
+    border-color: @color;
+    color: @color;
+  }
+  &.overdue {
+    @color: #ff4d4f;
+    border-color: @color;
+    color: @color;
+  }
+}
+
+.recevie-object {
+  transition: all 0.2s;
+  .recevie-object-header {
+    margin-bottom: 18px;
+  }
+  .recevie-object-title {
+    color: @heading-color;
+    label {
+      &::after {
+        content: ":";
+        display: inline-block;
+        padding: "0px 4px";
+      }
+      margin-right: 6px;
+      word-break: keep-all;
+      white-space: nowrap;
+    }
+    display: flex;
+    align-items: center;
+    .recevie-title-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: keep-all;
+    }
+  }
+  .expand-icon {
+    color: @text-color-secondary;
+    margin-left: 6px;
+  }
+  &.recevie-object-hide {
+    .recevie-object-body {
+      height: 0px;
+      visibility: hidden;
+    }
+    .expand-icon {
+      transform: rotate(180deg);
+    }
+  }
+}
+.remind-footer {
+  padding: 10px 0px;
+  width: 100%;
+}
