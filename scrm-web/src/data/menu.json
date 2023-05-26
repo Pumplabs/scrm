@@ -256,21 +256,6 @@
         "children": []
       },
       {
-        "id": "de2c330fea284b78972566801465fd47",
-        "name": "客户裂变",
-        "des": null,
-        "creator": "admin",
-        "editor": "admin",
-        "createdAt": "2022-05-16 10:17:27",
-        "updatedAt": "2022-05-23 11:19:58",
-        "deletedAt": null,
-        "parentId": "fc9723a9ab0749bcb1d94e6e93c87fe9",
-        "url": "/app/taskManage/list",
-        "type": 1,
-        "sort": 2,
-        "children": []
-      },
-      {
         "id": "450ab109f7414b68b77dda61fc82bf1e",
         "name": "客户群发",
         "des": null,
@@ -298,36 +283,6 @@
         "url": "/app/customerGroupMass",
         "type": 1,
         "sort": 4,
-        "children": []
-      },
-      {
-        "id": "03de16eca47940d9a08ee27cae8b33ed",
-        "name": "客户自动化营销",
-        "des": null,
-        "creator": "admin",
-        "editor": "admin",
-        "createdAt": "2022-05-16 10:18:02",
-        "updatedAt": "2022-08-05 09:34:52",
-        "deletedAt": null,
-        "parentId": "fc9723a9ab0749bcb1d94e6e93c87fe9",
-        "url": "/app/customerSop/list",
-        "type": 1,
-        "sort": 5,
-        "children": []
-      },
-      {
-        "id": "c925f319bcf54c7d9a6b09be4b365d76",
-        "name": "群自动化营销",
-        "des": null,
-        "creator": "admin",
-        "editor": "admin",
-        "createdAt": "2022-05-16 10:17:46",
-        "updatedAt": "2022-08-05 09:35:03",
-        "deletedAt": null,
-        "parentId": "fc9723a9ab0749bcb1d94e6e93c87fe9",
-        "url": "/app/groupSop/list",
-        "type": 1,
-        "sort": 6,
         "children": []
       },
       {
