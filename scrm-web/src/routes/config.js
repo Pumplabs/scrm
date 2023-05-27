@@ -187,18 +187,6 @@ const config = [
         element: <DimissionInherit />,
       },
       {
-        path: 'taskManage/list',
-        element: <FissionActivity />,
-      },
-      {
-        path: 'taskManage/list/add',
-        element: <FissionActivityAddOrEditPage />,
-      },
-      {
-        path: 'taskManage/list/edit/:id',
-        element: <FissionActivityAddOrEditPage />,
-      },
-      {
         path: 'saleOperation/trackMaterial',
         element: <TrackMaterial />,
       },
