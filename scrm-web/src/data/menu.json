@@ -408,36 +408,6 @@
         "children": []
       },
       {
-        "id": "a924a947caeb4fea80a7261d0861ba95",
-        "name": "版本信息",
-        "des": null,
-        "creator": "admin",
-        "editor": null,
-        "createdAt": "2022-05-16 10:13:35",
-        "updatedAt": null,
-        "deletedAt": null,
-        "parentId": "14c8b6e523224328b5ab034e22534ef9",
-        "url": "/app/versionInfo",
-        "type": 1,
-        "sort": 1,
-        "children": []
-      },
-      {
-        "id": "d2aa7ad7635d4e6fa7f714a4240b46d1",
-        "name": "操作日志",
-        "des": null,
-        "creator": "admin",
-        "editor": null,
-        "createdAt": "2022-05-16 10:13:20",
-        "updatedAt": null,
-        "deletedAt": null,
-        "parentId": "14c8b6e523224328b5ab034e22534ef9",
-        "url": "/app/systemLog",
-        "type": 1,
-        "sort": 1,
-        "children": []
-      },
-      {
         "id": "ca8ec03f42ed4b64ad422eb44938ac9f",
         "name": "管理员列表",
         "des": null,
