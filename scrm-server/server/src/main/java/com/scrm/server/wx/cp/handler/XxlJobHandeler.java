@@ -36,7 +36,6 @@ public class XxlJobHandeler {
     @Autowired
     private IWxMsgTemplateService msgTemplateService;
 
-
     @Autowired
     private IXxlJobService xxlJobService;
 
