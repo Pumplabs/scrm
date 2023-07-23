@@ -516,6 +516,11 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
     }
 
+    @Override
+    public void sync(String extCorpId, boolean isSync) {
+
+    }
+
     @Validated
     public WxCustomer refreshCustomer(WxCpExternalContactBatchInfo.ExternalContactInfo externalContactInfo, String extCorpId) {
 
@@ -1394,6 +1399,11 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         if (lock.isLocked() && lock.isHeldByCurrentThread()) {
             lock.unlock();
         }
+    }
+
+    @Override
+    public List<RLock> getCustomerSyncLock(String extCorpId, boolean needCache) {
+        return null;
     }
 
     @Override

@@ -95,6 +95,16 @@ public interface IWxCustomerService extends IService<WxCustomer> {
      * @date 2021-12-22
      */
     void sync(String extCorpId);
+    /**
+     * 同步员工客户数据
+     *
+     * @param extCorpId 外包企业id
+     * @param isSync 是否已经从微信同步
+     * @return com.scrm.api.wx.cp.entity.WxCustomer
+     * @author xxh
+     * @date 2021-12-22
+     */
+    void sync(String extCorpId, boolean isSync);
 
     /**
      * 修改客户详情
@@ -366,6 +376,14 @@ public interface IWxCustomerService extends IService<WxCustomer> {
      * @param rLock
      */
     void releaseSyncLock(RLock rLock);
+    /**
+     * 获取客户同步信息的锁
+     *
+     * @param extCorpId
+     * @param needCache 是否需要缓存
+     * @return
+     */
+    List<RLock> getCustomerSyncLock(String extCorpId, boolean needCache);
 
     /**
      * 获取所有客户的extId

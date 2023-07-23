@@ -23,6 +23,7 @@ import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -48,7 +49,8 @@ public class WxCustomerController {
     @ApiImplicitParam(value = "外部企业ID", name = "extCorpId", required = true)
     public R<Void> sync(String extCorpId) {
         Assert.isTrue(StringUtils.isNotBlank(extCorpId), "外部企业ID不能为空");
-        List<RLock> lockList = wxCustomerService.getCustomerSyncLock(extCorpId);
+        List<RLock> lockList = wxCustomerService.getCustomerSyncLock(extCorpId, true);
+
         try {
             boolean lockAll = true;
             for (RLock rLock : lockList) {
@@ -57,7 +59,7 @@ public class WxCustomerController {
                 }
             }
             if (lockAll) {
-                wxCustomerService.sync(extCorpId);
+                wxCustomerService.sync(extCorpId, false);
             }
         } catch (Exception e) {
             e.printStackTrace();

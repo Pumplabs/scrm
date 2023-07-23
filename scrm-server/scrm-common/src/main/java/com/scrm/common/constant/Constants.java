@@ -61,6 +61,11 @@ public class Constants {
     public static final String FISSION_SERVICE_CONTACT_WAY_STATE_PRE = "f_service:";
 
     /**
+     * 群活码的state
+     */
+    public static final String JOIN_WAY_STATE = "joinWay";
+
+    /**
      * 临时文件类型是图片
      */
     public static final String TEMP_FILE_IMG = "image";
@@ -79,7 +84,7 @@ public class Constants {
      * 临时文件类型是语音
      */
     public static final String TEMP_FILE_VOICE = "voice";
-    
+
     /**
      * 默认跟部门id,extId
      */
@@ -165,6 +170,16 @@ public class Constants {
     public static final String EDIT_TAG_REDIS_PRE = "editTag:";
 
     /**
+     * 查询群聊的redis前缀
+     */
+    public static final String WX_GROUP_CHAT_PRE = "wxGroupChat:";
+
+    /**
+     * 客户同步信息列表
+     */
+    public static final String WX_CUSTOMER_SYNC_INFOS="wxCustomerSyncInfo:";
+
+    /**
      * 客户标签： 新增
      */
     public static final String WX_TAG_CREATE = WxCpConsts.EventType.CHANGE_EXTERNAL_TAG + "_create";
@@ -185,10 +200,55 @@ public class Constants {
     public static final String WX_TAG_SHUFFLE = WxCpConsts.EventType.CHANGE_EXTERNAL_TAG + "_shuffle";
 
     /**
+     * 会话存档-消息类型：文本
+     */
+    public static final String WX_MSG_AUDIT_TYPE_TEXT = "text";
+
+    /**
+     * 会话存档-消息类型：图片
+     */
+    public static final String WX_MSG_AUDIT_TYPE_IMG = "image";
+
+    /**
+     * 会话存档-消息类型：表情
+     */
+    public static final String WX_MSG_AUDIT_TYPE_EMOTION = "emotion";
+
+    /**
+     * 会话存档-消息类型：语音
+     */
+    public static final String WX_MSG_AUDIT_TYPE_VOICE = "voice";
+
+    /**
+     * 会话存档-消息类型：链接
+     */
+    public static final String WX_MSG_AUDIT_TYPE_LINK = "link";
+
+    /**
+     * 会话存档-消息类型：文件
+     */
+    public static final String WX_MSG_AUDIT_TYPE_FILE = "file";
+
+    /**
+     * 会话存档-消息类型：撤回
+     */
+    public static final String WX_MSG_AUDIT_TYPE_REVOKE = "revoke";
+
+    /**
+     * 会话存档-消息类型：红包
+     */
+    public static final String WX_MSG_AUDIT_TYPE_RED_PACKET = "redpacket";
+
+    /**
+     * 会话存档-消息类型：红包
+     */
+    public static final String WX_MSG_AUDIT_TYPE_EXTERNAL_RED_PACKET = "external_redpacket";
+
+    /**
      * 同步客户数据时的锁前缀
      */
     public static final String CUSTOMER_SYNC_LOCK_PRE = "customerSyncLock:";
-    
+
     /**
      * 企业微信所有回调事件类型列表
      */
@@ -217,6 +277,7 @@ public class Constants {
             WxCpConsts.EventType.DELETE_CALENDAR,
             WxCpConsts.EventType.ADD_SCHEDULE,
             WxCpConsts.EventType.MODIFY_SCHEDULE,
+            "msgaudit_notify",
             WxCpConsts.EventType.DELETE_SCHEDULE).collect(Collectors.toList());
 
     /**
@@ -236,6 +297,8 @@ public class Constants {
     public static final String FISSION_CONTACT_EXPIRE_HANDLER = "fissionContactExpireJobHandler";
 
     public static final String FOLLOW_REMIND_HANDLER = "followRemindHandler";
+
+    public static final String CLUE_REMIND_HANDLER = "clueRemindHandler";
 
     /**
      * 应用内推送要用到的前端页面跳转链接
@@ -274,5 +337,13 @@ public class Constants {
     public static final String DYNAMIC_TAG_TYPE_CONTACT = "contact";
 
     public static final String DYNAMIC_TAG_TYPE_MANUAL = "manual";
+
+
+    /**
+     * 1:启用 0:禁用
+     */
+    public static final Integer ENABLE = 1;
+
+    public static final Integer DISABLE = 0;
 
 }

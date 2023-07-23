@@ -140,12 +140,13 @@ mybatis-plus:
 
 
 
-# 可信域名
-domainName: ####
-# api 代理，填写企微白名单ip，方便调试，生产环境换成企微接口的url https://qyapi.weixin.qq.com
-baseApiUrl: ####
-# 项目相关配置
+
 scrm:
+  # 可信域名
+  domainName: ####
+  # api 代理，填写企微白名单ip，方便调试，生产环境换成企微接口的url https://qyapi.weixin.qq.com
+  baseApiUrl: ####
+  # 项目相关配置
   # * 企业ID，https://work.weixin.qq.com/wework_admin/frame#profile
   extCorpID: ####
   # 企业名称
