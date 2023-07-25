@@ -114,4 +114,20 @@
         </where>
     </select>
 
+
+    <select id="addedByDate" resultType="java.lang.Long">
+        select count(*) addedCount from br_opportunity where  DATEDIFF(created_at, #{date}) = 0 and ext_corp_id = #{extCorpId}
+    </select>
+
+    <select id="countByDateAndCorp" resultType="java.util.HashMap">
+        select count(*) total , date(created_at), ext_corp_id from br_opportunity where  DATEDIFF(created_at, #{date}) = 0 group by created_at, ext_corp_id;
+    </select>
+
+
+
+    <select id="getLastNDaysCountDaily"  resultType="com.scrm.server.wx.cp.vo.DailyTotalVO">
+        SELECT COUNT( id ) as saveTotal ,date(created_at) as day FROM br_opportunity WHERE deleted_at IS NULL
+        AND (ext_corp_id = #{extCorpId} AND created_at >= #{startTime} AND created_at &lt;= #{endTime})
+        group by  created_at
+    </select>
 </mapper>

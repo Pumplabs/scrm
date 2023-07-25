@@ -135,7 +135,7 @@ export default () => {
     {
       title: '完成率',
       dataIndex: 'finishPercent',
-      render: val => `${val|| 0}%`
+      render: val => `${val || 0}%`
     },
     {
       title: '创建人',
@@ -152,6 +152,7 @@ export default () => {
       label: '月份',
       name: 'time',
       type: 'date',
+      disabledDate: false,
       eleProps: {
         picker: 'month',
       },

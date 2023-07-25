@@ -6,37 +6,11 @@ import {
   useRef,
   forwardRef,
 } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate, useLocation  } from 'react-router-dom'
 import { decode } from 'js-base64'
 import { useRequest } from 'ahooks'
-import { Switch } from 'antd-mobile'
-import { useModalHook, useBack } from 'src/hooks'
-import { GetOppDetail } from 'services/modules/opportunity'
-// export default () => {
-//   const { oppId: oppSearchId } = useParams()
-//   const { run: runGetOppDetail, data: oppData = {} } = useRequest(GetOppDetail, {
-//     manual: true,
-//   })
-//   const oppId = useMemo(() => {
-//     return decode(oppSearchId)
-//   }, [oppSearchId])
-
-//   useEffect(() => {
-//     if (oppId) {
-//       runGetOppDetail({
-//         id: oppId,
-//       })
-//     }
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [oppId])
-
-//   useBack({
-//     backUrl: `/opportunity/${oppSearchId}`
-//   })
-//   return <div>新增跟进</div>
-// }
-
 import {
+  Switch,
   Form,
   TextArea,
   Tag,
@@ -49,7 +23,6 @@ import {
 import moment from 'moment'
 import { MobXProviderContext, observer } from 'mobx-react'
 import {
-  CloseOutline,
   CheckCircleOutline,
   AddOutline,
   MoreOutline,
@@ -57,7 +30,9 @@ import {
 } from 'antd-mobile-icons'
 import { toJS } from 'mobx'
 import { isEmpty } from 'lodash'
-import { useNavigate, useLocation } from 'react-router-dom'
+
+import { useModalHook, useBack } from 'src/hooks'
+import { GetOppDetail } from 'services/modules/opportunity'
 import List from 'components/List'
 import {
   UploadFormItem,

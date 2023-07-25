@@ -1,6 +1,7 @@
 package com.scrm.server.wx.cp.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.scrm.common.config.ScrmConfig;
 import com.scrm.server.wx.cp.config.WxCpConfiguration;
 import com.scrm.server.wx.cp.service.IWxPortalService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class WxPortalServiceImpl implements IWxPortalService {
                 timestamp, nonce, signature);
         log.debug("\n消息解密后内容为：\n{} ", JSON.toJSONString(inMessage));
         //返回
-        WxCpXmlOutMessage outMessage = this.route(agentId, inMessage);
+        WxCpXmlOutMessage outMessage = route(agentId, inMessage);
         if (outMessage == null) {
             return "";
         }
@@ -43,9 +44,9 @@ public class WxPortalServiceImpl implements IWxPortalService {
         return out;
     }
 
-    private WxCpXmlOutMessage route(Integer agentId, WxCpXmlMessage message) {
+    public WxCpXmlOutMessage route(Integer agentId, WxCpXmlMessage message) {
         try {
-            return WxCpConfiguration.getRouters().get(agentId).route(message);
+            return WxCpConfiguration.getRouters().get(ScrmConfig.getMainAgentID()).route(message);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

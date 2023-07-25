@@ -138,7 +138,6 @@ export default () => {
   }
 
   const onDataRecord = (record) => {
-    console.log('onDataRecord')
     openModal('data', record)
   }
   const columns = [

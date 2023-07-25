@@ -15,5 +15,7 @@ public class GetUserInfoRes extends MpErrorCode{
     private String userid;
     
     private String openid;
+
+    private  String  user_ticket;
     
 }

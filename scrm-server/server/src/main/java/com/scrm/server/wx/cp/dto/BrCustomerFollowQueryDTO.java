@@ -13,7 +13,7 @@ import javax.validation.constraints.NotBlank;
  * @since 2022-05-19
  */
 @Data
-@ApiModel(value = "客户跟进请求参数")
+@ApiModel(value = "跟进请求参数")
 @Accessors(chain = true)
 public class BrCustomerFollowQueryDTO{
 
@@ -30,7 +30,7 @@ public class BrCustomerFollowQueryDTO{
     @ApiModelProperty("客户extid")
     private String extCustomerId;
 
-    @ApiModelProperty(value = "跟进类型 1：客户 2：商机")
+    @ApiModelProperty(value = "跟进类型 1：客户 2：商机 3:线索")
     private Integer type;
 
 

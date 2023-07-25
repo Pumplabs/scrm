@@ -84,7 +84,7 @@ public class Constants {
      * 临时文件类型是语音
      */
     public static final String TEMP_FILE_VOICE = "voice";
-
+    
     /**
      * 默认跟部门id,extId
      */
@@ -248,7 +248,7 @@ public class Constants {
      * 同步客户数据时的锁前缀
      */
     public static final String CUSTOMER_SYNC_LOCK_PRE = "customerSyncLock:";
-
+    
     /**
      * 企业微信所有回调事件类型列表
      */

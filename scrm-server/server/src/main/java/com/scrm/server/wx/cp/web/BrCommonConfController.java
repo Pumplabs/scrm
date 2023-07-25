@@ -1,31 +1,23 @@
 package com.scrm.server.wx.cp.web;
 
-import com.scrm.common.dto.BatchDTO;
-import com.scrm.server.wx.cp.service.IBrCommonConfService;
-import com.scrm.server.wx.cp.entity.BrCommonConf;
-
-import com.scrm.server.wx.cp.dto.BrCommonConfPageDTO;
-import com.scrm.server.wx.cp.dto.BrCommonConfSaveDTO;
-import com.scrm.server.wx.cp.dto.BrCommonConfUpdateDTO;
-
-import com.scrm.server.wx.cp.dto.BrCommonConfQueryDTO;
-import com.scrm.server.wx.cp.vo.BrCommonConfVO;
-
-import com.scrm.common.log.annotation.Log;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.scrm.common.constant.R;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
-import java.util.List;
-
+import com.scrm.common.dto.BatchDTO;
+import com.scrm.common.log.annotation.Log;
+import com.scrm.server.wx.cp.dto.*;
+import com.scrm.server.wx.cp.entity.BrCommonConf;
+import com.scrm.server.wx.cp.service.IBrCommonConfService;
+import com.scrm.server.wx.cp.vo.BrCommonConfVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import com.scrm.api.wx.cp.dto.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 通用配置 控制器
@@ -39,7 +31,6 @@ public class BrCommonConfController {
 
     @Autowired
     private IBrCommonConfService brCommonConfService;
-
 
     @PostMapping("/pageList")
     @ApiOperation(value = "分页查询")
@@ -99,5 +90,16 @@ public class BrCommonConfController {
         brCommonConfService.batchDelete(dto);
         return R.success("删除成功");
     }
+
+
+    @PostMapping("/updateSort")
+    @ApiOperation(value = "更新商机阶段排序")
+    @Log(modelName = "更新商机阶段排序", operatorType = "更新商机阶段排序")
+    public R<Void> updateSort(@RequestBody @Valid BrCommonConfUpdateSortDTO dto){
+        brCommonConfService.updateSort(dto);
+        return R.success("更新成功");
+    }
+
+
 
 }

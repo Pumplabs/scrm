@@ -2,20 +2,16 @@ package com.scrm.server.wx.cp.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.scrm.api.wx.cp.dto.*;
-import com.scrm.api.wx.cp.entity.Staff;
-import com.scrm.api.wx.cp.entity.WxCustomer;
-import com.scrm.api.wx.cp.entity.WxGroupChat;
+import com.scrm.api.wx.cp.entity.*;
 import com.scrm.api.wx.cp.enums.WxStaffTransferStatusEnum;
+import com.scrm.api.wx.cp.vo.StaffFollowVO;
 import com.scrm.api.wx.cp.vo.WxCustomerVO;
 import com.scrm.api.wx.cp.vo.WxGroupChatVO;
-import com.scrm.server.wx.cp.service.IStaffService;
-import com.scrm.server.wx.cp.service.IWxCustomerService;
-import com.scrm.server.wx.cp.service.IWxGroupChatService;
+import com.scrm.common.util.ListUtils;
+import com.scrm.server.wx.cp.service.*;
 import lombok.extern.slf4j.Slf4j;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.scrm.api.wx.cp.entity.WxStaffTransferInfo;
 import com.scrm.server.wx.cp.mapper.WxStaffTransferInfoMapper;
-import com.scrm.server.wx.cp.service.IWxStaffTransferInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,9 +22,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.scrm.api.wx.cp.vo.WxStaffTransferInfoVO;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 员工在职转接记录 服务实现类
@@ -49,6 +44,9 @@ public class WxStaffTransferInfoServiceImpl extends ServiceImpl<WxStaffTransferI
 
     @Autowired
     private IWxGroupChatService groupChatService;
+
+    @Autowired
+    private IWxCustomerStaffTagService customerStaffTagService;
 
     @Override
     public IPage<WxStaffTransferInfoVO> pageList(WxStaffTransferInfoPageDTO dto) {
@@ -115,7 +113,12 @@ public class WxStaffTransferInfoServiceImpl extends ServiceImpl<WxStaffTransferI
     private WxStaffTransferInfoVO translation(WxStaffTransferInfo wxStaffTransferInfo) {
         WxStaffTransferInfoVO vo = new WxStaffTransferInfoVO();
         BeanUtils.copyProperties(wxStaffTransferInfo, vo);
-        return vo.setHandover(staffService.translation(staffService.find(wxStaffTransferInfo.getExtCorpId(), vo.getHandoverStaffExtId())))
+
+        // 查询员工-客户标签
+        List<WxTag> tags = customerStaffTagService.findTagList(wxStaffTransferInfo.getExtCorpId(),wxStaffTransferInfo.getTakeoverStaffExtId(),wxStaffTransferInfo.getCustomerExtId());
+
+        return vo.setTags(tags)
+                .setHandover(staffService.translation(staffService.find(wxStaffTransferInfo.getExtCorpId(), vo.getHandoverStaffExtId())))
                 .setTakeover(staffService.translation(staffService.find(wxStaffTransferInfo.getExtCorpId(), vo.getTakeoverStaffExtId())))
                 .setCustomer(customerService.translation(customerService.find(wxStaffTransferInfo.getExtCorpId(), vo.getCustomerExtId())));
     }

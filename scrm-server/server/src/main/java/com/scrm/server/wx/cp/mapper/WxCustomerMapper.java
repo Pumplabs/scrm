@@ -11,9 +11,12 @@ import com.scrm.api.wx.cp.vo.WxCustomerVO;
 import com.scrm.server.wx.cp.dto.BrJourneyCustomerPageDTO;
 
 import com.scrm.server.wx.cp.dto.WxCustomerAssistPageDTO;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 企业微信客户 Mapper接口
@@ -86,4 +89,14 @@ public interface WxCustomerMapper extends BaseMapper<WxCustomer> {
      * @return int
      */
     int count(String extCorpId);
+
+
+    Long addedByDate(Date date, String extCorpId);
+
+    List<Map<String, Object>> countByDateAndCorp(@Param("date") Date date);
+
+    List<DailyTotalVO> getLastNDaysCountDaily(@Param("startTime") Date startTime,
+                                              @Param("endTime") Date endTime,
+                                              @Param("extCorpId") String extCorpId);
+
 }

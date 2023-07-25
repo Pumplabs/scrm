@@ -210,6 +210,21 @@
         "children": []
       },
       {
+        "id": "364dc9e8c23748029ae0bb44956db0a7",
+        "name": "离职继承",
+        "des": null,
+        "creator": "admin",
+        "editor": "admin",
+        "createdAt": "2022-05-16 10:12:44",
+        "updatedAt": "2022-05-23 11:21:53",
+        "deletedAt": null,
+        "parentId": "6c7a14090bcb4000ad1d3cf3980a4c84",
+        "url": "/app/dimissionInherit",
+        "type": 1,
+        "sort": 7,
+        "children": []
+      },
+      {
         "id": "359e79be0f884ac6a59cf383ceac4407",
         "name": "流失记录",
         "des": null,
@@ -390,7 +405,7 @@
     "parentId": null,
     "url": null,
     "type": 1,
-    "sort": 5,
+    "sort": 6,
     "children": [
       {
         "id": "a703468099034ca68d6b5720049a270b",

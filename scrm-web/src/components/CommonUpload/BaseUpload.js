@@ -3,7 +3,7 @@ import { Upload } from 'antd'
 import cls from 'classnames'
 import { UPLOAD_API } from './constants'
 import { showUserExpiredModal } from 'services/request'
-import { TOKEN_KEY, SUCCESS_CODE } from 'src/utils/constants'
+import { TOKEN_KEY, SUCCESS_CODE } from 'utils/constants'
 import useUploadHook from './useUploadHook'
 
 /**
@@ -73,8 +73,8 @@ export default forwardRef((props, ref) => {
   const acceptProps =
     Array.isArray(acceptTypeList) && acceptTypeList.length
       ? {
-          accept: acceptTypeList.join(),
-        }
+        accept: acceptTypeList.join(),
+      }
       : {}
   const uploadProps = {
     fileList: currentFileList,
@@ -93,14 +93,14 @@ export default forwardRef((props, ref) => {
   return (
     <div ref={ref} id={props.id}>
       <Upload
-      action={UPLOAD_API}
-      headers={{
-        token: localStorage.getItem(TOKEN_KEY),
-      }}
-      {...uploadProps}
-    >
-      {isOverFiles && hidedFiles ? null : children}
-    </Upload>
+        action={UPLOAD_API}
+        headers={{
+          token: localStorage.getItem(TOKEN_KEY),
+        }}
+        {...uploadProps}
+      >
+        {isOverFiles && hidedFiles ? null : children}
+      </Upload>
     </div>
   )
 })

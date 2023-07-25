@@ -85,4 +85,5 @@ public class BrCustomerFollow implements Serializable{
     public static final Integer CUSTOMER_TYPE = 1;
 
     public static final Integer OPPORTUNITY_TYPE = 2;
+
 }

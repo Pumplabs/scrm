@@ -4,22 +4,47 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.scrm.api.wx.cp.entity.WxCustomerStaffTag">
-        <id column="id" property="id" />
-        <result column="ext_corp_id" property="extCorpId" />
-        <result column="ext_creator_id" property="extCreatorId" />
-        <result column="customer_staff_id" property="customerStaffId" />
-        <result column="ext_tag_id" property="extTagId" />
-        <result column="group_name" property="groupName" />
-        <result column="tag_name" property="tagName" />
-        <result column="type" property="type" />
-        <result column="created_at" property="createdAt" />
-        <result column="updated_at" property="updatedAt" />
-        <result column="deleted_at" property="deletedAt" />
+        <id column="id" property="id"/>
+        <result column="ext_corp_id" property="extCorpId"/>
+        <result column="ext_creator_id" property="extCreatorId"/>
+        <result column="customer_staff_id" property="customerStaffId"/>
+        <result column="ext_tag_id" property="extTagId"/>
+        <result column="group_name" property="groupName"/>
+        <result column="tag_name" property="tagName"/>
+        <result column="type" property="type"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted_at" property="deletedAt"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id, ext_corp_id, ext_creator_id, customer_staff_id, ext_tag_id, group_name, tag_name, type, created_at, updated_at, deleted_at
     </sql>
+    <select id="findTagList" resultType="com.scrm.api.wx.cp.entity.WxTag">
+        SELECT
+        t.*
+        FROM
+        wx_customer_staff_tag m
+        JOIN wx_tag t ON m.ext_corp_id = t.ext_corp_id
+        AND m.ext_tag_id = t.ext_id
+        <where>
+            <if test="extCorpId != null and extCorpId != ''">
+                m.ext_corp_id = #{extCorpId}
+            </if>
+            <if test="staffExtId != null and staffExtId != ''">
+                and m.ext_staff_id = #{staffExtId}
+            </if>
+            <if test="customerExtId != null and customerExtId != ''">
+                and m.ext_customer_id = #{customerExtId}
+            </if>
+        </where>
+        GROUP BY
+        m.has_delete,
+        m.deleted_at
+        ORDER BY
+        m.has_delete IS NULL,
+        m.deleted_at DESC
+    </select>
 
 </mapper>

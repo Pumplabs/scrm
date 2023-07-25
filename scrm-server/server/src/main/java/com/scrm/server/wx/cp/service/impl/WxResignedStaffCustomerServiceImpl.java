@@ -120,6 +120,9 @@ public class WxResignedStaffCustomerServiceImpl extends ServiceImpl<WxResignedSt
     private WxResignedStaffCustomerVO translation(WxResignedStaffCustomer wxResignedStaffCustomer) {
         WxResignedStaffCustomerVO vo = new WxResignedStaffCustomerVO();
         BeanUtils.copyProperties(wxResignedStaffCustomer, vo);
+        vo.setCustomer(wxCustomerService.translation(wxCustomerService.find(wxResignedStaffCustomer.getExtCorpId(), wxResignedStaffCustomer.getCustomerExtId())));
+        vo.setHandoverStaff(staffService.translation(staffService.find(vo.getExtCorpId(), vo.getHandoverStaffExtId())));
+        vo.setTakeoverStaff(staffService.translation(staffService.find(vo.getExtCorpId(), vo.getTakeoverStaffExtId())));
         return vo;
     }
 
@@ -150,13 +153,16 @@ public class WxResignedStaffCustomerServiceImpl extends ServiceImpl<WxResignedSt
     private WxCustomerVO translationWaitTransferPage(WxResignedStaffCustomer wxResignedStaffCustomer) {
         String customerExtId = wxResignedStaffCustomer.getCustomerExtId();
         String extCorpId = wxResignedStaffCustomer.getExtCorpId();
-        return wxCustomerService.translation(wxCustomerService.checkExists(extCorpId, customerExtId));
+        WxCustomerVO wxCustomerVO = new WxCustomerVO();
+        wxCustomerVO.setExtId(customerExtId).setExtCorpId(extCorpId);
+        return Optional.ofNullable(wxCustomerService.translation(wxCustomerService.find(extCorpId, customerExtId), true))
+                .orElse(wxCustomerVO);
     }
 
     @Override
     public IPage<WxResignedStaffCustomerInfoVO> pageCustomerResignedInheritance(WxResignedStaffCustomerInfoDTO dto) {
         IPage<WxResignedStaffCustomerInfoVO> page = baseMapper.pageCustomerResignedInheritance(new Page<>(dto.getPageNum(), dto.getPageSize()), dto);
-        Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>()).forEach(vo -> vo.setHandoverStaff(staffService.translation(staffService.findByExtId(vo.getExtCorpId(), vo.getHandoverStaffExtId()))));
+        Optional.ofNullable(page.getRecords()).orElse(new ArrayList<>()).forEach(vo -> vo.setHandoverStaff(staffService.translation(staffService.find(vo.getExtCorpId(), vo.getHandoverStaffExtId()))));
         return page;
     }
 
@@ -165,8 +171,11 @@ public class WxResignedStaffCustomerServiceImpl extends ServiceImpl<WxResignedSt
     public void syncCustomer(String extCorpId) throws WxErrorException {
 
         List<WxResignedStaffCustomer> saveList = new ArrayList<>();
+        List<WxResignedStaffCustomer> updateList = new ArrayList<>();
         WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(WxCpConfiguration.getCustomerSecretWxCpService());
-        listUnassignedList(externalContactService, null, null).forEach(unassignInfo -> {
+        List<String> existsKeyList = new ArrayList<>();
+        List<WxCpUserExternalUnassignList.UnassignInfo> unassignInfos = listUnassignedList(externalContactService, null, null);
+        unassignInfos.forEach(unassignInfo -> {
             WxResignedStaffCustomer staffCustomer = getOne(new LambdaQueryWrapper<WxResignedStaffCustomer>()
                     .eq(WxResignedStaffCustomer::getExtCorpId, extCorpId)
                     .eq(WxResignedStaffCustomer::getHandoverStaffExtId, unassignInfo.getHandoverUserid())
@@ -186,46 +195,74 @@ public class WxResignedStaffCustomerServiceImpl extends ServiceImpl<WxResignedSt
                         .setCreateTime(new Date());
                 saveList.add(wxResignedStaffCustomer);
             }
+            existsKeyList.add(unassignInfo.getHandoverUserid() + unassignInfo.getExternalUserid());
         });
         if (ListUtils.isNotEmpty(saveList)) {
             saveBatch(saveList);
         }
+        if (ListUtils.isNotEmpty(updateList)) {
+            updateBatchById(updateList);
+        }
+
+
+        //删除在企微后台分配了的记录
+        List<WxResignedStaffCustomer> list = Optional.ofNullable(list(new LambdaQueryWrapper<WxResignedStaffCustomer>()
+                .eq(WxResignedStaffCustomer::getExtCorpId, extCorpId)
+                .in(WxResignedStaffCustomer::getStatus, Arrays.asList(WxResignedStaffCustomer.STATUS_WAITING_TAKE_OVER, WxResignedStaffCustomer.STATUS_SUCCESSION_RECORD))
+                .isNull(WxResignedStaffCustomer::getTakeoverStaffExtId)
+                .isNotNull(WxResignedStaffCustomer::getHandoverStaffExtId))).orElse(new ArrayList<>());
+
+        List<String> deleteIds = new ArrayList<>();
+        Iterator<WxResignedStaffCustomer> iterator = list.iterator();
+        while (iterator.hasNext()) {
+            WxResignedStaffCustomer next = iterator.next();
+            //如果接替员工为空，且企微接口未返回，则说明已经在企微后台进行了分配操作
+            if (!existsKeyList.contains(next.getHandoverStaffExtId() + next.getCustomerExtId())) {
+                deleteIds.add(next.getId());
+                iterator.remove();
+            }
+        }
+        if (ListUtils.isNotEmpty(deleteIds)) {
+            removeByIds(deleteIds);
+        }
 
         //同步状态
-        List<WxResignedStaffCustomer> list = Optional.ofNullable(list(new LambdaQueryWrapper<WxResignedStaffCustomer>()
+        list = Optional.ofNullable(list(new LambdaQueryWrapper<WxResignedStaffCustomer>()
                 .eq(WxResignedStaffCustomer::getExtCorpId, extCorpId)
                 .in(WxResignedStaffCustomer::getStatus, Arrays.asList(WxResignedStaffCustomer.STATUS_WAITING_TAKE_OVER, WxResignedStaffCustomer.STATUS_SUCCESSION_RECORD))
                 .isNotNull(WxResignedStaffCustomer::getTakeoverStaffExtId)
                 .isNotNull(WxResignedStaffCustomer::getHandoverStaffExtId))).orElse(new ArrayList<>());
 
+
         Map<String, WxCpUserTransferResultResp.TransferResult> map = new HashMap<>();
         List<String> checkList = new ArrayList<>();
-        List<WxResignedStaffCustomer> updateList = new ArrayList<>();
+        List<WxResignedStaffCustomer> waitUpdateList = new ArrayList<>();
         list.forEach(resignedStaffCustomer -> {
-            try {
-                String key = resignedStaffCustomer.getHandoverStaffExtId() + resignedStaffCustomer.getTakeoverStaffExtId() + resignedStaffCustomer.getCustomerExtId();
-                String checkKey = resignedStaffCustomer.getHandoverStaffExtId() + resignedStaffCustomer.getTakeoverStaffExtId();
-                if (!checkList.contains(checkKey)) {
+            String key = resignedStaffCustomer.getHandoverStaffExtId() + resignedStaffCustomer.getTakeoverStaffExtId() + resignedStaffCustomer.getCustomerExtId();
+            String checkKey = resignedStaffCustomer.getHandoverStaffExtId() + resignedStaffCustomer.getTakeoverStaffExtId();
+            if (!checkList.contains(checkKey)) {
+                try {
                     List<WxCpUserTransferResultResp.TransferResult> transferResults = resignedTransferResult(externalContactService, resignedStaffCustomer.getHandoverStaffExtId(),
                             resignedStaffCustomer.getTakeoverStaffExtId(), null, null);
                     for (WxCpUserTransferResultResp.TransferResult transferResult : transferResults) {
                         map.put(checkKey + transferResult.getExternalUserid(), transferResult);
                     }
+                } catch (WxErrorException ex) {
+                    log.error("调用企业微信离职继承状态异常：code:{},msg:{}", ex.getError().getErrorCode(), ex.getError().getErrorMsgEn());
                 }
-                WxCpUserTransferResultResp.TransferResult transferResult = map.get(key);
-                if (transferResult != null) {
-                    updateList.add(resignedStaffCustomer.setStatus(transferResult.getStatus().ordinal())
-                            .setIsHandOver(!Objects.equals(WxResignedStaffCustomer.STATUS_SUCCESSION_RECORD, transferResult.getStatus().ordinal()))
-                            .setTakeoverTime(new Date(transferResult.getTakeOverTime() * 1000)));
-                }
-            } catch (WxErrorException e) {
-                e.printStackTrace();
-                throw new BaseException(e.getError().getErrorCode(), e.getError().getErrorMsgEn());
+
             }
+            WxCpUserTransferResultResp.TransferResult transferResult = map.get(key);
+            if (transferResult != null) {
+                waitUpdateList.add(resignedStaffCustomer.setStatus(transferResult.getStatus().ordinal())
+                        .setIsHandOver(!Objects.equals(WxResignedStaffCustomer.STATUS_SUCCESSION_RECORD, transferResult.getStatus().ordinal()))
+                        .setTakeoverTime(new Date(transferResult.getTakeOverTime() * 1000)));
+            }
+
         });
 
-        if (ListUtils.isNotEmpty(updateList)) {
-            updateBatchById(updateList);
+        if (ListUtils.isNotEmpty(waitUpdateList)) {
+            updateBatchById(waitUpdateList);
         }
 
     }
@@ -240,7 +277,7 @@ public class WxResignedStaffCustomerServiceImpl extends ServiceImpl<WxResignedSt
         }
         Staff takeoverStaff = staffService.checkExists(dto.getTakeoverStaffExtId(), dto.getExtCorpId());
 
-        List<WxCustomer> wxCustomers = dto.getCustomerExtIds().stream().map(customExtId -> customerService.checkExists(dto.getExtCorpId(), customExtId)).collect(Collectors.toList());
+        List<WxCustomer> wxCustomers = dto.getCustomerExtIds().stream().map(customExtId -> customerService.find(dto.getExtCorpId(), customExtId)).collect(Collectors.toList());
 
         //递归查询
         if (ListUtils.isEmpty(wxCustomers) || wxCustomers.size() != dto.getCustomerExtIds().size()) {
@@ -281,7 +318,7 @@ public class WxResignedStaffCustomerServiceImpl extends ServiceImpl<WxResignedSt
             customerReq.setTransferMsg(dto.getTransferMsg());
             WxCpUserTransferCustomerResp resp;
             try {
-                resp = externalContactService.transferCustomer(customerReq);
+                resp = externalContactService.resignedTransferCustomer(customerReq);
                 Optional.ofNullable(resp.getCustomer()).orElse(new ArrayList<>()).forEach(customer -> {
                     WxCustomer wxCustomer = Optional.ofNullable(customerMap.get(customer.getExternalUserid())).orElse(new WxCustomer());
                     StaffTransferCustomerInfoVO staffTransferCustomerInfoVO = new StaffTransferCustomerInfoVO().setCustomerUserId(wxCustomer.getExtId()).setCustomerId(wxCustomer.getId()).setCustomerName(wxCustomer.getName()).setErrCode(customer.getErrcode());
@@ -302,7 +339,7 @@ public class WxResignedStaffCustomerServiceImpl extends ServiceImpl<WxResignedSt
         if (ListUtils.isNotEmpty(customerExtIds)) {
             resignedStaffCustomerList.forEach(resignedStaffCustomer -> {
                 if (customerExtIds.contains(resignedStaffCustomer.getCustomerExtId())) {
-                    updateList.add(resignedStaffCustomer.setTakeoverStaffExtId(dto.getHandoverStaffExtId())
+                    updateList.add(resignedStaffCustomer.setTakeoverStaffExtId(dto.getTakeoverStaffExtId())
                             .setIsHandOver(true)
                             .setStatus(WxResignedStaffCustomer.STATUS_WAITING_TAKE_OVER)
                             .setAllocateTime(new Date()));

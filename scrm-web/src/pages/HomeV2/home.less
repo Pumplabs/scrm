@@ -1,0 +1,190 @@
+@container-header-title: 1.27rem;
+@container-header-color: #000;
+@container-header-font-weight: 700;
+
+
+@top-first: #DD4377;
+@top-second: #e9500e;
+@top-third: #e6f114;
+
+.overview-container {
+    background-color: #fbfbfd;
+    border-radius: 16px;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: start;
+    padding: 16px;
+
+    margin-bottom: 24px;
+
+    .header {
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .overview-list {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+    }
+
+    .overview-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: start;
+        padding: 15px;
+
+        .index-name {
+            color: #7E7A7A;
+            margin-bottom: 12px;
+
+        }
+
+        .index-value {
+            color: #333;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+    }
+}
+
+.chart-container {
+    border-radius: 16px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    .item-container {
+
+        flex: 1;
+
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: start;
+    }
+}
+
+.section-container {
+
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+
+    .item-panel {
+        border-radius: 16px;
+        background-color: #fbfbfd;
+        margin-left: 8px;
+        margin-right: 8px;
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        padding-left: 15px;
+        padding-right: 15px;
+        padding: 15px;
+
+        .header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-bottom: 24px;
+
+            .title {
+
+                font-size: @container-header-title;
+                color: @container-header-color;
+                font-weight: @container-header-font-weight;
+            }
+
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+
+            .item {
+                flex: 1;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: 12px;
+                padding: 8px;
+
+
+                .item-icon-wrap {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    margin-right: 20px;
+
+                    .item-icon {
+                        // width: 24px;
+                        // height: 24px;
+                        // border: 2px solid #DD4377;
+                        border-radius: 9999px;
+                        text-align: center;
+                        line-height: 22px;
+                        align-self: center;
+                        font-size: 24px;
+                        font-weight: 700;
+                    }
+                }
+
+                .user-label {
+                    display: flex;
+                    flex-direction: row;
+                    flex: 1;
+
+                    .user-avatar {
+                        height: 40px;
+                        width: 40px;
+                        margin-right: 8px;
+
+                        img {
+                            height: 100%;
+                            width: 100%;
+                            border-radius: 9999px;
+                            border: 2px solid #3081dd;
+                        }
+
+                    }
+
+                    .username {
+                        display: flex;
+                        flex-direction: column;
+
+                        .name {
+                            color: #000;
+                            font-size: 16px;
+                            font-weight: 500;
+                        }
+
+                        .department {
+                            font-size: 13px;
+
+                        }
+                    }
+                }
+
+                .value {
+                    font-size: 20px;
+                    font-weight: 700;
+                    color: #000;
+                }
+
+            }
+        }
+
+    }
+}

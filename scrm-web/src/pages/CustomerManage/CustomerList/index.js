@@ -15,13 +15,12 @@ import UserTag from 'components/UserTag'
 import TagCell from 'components/TagCell'
 import { DepNames } from 'components/DepName'
 import { ChooseTagModal } from 'components/TagSelect'
-import { useModalHook, useTable } from 'src/hooks'
+import { useModalHook, useTable } from 'hooks'
 import { SUCCESS_CODE } from 'utils/constants'
 import DetailDrawer from './components/DetailDrawer'
 import {
   actionRequestHookOptions,
-  getRequestError,
-  exportByLink,
+  getRequestError
 } from 'services/utils'
 import {
   GetCustomerList,
@@ -85,7 +84,7 @@ export default () => {
             Modal.info({
               title: '操作结果',
               content: `操作成功：${successCount},操作失败：${failCount}`,
-              onOk: () => {},
+              onOk: () => { },
             })
           }
         }
@@ -99,10 +98,6 @@ export default () => {
   })
   const { run: runExportCustomer } = useRequest(ExportCustomer, {
     manual: true,
-    onSuccess: (res) => {
-      exportByLink(res)
-      message.info('正在导出中...')
-    },
     onError: (e) => getRequestError(e, '导出异常'),
   })
 

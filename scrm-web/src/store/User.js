@@ -21,7 +21,8 @@ class UserStore {
     }
     if (authCode) {
       this.fetchUserInfo(GetUserInfoByCode, {
-        code: authCode
+        code: authCode,
+        loginFromWeb: ""
       })
     } else {
       const authority = localStorage.getItem(TOKEN_KEY)

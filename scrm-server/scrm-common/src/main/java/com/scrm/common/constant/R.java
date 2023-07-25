@@ -1,5 +1,6 @@
 package com.scrm.common.constant;
 
+import com.scrm.common.util.SpringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -10,7 +11,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.Optional;
-
+import brave.Tracer;
 
 /**
  * @author: xxh
@@ -37,6 +38,9 @@ public class R<T> implements Serializable {
     @ApiModelProperty(value = "返回消息", required = true)
     private String msg;
 
+    @ApiModelProperty(value = "traceId")
+    private String traceId;
+
 
     public static boolean isSuccess(@Nullable R<?> result) {
         return Optional.ofNullable(result).map(x ->
@@ -61,23 +65,24 @@ public class R<T> implements Serializable {
     }
 
     public static <T> R<T> data(int code, T data, String msg) {
-        return new R<T>().setCode(code).setData(data).setMsg(msg);
+        R<T> tr = new R<T>().setCode(code).setData(data).setMsg(msg).setTraceId(getThreadTraceId());
+        return tr;
     }
 
     public static <T> R<T> success() {
-        return new R<T>().setCode(ResultCode.SUCCESS.code).setMsg(ResultCode.SUCCESS.msg);
+        return new R<T>().setCode(ResultCode.SUCCESS.code).setMsg(ResultCode.SUCCESS.msg).setTraceId(getThreadTraceId());
     }
 
     public static <T> R<T> success(String msg) {
-        return new R<T>().setCode(ResultCode.SUCCESS.code).setMsg(msg);
+        return new R<T>().setCode(ResultCode.SUCCESS.code).setMsg(msg).setTraceId(getThreadTraceId());
     }
 
     public static <T> R<T> success(IResultCode resultCode) {
-        return new R<T>().setCode(resultCode.getCode()).setMsg(resultCode.getMsg());
+        return new R<T>().setCode(resultCode.getCode()).setMsg(resultCode.getMsg()).setTraceId(getThreadTraceId());
     }
 
     public static <T> R<T> success(IResultCode resultCode, String msg) {
-        return new R<T>().setCode(resultCode.getCode()).setMsg(msg);
+        return new R<T>().setCode(resultCode.getCode()).setMsg(msg).setTraceId(getThreadTraceId());
     }
 
     public static <T> R<T> fail(String msg) {
@@ -85,18 +90,25 @@ public class R<T> implements Serializable {
     }
 
     public static <T> R<T> fail(int code, String msg) {
-        return new R<T>().setCode(code).setMsg(StringUtils.isBlank(msg) ? ResultCode.FAILURE.getMsg() : msg);
+        return new R<T>().setCode(code).setMsg(StringUtils.isBlank(msg) ? ResultCode.FAILURE.getMsg() : msg).setTraceId(getThreadTraceId());
     }
 
     public static <T> R<T> fail(IResultCode resultCode) {
-        return new R<T>().setCode(resultCode.getCode()).setMsg(resultCode.getMsg());
+        return new R<T>().setCode(resultCode.getCode()).setMsg(resultCode.getMsg()).setTraceId(getThreadTraceId());
     }
 
     public static <T> R<T> fail(IResultCode resultCode, String msg) {
-        return new R<T>().setCode(ResultCode.FAILURE.getCode()).setMsg(msg);
+        return new R<T>().setCode(ResultCode.FAILURE.getCode()).setMsg(msg).setTraceId(getThreadTraceId());
 
     }
 
-
+    public static String getThreadTraceId(){
+        Tracer tracer = SpringUtils.getBeanNew(Tracer.class);
+        try {
+           return tracer.currentSpan().context().traceIdString();
+        }catch (Exception e){
+            return null;
+        }
+    }
 }
 

@@ -16,19 +16,19 @@ export default (props) => {
   }, [isDefinedPagination, dataSource, titleKey, searchText])
 
   const curPager = useMemo(() => {
-    return isDefinedPagination ? pagination : {...pager, total: allList.length}
+    return isDefinedPagination ? pagination : { ...pager, total: allList.length }
   }, [pager, isDefinedPagination, pagination, allList.length])
 
   const curList = useMemo(() => {
     const list = isDefinedPagination ? dataSource : getListByPager(curPager, allList)
-   return list
+    return list
   }, [isDefinedPagination, dataSource, allList, curPager])
 
 
   const fetchData = (pager, keyword = searchText) => {
     if (isDefinedPagination) {
-      console.log('isDefinedPagination', isDefinedPagination)
-      request(pager, {keyword})
+      // console.log('isDefinedPagination', isDefinedPagination)
+      request(pager, { keyword })
     } else {
       setPager(pager)
     }

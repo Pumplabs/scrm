@@ -40,6 +40,8 @@ public enum WxErrorEnum implements IResultCode {
     CODE_610016(610016, "企业未认证"),
     
     CODE_610004(610004, "不是客户"),
+
+    CODE_90207(90207, "错误的小程序appId"),
     
     CODE_701008(701008, "没有互通账号");
 

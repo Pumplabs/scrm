@@ -12,6 +12,7 @@ import com.scrm.server.wx.cp.vo.BrOpportunityVO;
 import com.scrm.common.log.annotation.Log;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.scrm.common.constant.R;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
@@ -22,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 商机 控制器
@@ -106,5 +109,14 @@ public class BrOpportunityController {
     public R<IPage<BrFieldLogVO>> logList(@RequestBody @Valid BrFieldLogPageDTO dto){
         return R.data(fieldLogService.pageList(dto));
     }
+
+
+    @GetMapping("/getLastNDaysCountDaily")
+    @ApiOperation(value = "获取每天新增商机数量")
+    @Log(modelName = "企业微信客户", operatorType = "获取每天新增客户数量")
+    public R<List<DailyTotalVO>> getLastNDaysCountDaily(@NotNull Integer days) {
+        return R.data(brOpportunityService.getLastNDaysCountDaily(days));
+    }
+
 
 }

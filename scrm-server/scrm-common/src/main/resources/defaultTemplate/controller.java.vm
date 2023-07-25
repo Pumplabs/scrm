@@ -1,0 +1,102 @@
+package ${package.Controller.replace(".server;",";").replace("controller","web")};
+
+import ${package.Service}.${table.serviceName};
+import ${package.Entity}.${entity};
+
+import ${package.Entity.replace("entity","dto")}.${entity}PageDTO;
+import ${package.Entity.replace("entity","dto")}.${entity}SaveDTO;
+import ${package.Entity.replace("entity","dto")}.${entity}UpdateDTO;
+
+import ${package.Entity.replace("entity","dto")}.${entity}QueryDTO;
+import ${package.Entity.replace("entity","vo")}.${entity}VO;
+
+import com.scrm.common.log.annotation.Log;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.scrm.common.constant.R;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
+import java.util.List;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import com.scrm.api.wx.cp.dto.*;
+
+import javax.validation.Valid;
+
+/**
+ * $!{table.comment} 控制器
+ * @author ${author}
+ * @since ${date}
+ */
+@RestController
+@RequestMapping("/${table.entityPath}")
+@Api(tags = {"$!{table.comment}"})
+public class ${table.controllerName} {
+
+    @Autowired
+    private ${table.serviceName} ${table.entityPath}Service;
+
+
+    @PostMapping("/pageList")
+    @ApiOperation(value = "分页查询")
+    @Log(modelName = "$!{table.comment}", operatorType = "分页查询")
+    public R<IPage<${entity}VO>> pageList(@RequestBody @Valid ${entity}PageDTO dto){
+        return R.data(${table.entityPath}Service.pageList(dto));
+    }
+
+    @PostMapping("/list")
+    @ApiOperation(value = "查询列表")
+    @Log(modelName = "$!{table.comment}", operatorType = "查询列表")
+    public R<List<${entity}VO>> list(@RequestBody @Valid ${entity}QueryDTO dto){
+        return R.data(${table.entityPath}Service.queryList(dto));
+    }
+
+
+    @GetMapping("/{id}")
+    @ApiOperation(value = "根据主键查询")
+    @Log(modelName = "$!{table.comment}", operatorType = "根据主键查询")
+    public R<${entity}VO> findById(@PathVariable(value = "id") String id){
+        Assert.isTrue(StringUtils.isNotBlank(id), "$!{table.comment}ID不能为空");
+        return R.data(${table.entityPath}Service.findById(id));
+    }
+
+
+    @PostMapping(value = "/save")
+    @ApiOperation(value = "新增")
+    @Log(modelName = "$!{table.comment}", operatorType = "新增")
+    public R<${entity}> save(@RequestBody @Valid ${entity}SaveDTO dto){
+        return R.data(${table.entityPath}Service.save(dto));
+    }
+
+
+    @PostMapping(value = "/update")
+    @ApiOperation(value = "修改")
+    @Log(modelName = "$!{table.comment}", operatorType = "修改")
+    public R<${entity}> update(@RequestBody @Valid ${entity}UpdateDTO dto){
+        return R.data(${table.entityPath}Service.update(dto));
+    }
+
+
+    @PostMapping("/delete")
+    @ApiImplicitParam(name = "id", value = "id", required = true, dataType = "string", paramType = "query")
+    @ApiOperation(value = "删除")
+    @Log(modelName = "$!{table.comment}", operatorType = "删除")
+    public R<Void> delete(String id){
+        Assert.isTrue(StringUtils.isNotBlank(id), "$!{table.comment}ID不能为空");
+        ${table.entityPath}Service.delete(id);
+        return R.success("删除成功");
+    }
+
+
+    @PostMapping("/batchDelete")
+    @ApiOperation(value = "批量删除")
+    @Log(modelName = "$!{table.comment}", operatorType = "批量删除")
+    public R<Void> batchDelete(@RequestBody @Valid BatchDTO<String> dto){
+        ${table.entityPath}Service.batchDelete(dto);
+        return R.success("删除成功");
+    }
+
+}

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { get } from 'lodash'
 import { useAntdTable } from 'ahooks'
-import CommonModal from 'components/CommonModal'
+
+import CustomerDrawer from 'components/CommonDrawer'
 import UserTag from 'components/UserTag'
 import { DepNames } from 'components/DepName'
 import { Table } from 'components/TableContent'
@@ -14,61 +14,65 @@ export default (props) => {
     manual: true
   })
   useEffect(() => {
-    if (visible && data.staffId) {
+    if (visible ) {
       runGetTableList(
         {
           current: 1,
           pageSize: 10,
-        },
-        {
-          beginTime: '',
-          endTime: '',
-          keyword: '',
-          staffId: data.staffId,
-          status: '',
         }
       )
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, data])
+  }, [visible])
+  
   const columns = [
     {
       title: '群聊名称',
-      dataIndex: 'name'
+      dataIndex: 'name',
+      render: (_, record) => record?.groupChat?.name
     },
     {
       title: '群标签',
       dataIndex: 'tags',
-      render: val => <TagCell dataSource={val}/>
+      render: (_, record) => <TagCell dataSource={record.groupChat?.tags}/>
     },
     {
       title: '群人数',
-      dataIndex: 'total'
+      dataIndex: 'total',
+      render: (_, record) => record.groupChat?.total
     },
     {
       title: '新群主',
-      dataIndex: 'newOwner',
+      dataIndex: 'takeoverStaff',
       render: val => <UserTag data={val}/>
     },
     {
       title: '新群主所属部门',
       dataIndex: 'newDep',
       render: (_, record) => {
-        const dep = record.takeover ? record.takeover.departmentList : []
+        const dep = record.takeoverStaff?.departmentList || []
         return <DepNames dataSource={dep}/>
       },
     },
+    {
+      title: '原群主',
+      dataIndex: 'handoverStaff',
+      render: (val, record) => <UserTag data={{
+        name: record.handoverStaffExtId
+      }}/>
+    },
+    // handoverStaff
     {
       title: '分配时间',
       dataIndex: 'createTime'
     }
   ]
   return (
-    <CommonModal visible={visible} {...rest}>
+    <CustomerDrawer footer={false} visible={visible} width={1000} {...rest}>
         <Table
         columns={columns}
         {...tableProps}
       />
-    </CommonModal>
+    </CustomerDrawer>
   )
 }

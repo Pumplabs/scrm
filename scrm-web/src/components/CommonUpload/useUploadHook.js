@@ -100,17 +100,22 @@ export default (props) => {
   }
 
   const validateFn = ({ file, fileList }) => {
-    for (const key in defaultValidOption) {
-      const fn = defaultValidOption[key]
-      if (typeof fn === 'function') {
-        const validFlag = fn({ file, fileList }, { ...options, forbidUids: forbidUidsRef.current, uploadList: [] })
-        if (!validFlag) {
-          forbidUidsRef.current = [...forbidUidsRef.current, file.uid];
-          showFileValidFailMsg(key, { file, fileList }, options)
-          return validFlag
+    try {
+      for (const key in defaultValidOption) {
+        const fn = defaultValidOption[key]
+        if (typeof fn === 'function') {
+          const validFlag = fn({ file, fileList }, { ...options, forbidUids: forbidUidsRef.current, uploadList: [] })
+          if (!validFlag) {
+            forbidUidsRef.current = [...forbidUidsRef.current, file.uid];
+            showFileValidFailMsg(key, { file, fileList }, options)
+            return validFlag
+          }
         }
       }
+    } catch (error) {
+      console.error(error)
     }
+
     return true
   }
 

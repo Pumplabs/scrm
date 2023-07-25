@@ -33,16 +33,18 @@ const initAgentConfig = async (corpid) => {
     }
   })
 }
-const initAppConfig = async () => {
+const initAppConfig = async (extCorpId) => {
   const signatureData = await GetSignature({
     url: window.location.href,
     isCorp: true,
   })
   return new Promise((resolve, reject) => {
+
+    console.log(signatureData, "signatureData");
     window.wx.config({
       beta: true,
       debug: false,
-      appId: 'ww7e2fd0b8ae80b840',
+      appId: extCorpId,
       timestamp: signatureData.timestamp,
       nonceStr: signatureData.nonceStr,
       signature: signatureData.signature,

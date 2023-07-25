@@ -91,8 +91,8 @@ public class LogAspect {
             getControllerMethodDescription(joinPoint, controllerLog, operLog, jsonResult);
             // 保存数据库
             if (StringUtils.isNotBlank(operLog.getExtCorpId())) {
-                R<SysOperLog> save = sysOperLogClient.save(operLog);
-                log.info("保存日志结果:{}", save);
+                //R<SysOperLog> save = sysOperLogClient.save(operLog);
+                //log.info("保存日志结果:{}", save);
             }
         } catch (Exception exp) {
             // 记录本地异常日志

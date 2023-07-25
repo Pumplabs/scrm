@@ -30,12 +30,12 @@ public class ContactWayCountParamsVO {
     @NotBlank
     private String state;
 
-    @ApiModelProperty("开始事件，格式yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("开始时间，格式yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date start;
 
-    @ApiModelProperty("结束事件，格式yyyy-MM-dd HH:mm:ss")
+    @ApiModelProperty("结束时间，格式yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date end;

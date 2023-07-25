@@ -283,7 +283,6 @@ export default (props) => {
                 },
                 {
                   validator: async (_, value) => {
-                    console.log(value)
                     if (value && value.checked) {
                       if (dataList.length) {
                         return Promise.resolve()

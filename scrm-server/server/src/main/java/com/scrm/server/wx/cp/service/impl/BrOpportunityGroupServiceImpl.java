@@ -88,7 +88,6 @@ public class BrOpportunityGroupServiceImpl extends ServiceImpl<BrOpportunityGrou
                     .setIsSystem(true)
                     .setName("默认分组")
                     .setCreator("--");
-
             save(opportunityGroupSaveDTO);
         }
 
@@ -122,15 +121,41 @@ public class BrOpportunityGroupServiceImpl extends ServiceImpl<BrOpportunityGrou
         //入库
         save(brOpportunityGroup);
 
+        BrCommonConfSaveDTO brCommonConfSaveDTO1 = new BrCommonConfSaveDTO();
+        brCommonConfSaveDTO1.setTypeCode(BrCommonConf.OPPORTUNITY_STAGE).setName("初步接洽").setGroupId(brOpportunityGroup.getId())
+                .setColor("#5483ED").setIsSystem(false).setExtCorpId(dto.getExtCorpId()).setCode(2).setSort(1);
+        confService.save(brCommonConfSaveDTO1);
+
+        BrCommonConfSaveDTO brCommonConfSaveDTO2 = new BrCommonConfSaveDTO();
+        brCommonConfSaveDTO2.setTypeCode(BrCommonConf.OPPORTUNITY_STAGE).setName("需求调研").setGroupId(brOpportunityGroup.getId())
+                .setColor("#7132F8").setIsSystem(false).setExtCorpId(dto.getExtCorpId()).setCode(3).setSort(2);
+        confService.save(brCommonConfSaveDTO2);
+
+
+        BrCommonConfSaveDTO brCommonConfSaveDTO3 = new BrCommonConfSaveDTO();
+        brCommonConfSaveDTO3.setTypeCode(BrCommonConf.OPPORTUNITY_STAGE).setName("方案确认").setGroupId(brOpportunityGroup.getId())
+                .setColor("#3A75C5").setIsSystem(false).setExtCorpId(dto.getExtCorpId()).setCode(4).setSort(3);
+        confService.save(brCommonConfSaveDTO3);
+
+        BrCommonConfSaveDTO brCommonConfSaveDTO4 = new BrCommonConfSaveDTO();
+        brCommonConfSaveDTO4.setTypeCode(BrCommonConf.OPPORTUNITY_STAGE).setName("报价").setGroupId(brOpportunityGroup.getId())
+                .setColor("#3A75C5").setIsSystem(false).setExtCorpId(dto.getExtCorpId()).setCode(5).setSort(4);
+        confService.save(brCommonConfSaveDTO4);
+
+        BrCommonConfSaveDTO brCommonConfSaveDTO5 = new BrCommonConfSaveDTO();
+        brCommonConfSaveDTO5.setTypeCode(BrCommonConf.OPPORTUNITY_STAGE).setName("合同谈判").setGroupId(brOpportunityGroup.getId())
+                .setColor("#3A75C5").setIsSystem(false).setExtCorpId(dto.getExtCorpId()).setCode(6).setSort(5);
+        confService.save(brCommonConfSaveDTO5);
+
         //默认同时添加输单，赢单阶段
         BrCommonConfSaveDTO winDto = new BrCommonConfSaveDTO();
         winDto.setTypeCode(BrCommonConf.OPPORTUNITY_STAGE).setName("赢单").setGroupId(brOpportunityGroup.getId())
-                .setColor("#57A65B").setIsSystem(true).setExtCorpId(dto.getExtCorpId()).setCode(0);
+                .setColor("#57A65B").setIsSystem(true).setExtCorpId(dto.getExtCorpId()).setCode(0).setSort(6);
         confService.save(winDto);
 
         BrCommonConfSaveDTO loseDto = new BrCommonConfSaveDTO();
         loseDto.setTypeCode(BrCommonConf.OPPORTUNITY_STAGE).setName("输单").setGroupId(brOpportunityGroup.getId())
-                .setColor("#DD4377").setIsSystem(true).setExtCorpId(dto.getExtCorpId()).setCode(1);
+                .setColor("#DD4377").setIsSystem(true).setExtCorpId(dto.getExtCorpId()).setCode(1).setSort(7);
         confService.save(loseDto);
 
         return brOpportunityGroup;

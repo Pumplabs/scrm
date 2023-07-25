@@ -4,7 +4,7 @@ import { useRequest } from 'ahooks'
 import OpportunityMoment from './components/OpportunityMoment'
 import OppFollow from './components/OppFollow'
 import OppTask from './components/OppTask'
-import { AttachPane } from './components/OppFollow/FollowContent'
+import AttachList from 'components/AttachList'
 import { actionRequestHookOptions } from 'services/utils'
 import { DoneOppTask } from 'services/modules/commercialOpportunity'
 import styles from './index.module.less'
@@ -87,7 +87,17 @@ export default forwardRef((props, ref) => {
         </TabPane>
         <TabPane tab="关联附件" key={TAB_KEYS.ATTACH}>
           <div className={styles['attach-pane']}>
-            {mediaList.length ? <AttachPane list={mediaList} /> : <Empty />}
+            {mediaList.length ? (
+              <AttachList
+                list={mediaList}
+                fieldNames={{
+                  id: 'file.id',
+                  fileName: 'file.fileName',
+                }}
+              />
+            ) : (
+              <Empty />
+            )}
           </div>
         </TabPane>
       </Tabs>

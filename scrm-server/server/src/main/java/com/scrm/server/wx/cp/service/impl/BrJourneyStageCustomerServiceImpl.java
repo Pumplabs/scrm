@@ -189,7 +189,7 @@ public class BrJourneyStageCustomerServiceImpl extends ServiceImpl<BrJourneyStag
         BrJourneyStageCustomer brJourneyStage = checkExists(id);
 
         if (Optional.ofNullable(baseMapper.queryList(new BrJourneyStageCustomerQueryDTO().setJourneyStageId(id))).orElse(new ArrayList<>()).size() > 0) {
-            throw new BaseException("旅程阶段还存在客户,不允许删除");
+            throw new BaseException("旅程阶段还存在客户,请先移除该旅程阶段的客户");
         }
 
         //删除

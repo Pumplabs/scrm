@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 
 /**
  * 客户群聊-群发消息 服务实现类
+ *
  * @author xxh
  * @since 2022-03-02
  */
@@ -86,7 +87,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
             "可前往【客户群】中确认发送，记得及时完成哦";
 
     @Override
-    public IPage<WxMsgGroupTemplateVO> pageList(WxMsgGroupTemplatePageDTO dto){
+    public IPage<WxMsgGroupTemplateVO> pageList(WxMsgGroupTemplatePageDTO dto) {
         LambdaQueryWrapper<WxMsgGroupTemplate> queryWrapper = buildQuery(dto);
         IPage<WxMsgGroupTemplate> page = page(new Page<>(dto.getPageNum(), dto.getPageSize()), queryWrapper);
         return page.convert(this::translation);
@@ -104,19 +105,19 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
     }
 
     @Override
-    public WxMsgGroupTemplateVO findById(String id){
+    public WxMsgGroupTemplateVO findById(String id) {
         return translation(getById(id));
     }
 
 
     @Override
-    public WxMsgGroupTemplate save(WxMsgGroupTemplateSaveDTO dto){
+    public WxMsgGroupTemplate save(WxMsgGroupTemplateSaveDTO dto) {
 
         checkNameRepeat(null, dto.getExtCorpId(), dto.getName());
-        
+
         //封装数据
         WxMsgGroupTemplate wxMsgGroupTemplate = new WxMsgGroupTemplate();
-        BeanUtils.copyProperties(dto,wxMsgGroupTemplate);
+        BeanUtils.copyProperties(dto, wxMsgGroupTemplate);
         wxMsgGroupTemplate.setId(UUID.get32UUID());
         wxMsgGroupTemplate.setCreatedAt(new Date());
         wxMsgGroupTemplate.setUpdatedAt(new Date());
@@ -135,7 +136,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
         //定时的
         if (dto.getHasSchedule()) {
             wxMsgGroupTemplate.setStatus(WxMsgTemplate.STATUS_NO_CREATE);
-        }else{
+        } else {
             wxMsgGroupTemplate.setStatus(WxMsgTemplate.STATUS_WAIT);
             //有客户要发送,创建群发任务
             createSendMsgTask(wxMsgGroupTemplate, detailList);
@@ -154,7 +155,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
                 .eq(WxMsgGroupTemplate::getName, name)) > 0) {
             throw new BaseException("该群发名称已存在！");
         }
-        
+
     }
 
     private void createSendMsgTask(WxMsgGroupTemplate wxMsgGroupTemplate, List<WxMsgGroupTemplateDetail> detailList) {
@@ -203,14 +204,14 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
         return chatList.stream().map(e ->
                 new WxMsgGroupTemplateDetail()
-                .setId(UUID.get32UUID())
-                .setExtCorpId(wxMsgGroupTemplate.getExtCorpId())
-                .setMsgTemplateId(wxMsgGroupTemplate.getId())
-                .setExtStaffId(e.getOwner())
-                .setExtChatId(e.getExtChatId())
-                .setSendStatus(WxMsgSendStatusEnum.STATUS_NO_SEND.getCode())
-                .setCreatedAt(new Date())
-                .setUpdatedAt(new Date())).collect(Collectors.toList());
+                        .setId(UUID.get32UUID())
+                        .setExtCorpId(wxMsgGroupTemplate.getExtCorpId())
+                        .setMsgTemplateId(wxMsgGroupTemplate.getId())
+                        .setExtStaffId(e.getOwner())
+                        .setExtChatId(e.getExtChatId())
+                        .setSendStatus(WxMsgSendStatusEnum.STATUS_NO_SEND.getCode())
+                        .setCreatedAt(new Date())
+                        .setUpdatedAt(new Date())).collect(Collectors.toList());
     }
 
     private void preHandle(WxMsgGroupTemplate wxMsgGroupTemplate) {
@@ -230,8 +231,8 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
 
     @Override
-    public WxMsgGroupTemplate update(WxMsgGroupTemplateUpdateDTO dto){
-        
+    public WxMsgGroupTemplate update(WxMsgGroupTemplateUpdateDTO dto) {
+
         //校验参数
         WxMsgGroupTemplate wxMsgGroupTemplate = checkExists(dto.getId());
 
@@ -259,7 +260,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
         //定时的
         if (dto.getHasSchedule()) {
             wxMsgGroupTemplate.setStatus(WxMsgTemplate.STATUS_NO_CREATE);
-        }else{
+        } else {
             wxMsgGroupTemplate.setStatus(WxMsgTemplate.STATUS_WAIT);
             //有客户要发送,创建群发任务
             createSendMsgTask(wxMsgGroupTemplate, detailList);
@@ -273,12 +274,13 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
     /**
      * 翻译
+     *
      * @param wxMsgGroupTemplate 实体
      * @return WxMsgGroupTemplateVO 结果集
      * @author xxh
      * @date 2022-03-02
      */
-    private WxMsgGroupTemplateVO translation(WxMsgGroupTemplate wxMsgGroupTemplate){
+    private WxMsgGroupTemplateVO translation(WxMsgGroupTemplate wxMsgGroupTemplate) {
         WxMsgGroupTemplateVO res = new WxMsgGroupTemplateVO();
         BeanUtils.copyProperties(wxMsgGroupTemplate, res);
 
@@ -304,25 +306,25 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
             if (statusList.stream().allMatch(e -> WxMsgSendStatusEnum.STATUS_SEND.getCode().equals(e))) {
                 res.setSendStaffCount(res.getSendStaffCount() + 1);
-            }else{
+            } else {
                 res.setNoSendStaffCount(res.getNoSendStaffCount() + 1);
             }
 
         });
-        
+
         chatMap.values().forEach(chatStatusList -> {
 
             chatStatusList.forEach(e -> {
 
                 if (WxMsgSendStatusEnum.STATUS_SEND.getCode().equals(e)) {
                     res.setSendChatCount(res.getSendChatCount() + 1);
-                }else{
+                } else {
                     res.setNoSendChatCount(res.getNoSendChatCount() + 1);
                 }
-                
+
             });
         });
-        
+
         //翻译群聊信息
         if (!chatMap.isEmpty()) {
             List<WxGroupChat> wxGroupChats = Optional.ofNullable(chatService.listByIds(chatMap.keySet())).orElse(new ArrayList<>());
@@ -333,6 +335,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
     /**
      * 更新详情数据
+     *
      * @param id
      * @return
      */
@@ -341,7 +344,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
         List<WxMsgGroupTemplateDetail> templateDetails = detailService.list(new QueryWrapper<WxMsgGroupTemplateDetail>().lambda()
                 .eq(WxMsgGroupTemplateDetail::getExtCorpId, corpId)
                 .eq(WxMsgGroupTemplateDetail::getMsgTemplateId, id));
-        
+
         //查出全部msgId
         Set<String> noSendMsgIdSet = new HashSet<>();
         List<WxMsgGroupTemplateDetail> result = new ArrayList<>();
@@ -349,7 +352,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
             if (Objects.equals(WxMsgSendStatusEnum.STATUS_NO_SEND.getCode(), detail.getSendStatus()) &&
                     StringUtils.isNotBlank(detail.getExtMsgId())) {
                 noSendMsgIdSet.add(detail.getExtMsgId());
-            }else{
+            } else {
                 result.add(detail);
             }
         }
@@ -360,7 +363,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
         }
 
         noSendMsgIdSet.forEach(msgId -> {
-            
+
             //拿到所有发送人
             List<WxCpGroupMsgTaskResult.ExternalContactGroupMsgTaskInfo> groupMsgTask = null;
             try {
@@ -371,9 +374,9 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
             }
 
             //未发送的，查不出详情的
-            if (WxMsgSendStatusEnum.STATUS_NO_SEND.getCode().equals(groupMsgTask.get(0).getStatus())) {
+            if (groupMsgTask.size() == 0 || WxMsgSendStatusEnum.STATUS_NO_SEND.getCode().equals(groupMsgTask.get(0).getStatus())) {
                 result.addAll(templateDetails.stream().filter(e -> msgId.equals(e.getExtMsgId())).collect(Collectors.toList()));
-            }else{
+            } else {
                 //删掉这个msgId的
                 detailService.remove(new QueryWrapper<WxMsgGroupTemplateDetail>().lambda()
                         .eq(WxMsgGroupTemplateDetail::getExtCorpId, corpId)
@@ -416,7 +419,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
 
     @Override
-    public WxMsgGroupTemplate checkExists(String id){
+    public WxMsgGroupTemplate checkExists(String id) {
         if (StringUtils.isBlank(id)) {
             return null;
         }
@@ -572,6 +575,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
     /**
      * 构造群主发送详情的查询条件
+     *
      * @param dto
      * @return
      */
@@ -727,7 +731,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
                 detailList.add(wxMsgTemplateDetail);
             });
         }
-        
+
         List<String> staffIds = detailList.stream().map(WxMsgGroupTemplateDetail::getExtStaffId).distinct().collect(Collectors.toList());
 
         WxMsgGroupTemplate wxMsgGroupTemplate = new WxMsgGroupTemplate()
@@ -758,19 +762,20 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
     /**
      * 转发群主发送详情的查询数据成导出的
+     *
      * @param msgGroupStaffDTO
      * @return
      */
     private MsgGroupStaffExportDTO translationStaffExport(MsgGroupStaffDTO msgGroupStaffDTO) {
         MsgGroupStaffExportDTO result = new MsgGroupStaffExportDTO();
         BeanUtils.copyProperties(msgGroupStaffDTO, result);
-        
+
 //        result.setOwnerCN("$userName=" + msgGroupStaffDTO.getOwnerInfo().getName() + "$");
 //        result.setOwnerDeptCN("$departmentName=" + msgGroupStaffDTO.getOwnerInfo().getDeptCN().replace("[", "").replace("]", "") + "$");
 
         if (msgGroupStaffDTO.getSendStatus() != null && msgGroupStaffDTO.getSendStatus()) {
             result.setStatusCN("已发送");
-        }else {
+        } else {
             result.setStatusCN("未发送");
         }
 
@@ -779,6 +784,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
     /**
      * 把群聊信息翻译成导出的
+     *
      * @param msgGroupChatDTO
      * @return
      */
@@ -792,9 +798,9 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
         if (WxMsgSendStatusEnum.STATUS_NO_SEND.getCode().equals(msgGroupChatDTO.getSendStatus())) {
             result.setStatusCN("群主未发送");
-        }else if (WxMsgSendStatusEnum.STATUS_SEND.getCode().equals(msgGroupChatDTO.getSendStatus())){
+        } else if (WxMsgSendStatusEnum.STATUS_SEND.getCode().equals(msgGroupChatDTO.getSendStatus())) {
             result.setStatusCN("群主已发送");
-        }else {
+        } else {
             result.setStatusCN("群主发送失败");
         }
         return result;
@@ -812,6 +818,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
     /**
      * 转化查询的群主信息
+     *
      * @param templateDetails
      * @return
      */
@@ -832,7 +839,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
                 if (msgGroupChatDTO.getSendStatus().equals(WxMsgSendStatusEnum.STATUS_SEND.getCode())) {
                     staffDTO.setSendCount(staffDTO.getSendCount() + 1);
-                }else{
+                } else {
                     staffDTO.setNoSendCount(staffDTO.getNoSendCount() + 1);
                 }
 
@@ -849,6 +856,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
 
     /**
      * 翻译微信群详情
+     *
      * @param detail
      * @return
      */
@@ -864,7 +872,7 @@ public class WxMsgGroupTemplateServiceImpl extends ServiceImpl<WxMsgGroupTemplat
         //状态
         if (WxMsgSendStatusEnum.isInFailStatus(detail.getSendStatus())) {
             result.setSendStatus(WxMsgSendStatusEnum.STATUS_EXCEPTION.getCode());
-        }else{
+        } else {
             result.setSendStatus(detail.getSendStatus());
         }
 

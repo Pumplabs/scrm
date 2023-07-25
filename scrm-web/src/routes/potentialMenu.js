@@ -41,17 +41,6 @@ export default {
     name: '群详情',
     url: `${SYSTEM_PREFIX_PATH}/groupList/detail/:id`
   }],
-  // 任务宝
-  [`${SYSTEM_PREFIX_PATH}/taskManage/list`]: [
-    {
-      name: '创建活动',
-      url: `${SYSTEM_PREFIX_PATH}/taskManage/list/add`,
-    },
-    {
-      name: '编辑活动',
-      url: `${SYSTEM_PREFIX_PATH}/taskManage/list/edit/:id`,
-    }
-  ],
   // 轨迹素材
   [`${SYSTEM_PREFIX_PATH}/saleOperation/trackMaterial`]: [
     {
@@ -61,28 +50,6 @@ export default {
     {
       name: '编辑文章',
       url: `${SYSTEM_PREFIX_PATH}/saleOperation/trackMaterial/article/edit/:id`,
-    }
-  ],
-  // 群SOP
-  [`${SYSTEM_PREFIX_PATH}/groupSop/list`]: [
-    {
-      name: '创建自动化流程',
-      url: `${SYSTEM_PREFIX_PATH}/groupSop/list/add`,
-    },
-    {
-      name: '编辑自动化流程',
-      url: `${SYSTEM_PREFIX_PATH}/groupSop/list/edit/:id`,
-    }
-  ],
-  // 客户SOP
-  [`${SYSTEM_PREFIX_PATH}/customerSop/list`]: [
-    {
-      name: '创建自动化流程',
-      url: `${SYSTEM_PREFIX_PATH}/customerSop/list/add`,
-    },
-    {
-      name: '编辑自动化流程',
-      url: `${SYSTEM_PREFIX_PATH}/customerSop/list/edit/:id`,
     }
   ],
 }

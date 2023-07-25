@@ -20,32 +20,8 @@ import javax.validation.constraints.NotBlank;
 @ApiModel(value = "通用配置新增DTO")
 public class BrCommonConfSaveDTO {
 
-    @ApiModelProperty(value = "ID")
-    private String id;
-
     @ApiModelProperty(value = "外部企业ID")
     private String extCorpId;
-
-    @ApiModelProperty(value = "创建时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createdAt;
-
-    @ApiModelProperty(value = "修改时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updatedAt;
-
-    @ApiModelProperty(value = "创建员工id")
-    private String creator;
-
-    @ApiModelProperty(value = "编辑员工id")
-    private String editor;
-
-    @ApiModelProperty(value = "删除时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date deletedAt;
 
     @ApiModelProperty(value = "名称")
     @NotBlank(message = "名称不能为空")
@@ -60,7 +36,7 @@ public class BrCommonConfSaveDTO {
     @ApiModelProperty(value = "编码")
     private Integer code;
 
-    @ApiModelProperty(value = "类型编码")
+    @ApiModelProperty(value = "类型编码 OPPORTUNITY_STAGE:商机阶段 OPPORTUNITY_FAIL_REASON:商机输单原因 CLUE_SOURCE:线索来源")
     @NotBlank(message = "类型编码不能为空")
     private String typeCode;
 

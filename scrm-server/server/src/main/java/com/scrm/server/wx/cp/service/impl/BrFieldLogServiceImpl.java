@@ -75,15 +75,15 @@ public class BrFieldLogServiceImpl extends ServiceImpl<BrFieldLogMapper, BrField
 
 
     @Override
-    public void save(Object oldObj, Object newObj, String tableName, String dataId) {
-        Map<String, ValueChange> stringValueChangeMap = classBaseUtil.comparatorObject(ClassBaseUtil.UPDATE, oldObj, newObj);
+    public void save(Object oldObj, Object newObj, String tableName, String dataId, String extCorpId) {
+        Map<String, ValueChange> stringValueChangeMap = classBaseUtil.comparatorObject(ClassBaseUtil.UPDATE, oldObj, newObj, tableName, extCorpId);
         stringValueChangeMap.forEach((k, v) -> {
             //封装数据
             BrFieldLog brFieldLog = new BrFieldLog();
             brFieldLog.setId(UUID.get32UUID()).setMethod(BrFieldLog.FIELD_UPDATE)
                     .setTableName(tableName).setOldValue(v.getOldValue())
                     .setNewValue(v.getNewValue())
-                    .setOperId(JwtUtil.getExtUserId()).setExtCorpId(JwtUtil.getExtCorpId())
+                    .setOperId(JwtUtil.getExtUserId()).setExtCorpId(extCorpId)
                     .setOperTime(new Date()).setFieldName(k).setDataId(dataId);
             //入库
             save(brFieldLog);
@@ -131,5 +131,12 @@ public class BrFieldLogServiceImpl extends ServiceImpl<BrFieldLogMapper, BrField
             throw new BaseException("字段变化记录不存在");
         }
         return byId;
+    }
+
+    @Override
+    public void deleteByDataIds(String tableName, List<String> dataIds) {
+        remove(new LambdaQueryWrapper<BrFieldLog>()
+                .eq(BrFieldLog::getTableName, tableName)
+                .in(BrFieldLog::getDataId, dataIds));
     }
 }

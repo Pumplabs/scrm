@@ -1,6 +1,7 @@
 package com.scrm.server.wx.cp.utils;
 
 import com.scrm.common.util.DateUtils;
+import com.scrm.server.wx.cp.entity.BrFieldLog;
 import com.scrm.server.wx.cp.service.IBrCommonConfService;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,12 @@ public class ClassBaseUtil {
         put(3, "低");
     }};
 
+    public final static Map<Integer, String> sexMap = new HashMap() {{
+        put(0, "未知");
+        put(1, "男性");
+        put(2, "女性");
+    }};
+
     @Autowired
     private IBrCommonConfService commonConfService;
 
@@ -52,7 +59,7 @@ public class ClassBaseUtil {
      * @param newObj       新对象
      * @return matter 哪个字段有更新 content 内容更新成什么
      */
-    public Map<String, ValueChange> comparatorObject(String unityOperate, Object oldObj, Object newObj) {
+    public Map<String, ValueChange> comparatorObject(String unityOperate, Object oldObj, Object newObj, String tableName, String extCorpId) {
         Map<String, ValueChange> map = new HashMap();
         if (oldObj != null && UPDATE.equals(unityOperate)) {
             Map<String, Object> oldMap;
@@ -74,17 +81,20 @@ public class ClassBaseUtil {
                             oldValue = "";
                         }
                         if (!oldValue.equals(newValue)) {
-                            if ("预计成交日期".equals(entry.getKey())) {
-                                oldValue = StringUtils.isBlank(oldValue.toString())? "" : DateUtils.dateToSimpleStr((Date) oldValue);
-                                newValue = StringUtils.isBlank(newValue.toString()) ? "" : DateUtils.dateToSimpleStr((Date) newValue);
-                            }
-                            if ("优先级".equals(entry.getKey())) {
-                                oldValue = StringUtils.isBlank(oldValue.toString()) ? "" : priorityMap.get(oldValue);
-                                newValue = StringUtils.isBlank(newValue.toString()) ? "" : priorityMap.get(newValue);
-                            }
-                            if ("阶段".equals(entry.getKey())) {
-                                oldValue = StringUtils.isBlank(oldValue.toString()) ? "" : classBaseUtil.commonConfService.findById(oldValue.toString()).getName();
-                                newValue = StringUtils.isBlank(newValue.toString()) ? "" : classBaseUtil.commonConfService.findById(newValue.toString()).getName();
+                            //商机的特殊处理
+                            if (BrFieldLog.OPPORTUNITY_TABLE_NAME.equals(tableName)){
+                                if ("预计成交日期".equals(entry.getKey())) {
+                                    oldValue = StringUtils.isBlank(oldValue.toString())? "" : DateUtils.dateToSimpleStr((Date) oldValue);
+                                    newValue = StringUtils.isBlank(newValue.toString()) ? "" : DateUtils.dateToSimpleStr((Date) newValue);
+                                }
+                                if ("优先级".equals(entry.getKey())) {
+                                    oldValue = StringUtils.isBlank(oldValue.toString()) ? "" : priorityMap.get(oldValue);
+                                    newValue = StringUtils.isBlank(newValue.toString()) ? "" : priorityMap.get(newValue);
+                                }
+                                if ("阶段".equals(entry.getKey())) {
+                                    oldValue = StringUtils.isBlank(oldValue.toString()) ? "" : classBaseUtil.commonConfService.findById(oldValue.toString()).getName();
+                                    newValue = StringUtils.isBlank(newValue.toString()) ? "" : classBaseUtil.commonConfService.findById(newValue.toString()).getName();
+                                }
                             }
                             ValueChange valueChange = new ValueChange(oldValue.toString(), newValue.toString());
                             map.put(entry.getKey(), valueChange);
@@ -113,6 +123,7 @@ public class ClassBaseUtil {
         if ("BrOpportunity".equals(entity.getClass().getSimpleName())) {
             fields = fields.stream().filter(e -> fieldNameList.contains(e.getName())).collect(Collectors.toList());
         }
+
         for (Field field : fields) {
             field.setAccessible(true);
             resultMap.put(field.getAnnotation(ApiModelProperty.class).value(), field.get(entity));

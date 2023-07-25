@@ -74,7 +74,6 @@ public class WxGroupChatServiceImpl extends ServiceImpl<WxGroupChatMapper, WxGro
     @Autowired
     private WxCpConfiguration wxCpConfiguration;
 
-
     @Autowired
     private IBrCustomerDynamicService customerDynamicService;
 
@@ -433,6 +432,7 @@ public class WxGroupChatServiceImpl extends ServiceImpl<WxGroupChatMapper, WxGro
         AtomicReference<Integer> customerNum = new AtomicReference<>(0);
 
         AtomicReference<Integer> todayJoinMemberNum = new AtomicReference<>(0);
+        List<String> todayJoinMemberUserIds = new ArrayList<>();
         List<String> memberIds = new ArrayList<>();
         Optional.ofNullable(memberList).orElse(new ArrayList<>()).forEach(member -> {
 
@@ -458,7 +458,8 @@ public class WxGroupChatServiceImpl extends ServiceImpl<WxGroupChatMapper, WxGro
                     .setInvitor(Optional.ofNullable(member.getInvitor()).orElse(new WxCpUserExternalGroupChatInfo.Invitor()).getUserId())
                     .setType(member.getType())
                     .setJoinTime(member.getJoinTime())
-                    .setJoinScene(member.getJoinScene());
+                    .setJoinScene(member.getJoinScene())
+                    .setState(member.getState());
 
             if (Objects.equals(member.getUserId(), wxGroupChat.getOwner())) {
                 wxGroupChat.setOwnerName(member.getName());
@@ -482,6 +483,7 @@ public class WxGroupChatServiceImpl extends ServiceImpl<WxGroupChatMapper, WxGro
             //如果是当天加入的,累计当天入群数量
             if (DateUtils.isToday(wxGroupChatMember.getJoinTime() * 1000)) {
                 todayJoinMemberNum.getAndSet(todayJoinMemberNum.get() + 1);
+                todayJoinMemberUserIds.add(wxGroupChatMember.getUserId());
             }
 
             memberIds.add(wxGroupChatMember.getId());
@@ -511,7 +513,7 @@ public class WxGroupChatServiceImpl extends ServiceImpl<WxGroupChatMapper, WxGro
                     //去除还在的客户
                     todayQuitIds.removeAll(memberIds);
                 }
-                quitMemberNum = Optional.of(todayQuitIds.stream().distinct().collect(Collectors.toList())).orElse(new ArrayList<>()).size();
+               // quitMemberNum = Optional.of(todayQuitIds.stream().distinct().collect(Collectors.toList())).orElse(new ArrayList<>()).size();
 
                 //给退出的成员设置退群时间
                 groupChatMemberService.update(new LambdaUpdateWrapper<WxGroupChatMember>()
@@ -542,11 +544,15 @@ public class WxGroupChatServiceImpl extends ServiceImpl<WxGroupChatMapper, WxGro
             updateById(wxGroupChat);
         } else {
             save(wxGroupChat.setStatus(status));
+            //增加sop创建群聊定时任务
         }
 
 
-        groupChatStatistics.setQuitMemberNum(quitMemberNum)
-                .setJoinMemberNum(todayJoinMemberNum.get() + quitMemberNum)
+        List<String> todayQuitIds = Optional.ofNullable(groupChatMemberService.queryTodayQuitExtIds(extCorpId, chatId)).orElse(new ArrayList<>());
+        todayQuitIds.removeAll(todayJoinMemberUserIds);
+
+        groupChatStatistics.setQuitMemberNum(todayQuitIds.size())
+                .setJoinMemberNum(todayJoinMemberNum.get() + groupChatStatistics.getQuitMemberNum())
                 .setTotal(wxGroupChat.getTotal())
                 .setCustomerNum(wxGroupChat.getCustomerNum());
         groupChatStatisticsService.updateById(groupChatStatistics);

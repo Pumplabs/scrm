@@ -14,6 +14,7 @@ import java.util.List;
 public interface IBrMpAccreditService extends IService<BrMpAccredit> {
 
 
+
     /**
      * 校验是否存在
      * @author xxh

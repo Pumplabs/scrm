@@ -89,6 +89,14 @@ const renderContentItem = (record, type) => {
           cover={<PlayCircleOutlined style={{ fontSize: 40 }} />}
         />
       )
+      case MATERIAL_TYPE_EN_VALS.MINI_APP:
+      return (
+        <LinkItem
+          title={record.title}
+          info={record.appInfo?.appPath}
+          coverUrl={record.filePath}
+        />
+      )
     default:
       return null
   }

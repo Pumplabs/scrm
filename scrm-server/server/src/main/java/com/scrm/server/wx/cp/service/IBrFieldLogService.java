@@ -48,7 +48,7 @@ public interface IBrFieldLogService extends IService<BrFieldLog> {
      * @date 2022-06-17
      * @return com.scrm.server.wx.cp.entity.BrFieldLog
      */
-    void save(Object oldObj, Object newObj, String tableName, String dataId);
+    void save(Object oldObj, Object newObj, String tableName, String dataId, String extCorpId);
 
     /**
      * 新增
@@ -67,5 +67,12 @@ public interface IBrFieldLogService extends IService<BrFieldLog> {
      * @return com.scrm.server.wx.cp.entity.BrFieldLog
      */
     BrFieldLog checkExists(String id);
+
+    /**
+     * 删除
+     * @author ouyang
+     * @date 2023-05-16
+     */
+    void deleteByDataIds(String tableName, List<String> dataIds);
 
 }

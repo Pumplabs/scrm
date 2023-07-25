@@ -1,5 +1,6 @@
 package com.scrm.server.wx.cp.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.scrm.common.dto.BatchDTO;
 import com.scrm.common.util.JwtUtil;
 import com.scrm.common.util.ListUtils;
@@ -180,6 +181,22 @@ public class BrJourneyServiceImpl extends ServiceImpl<BrJourneyMapper, BrJourney
     }
 
 
+    public void updateSort(BrJourneyUpdateSortDTO journeyUpdateSortDTO) {
+        List<BrJourneyStageSaveOrUpdateDTO> journeyStageList = journeyUpdateSortDTO.getJourneyStageList();
+        final Integer[] sort = {0};
+        //1、遍历新增/修改旅程数据
+        journeyStageList.forEach(journeyStage -> {
+            sort[0] = sort[0] + 1;
+            if (StringUtils.isNotBlank(journeyStage.getId())) {
+                journeyStageService.update(new UpdateWrapper<BrJourneyStage>().lambda().set(BrJourneyStage::getSort, sort[0])
+                        .eq(BrJourneyStage::getJourneyId, journeyUpdateSortDTO.getId())
+                        .eq(BrJourneyStage::getId, journeyStage.getId()));
+            }
+        });
+
+    }
+
+
     @Override
     public void delete(String id) {
 
@@ -193,7 +210,7 @@ public class BrJourneyServiceImpl extends ServiceImpl<BrJourneyMapper, BrJourney
         List<BrJourneyStageStatisticsInfoVO> statisticsInfoList = journeyStageService.getStatisticsInfo(brJourney.getExtCorpId(), brJourney.getId());
         Optional.ofNullable(statisticsInfoList).orElse(new ArrayList<>()).forEach(statisticsInfo -> {
             if (statisticsInfo.getCustomerNum() > 0) {
-                throw new BaseException("该旅程还存在客户,不允许删除");
+                throw new BaseException("该旅程还存在客户,请先移除该旅程的客户");
             }
         });
 

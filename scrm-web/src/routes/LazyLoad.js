@@ -22,7 +22,6 @@ const PageLoad = () => {
  * @returns 
  */
 const LazyLoad = ({ comp: Comp, needAuth = true, needLogin = true }) => {
-  console.log("test!!!!!!!!!!!!!", Comp);
   const location = useLocation()
   const hasLogin = localStorage.getItem(TOKEN_KEY)
 

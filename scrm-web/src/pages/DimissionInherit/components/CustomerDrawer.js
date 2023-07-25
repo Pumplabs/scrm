@@ -9,13 +9,12 @@ import { Table } from 'components/TableContent'
 import TagCell from 'components/TagCell'
 import { TransferTipModal } from 'src/pages/IncumbencyTransfer'
 import { useModalHook, useTable } from 'src/hooks'
-import { TransferCustomer, GetWaitTransferCustomer } from 'services/modules/dimissionInherit'
-import { actionRequestHookOptions } from 'services/utils'
+import { TransferCustomer, GetWaitTransferCustomerPage } from 'services/modules/dimissionInherit'
 import { transferRequestData } from 'src/pages/IncumbencyTransfer/utils'
 
-export default ({ visible, onCancel, data = {}, ...rest }) => {
+export default ({ visible, onCancel, data = {}, refreshCustomerList, ...rest }) => {
   const { tableProps, run: runGetTableList, selectedKeys } = useTable(
-    GetWaitTransferCustomer,
+    GetWaitTransferCustomerPage,
     {
       manual: true,
       selected: true
@@ -30,7 +29,8 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
       },
       {
         "keyword": "",
-        "staffId": data.staffId,
+        'dimissionTime': data.dimissionTime,
+        "staffExtId": data.handoverStaffExtId,
       }
     )
   }
@@ -40,13 +40,14 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
     ...transferRequestData({
       successFn: () => {
         closeModal()
+        refreshCustomerList()
         refreshTable()
       }
     })
   })
   
   useEffect(() => {
-    if (visible && data.staffId) {
+    if (visible && data.handoverStaffExtId) {
       refreshTable()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,21 +58,22 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
   }
 
   const onTipOk = (msg) => {
-    const { takeoverStaffId, customerIds,handoverStaffId  } = modalInfo.data
+    const { takeoverStaffExtId, customerExtIds,handoverStaffExtId  } = modalInfo.data
     runTransferCustomer({
-      takeoverStaffId,
-      customerIds,
-      handoverStaffId,
+      "dimissionTime": data.dimissionTime,
+      takeoverStaffExtId,
+      customerExtIds,
+      handoverStaffExtId,
       "transferMsg": msg
     })
   }
 
   const onChooseOk = (users = []) => {
-    const [{id} = {}] = users
+    const [{extId} = {}] = users
     openModal('transferTip', {
-      "customerIds": selectedKeys,
-      "handoverStaffId": data.staffId,
-      takeoverStaffId: id,
+      customerExtIds: selectedKeys,
+      handoverStaffExtId: data.handoverStaffExtId,
+      takeoverStaffExtId: extId,
     })
   }
 
@@ -80,6 +82,9 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
       title: '客户名',
       dataIndex: 'customerInfo',
       render: (_, record) => {
+        if (!record) {
+          return null;
+        }
         return (
           <WeChatCell
             data={{
@@ -92,11 +97,6 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
       },
     },
     {
-      title: '客户标签',
-      dataIndex: 'tags',
-      render: (val) => <TagCell dataSource={val} />,
-    },
-    {
       title: '添加时间',
       dataIndex: 'createdAt',
     },
@@ -107,7 +107,6 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
   ]
   return (
     <CustomerDrawer
-      columns={columns}
       footer={false}
       visible={visible}
       onCancel={onCancel}
@@ -129,12 +128,13 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
         onCancel={closeModal}
         onOk={onChooseOk}
         title="选择员工"
-        valueKey="id"
+        valueKey="extId"
         max={1}
       />
       <Table
         columns={columns}
         name={selectedKeys.length ? `已选择${selectedKeys.length}条数据` : ''}
+        rowKey="extId"
         toolBar={[
           <Button
             key="async"

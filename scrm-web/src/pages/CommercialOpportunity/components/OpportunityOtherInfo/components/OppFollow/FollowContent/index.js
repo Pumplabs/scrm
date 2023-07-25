@@ -1,27 +1,18 @@
 import { useMemo } from 'react'
 import cls from 'classnames'
-import { Button, Tooltip, Tabs } from 'antd'
+import { Button, Tabs } from 'antd'
 import { get } from 'lodash'
 import moment from 'moment'
 import {
   CheckCircleOutlined,
-  AudioOutlined,
-  DownloadOutlined,
   DeleteOutlined,
   MessageOutlined,
-  FileImageOutlined,
-  FileExcelOutlined,
-  FilePdfOutlined,
-  FilePptOutlined,
-  FileWordOutlined,
-  VideoCameraOutlined,
-  FileOutlined,
 } from '@ant-design/icons'
-import { getFileParams } from 'components/CommonUpload/validFn'
+
 import OpenEle from 'components/OpenEle'
-import { WX_IMG_FILE_TYPE, ACCEPT_VIDEO_FILE_TYPE } from 'utils/constants'
 import { TASK_STATUS } from '../../OppTask/constants'
-import { DownFileByFileId } from 'services/modules/common'
+import AttachList from 'components/AttachList'
+
 import styles from './index.module.less'
 
 const TAB_KEYS = {
@@ -92,7 +83,11 @@ export default ({
               <TodoPane list={taskList} onDone={onDoneTask} />
             </TabPane>
             <TabPane key={TAB_KEYS.ATTACH}>
-              <AttachPane list={attachList} />
+              <AttachList list={attachList} 
+              fieldNames={{
+                id: 'file.id',
+                fileName: 'file.fileName'
+              }}/>
             </TabPane>
             <TabPane key={TAB_KEYS.REPLY}>
               <ReplyPane
@@ -173,38 +168,6 @@ const TodoListItem = ({ data = {}, onDone }) => {
   )
 }
 
-// 附件
-export const AttachPane = ({ list = [] }) => {
-  const onDownload = (item) => {
-    DownFileByFileId(
-      {
-        fileId: item.file.id,
-      },
-      item.file.fileName
-    )
-  }
-
-  return (
-    <ul className={styles['attach-pane']}>
-      {list.map((ele, idx) => (
-        <li className={styles['attach-file-item']} key={idx}>
-          <Tooltip title={ele.file.fileName} placement="topLeft">
-            <div className={styles['attach-file-content']}>
-              <div className={styles['attach-file-icon']}>
-                <FileIconByFileType fullName={ele.file.fileName} />
-              </div>
-              {ele.file.fileName}
-            </div>
-          </Tooltip>
-          <DownloadOutlined
-            className={styles['download-icon']}
-            onClick={() => onDownload(ele)}
-          />
-        </li>
-      ))}
-    </ul>
-  )
-}
 
 // 回复
 const ReplyPane = ({
@@ -321,30 +284,4 @@ const FollowTab = ({ sign, num = 0, isActive, onClick }) => {
       <span className={styles['follow-num']}>{num}</span>
     </span>
   )
-}
-
-const XCEL_TYPES = ['.xls', 'xlsx']
-const PPT_TYPES = ['.ppt', '.pptx']
-const WORD_TYPES = ['.doc', '.docx']
-const PDF_TYPEF = ['.pdf']
-const AUDIO_TYPES = ['.amr']
-const FileIconByFileType = ({ fullName }) => {
-  const { fileType } = useMemo(() => getFileParams(fullName), [fullName])
-  if (WX_IMG_FILE_TYPE.includes(fileType)) {
-    return <FileImageOutlined />
-  } else if (ACCEPT_VIDEO_FILE_TYPE.includes(fileType)) {
-    return <VideoCameraOutlined />
-  } else if (XCEL_TYPES.includes(fileType)) {
-    return <FileExcelOutlined />
-  } else if (PDF_TYPEF.includes(fileType)) {
-    return <FilePdfOutlined />
-  } else if (PPT_TYPES.includes(fileType)) {
-    return <FilePptOutlined />
-  } else if (WORD_TYPES.includes(fileType)) {
-    return <FileWordOutlined />
-  } else if (AUDIO_TYPES.includes(fileType)) {
-    return <AudioOutlined />
-  } else {
-    return <FileOutlined />
-  }
 }

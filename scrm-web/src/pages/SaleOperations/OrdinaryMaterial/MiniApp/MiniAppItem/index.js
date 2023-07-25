@@ -59,6 +59,7 @@ export default ({ data = {}, onEdit, onRemove, onDetail }) => {
         <div>
           <img
             src={data.filePath}
+                        //  src={data.filePath}
             alt=""
             width="100%"
             height={217}

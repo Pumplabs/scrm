@@ -1,6 +1,8 @@
 package com.scrm.server.wx.cp.service.impl;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -13,6 +15,7 @@ import com.scrm.api.wx.cp.enums.BrCustomerDynamicModelEnum;
 import com.scrm.api.wx.cp.enums.BrCustomerDynamicTypeEnum;
 import com.scrm.api.wx.cp.enums.WxCustomerAddWayEnum;
 import com.scrm.api.wx.cp.vo.*;
+import com.scrm.common.config.ScrmConfig;
 import com.scrm.common.constant.Constants;
 import com.scrm.common.dto.BatchDTO;
 import com.scrm.common.exception.BaseException;
@@ -22,14 +25,17 @@ import com.scrm.common.vo.FailResultVO;
 import com.scrm.server.wx.cp.config.WxCpConfiguration;
 import com.scrm.server.wx.cp.dto.*;
 import com.scrm.server.wx.cp.entity.BrJourneyStageCustomer;
+import com.scrm.server.wx.cp.entity.BrOpportunity;
 import com.scrm.server.wx.cp.entity.WxResignedStaffCustomer;
 import com.scrm.server.wx.cp.feign.dto.UserInfoRes;
 import com.scrm.server.wx.cp.mapper.WxCustomerMapper;
 import com.scrm.server.wx.cp.service.*;
 import com.scrm.server.wx.cp.thread.EditTagThread;
 import com.scrm.server.wx.cp.thread.ExecutorList;
+import com.scrm.server.wx.cp.utils.ReportUtil;
 import com.scrm.server.wx.cp.vo.BatchMarkRes;
 import com.scrm.server.wx.cp.vo.BrJourneyStageCustomerVO;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.cp.api.WxCpExternalContactService;
@@ -42,6 +48,7 @@ import me.chanjar.weixin.cp.bean.external.contact.FollowedUser;
 import me.chanjar.weixin.cp.bean.external.contact.WxCpExternalContactBatchInfo;
 import me.chanjar.weixin.cp.bean.external.contact.WxCpExternalContactInfo;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RList;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -101,7 +108,6 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     private WxCpConfiguration wxCpConfiguration;
 
 
-
     @Autowired
     private IWxGroupChatMemberService chatMemberService;
 
@@ -132,7 +138,6 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     @Autowired
     private IWxCustomerStaffAssistService customerStaffAssistService;
 
-
     @Autowired
     private IWxResignedStaffCustomerService resignedStaffCustomerService;
 
@@ -140,48 +145,58 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     @Override
     public IPage<WxCustomerVO> pageList(WxCustomerPageDTO dto) {
         if (dto.getNoTransferInfoStatus() != null) {
-            List<WxStaffTransferInfo> list = staffTransferInfoService.list(new QueryWrapper<WxStaffTransferInfo>().lambda()
-                    .le(WxStaffTransferInfo::getExtCorpId, dto.getExtCorpId())
-                    .in(WxStaffTransferInfo::getStatus, dto.getNoTransferInfoStatus()));
+            List<WxStaffTransferInfo> list = staffTransferInfoService
+                    .list(new QueryWrapper<WxStaffTransferInfo>().lambda()
+                            .le(WxStaffTransferInfo::getExtCorpId, dto.getExtCorpId())
+                            .in(WxStaffTransferInfo::getStatus, dto.getNoTransferInfoStatus()));
 
-            List<String> customerExtIds = list.stream().map(WxStaffTransferInfo::getCustomerExtId).collect(Collectors.toList());
+            List<String> customerExtIds = list.stream().map(WxStaffTransferInfo::getCustomerExtId)
+                    .collect(Collectors.toList());
             List<WxCustomerVO> wxCustomerVOS = find(dto.getExtCorpId(), customerExtIds);
-            dto.setNoCustomerIds(Optional.ofNullable(wxCustomerVOS).orElse(new ArrayList<>()).stream().map(WxCustomerVO::getId).collect(Collectors.toList()));
+            dto.setNoCustomerIds(Optional.ofNullable(wxCustomerVOS).orElse(new ArrayList<>()).stream()
+                    .map(WxCustomerVO::getId).collect(Collectors.toList()));
         }
-        /*LambdaQueryWrapper<WxCustomer> wrapper = new QueryWrapper<WxCustomer>().lambda()
-                .eq(StringUtils.isNotBlank(dto.getExtCorpId()), WxCustomer::getExtCorpId, dto.getExtCorpId())
-                .in(ListUtils.isNotEmpty(dto.getExtCreatorId()), WxCustomer::getExtCreatorId, dto.getExtCreatorId())
-                .ge(dto.getCreatedAtBegin() != null, WxCustomer::getCreatedAt, dto.getCreatedAtBegin())getByIdAndStaffId
-                .le(dto.getCreatedAtEnd() != null, WxCustomer::getCreatedAt, dto.getCreatedAtEnd())
-                .eq(dto.getGender() != null, WxCustomer::getGender, dto.getGender())
-                .eq(dto.getType() != null, WxCustomer::getType, dto.getType())
-                .like(StringUtils.isNotBlank(dto.getName()), WxCustomer::getName, dto.getName())
-                .orderByDesc(WxCustomer::getCreatedAt);*/
+        /*
+         * LambdaQueryWrapper<WxCustomer> wrapper = new
+         * QueryWrapper<WxCustomer>().lambda()
+         * .eq(StringUtils.isNotBlank(dto.getExtCorpId()), WxCustomer::getExtCorpId,
+         * dto.getExtCorpId())
+         * .in(ListUtils.isNotEmpty(dto.getExtCreatorId()), WxCustomer::getExtCreatorId,
+         * dto.getExtCreatorId())
+         * .ge(dto.getCreatedAtBegin() != null, WxCustomer::getCreatedAt,
+         * dto.getCreatedAtBegin())getByIdAndStaffId
+         * .le(dto.getCreatedAtEnd() != null, WxCustomer::getCreatedAt,
+         * dto.getCreatedAtEnd())
+         * .eq(dto.getGender() != null, WxCustomer::getGender, dto.getGender())
+         * .eq(dto.getType() != null, WxCustomer::getType, dto.getType())
+         * .like(StringUtils.isNotBlank(dto.getName()), WxCustomer::getName,
+         * dto.getName())
+         * .orderByDesc(WxCustomer::getCreatedAt);
+         */
 
         dto.setLoginStaffExtId(JwtUtil.getExtUserId()).setIsEnterpriseAdmin(roleStaffService.isEnterpriseAdmin());
         return baseMapper.list(new Page<>(dto.getPageNum(), dto.getPageSize()), dto).convert(this::translation);
     }
 
-
     @Override
     public IPage<WxCustomerVO> dropDownPageList(WxCustomerDropDownPageDTO dto) {
         dto.setLoginStaffExtId(JwtUtil.getExtUserId()).setIsEnterpriseAdmin(roleStaffService.isEnterpriseAdmin());
 
-        //分页查询
+        // 分页查询
         IPage<WxCustomer> page = baseMapper.dropDownPageList(new Page<>(dto.getPageNum(), dto.getPageSize()), dto);
         return page.convert(this::translation);
     }
 
     @Override
     public IPage<WxCustomerVO> pageCustomerList(BrJourneyCustomerPageDTO dto) {
-        return baseMapper.pageCustomerList(new Page<>(dto.getPageNum(), dto.getPageSize()), dto).convert(this::translation);
+        return baseMapper.pageCustomerList(new Page<>(dto.getPageNum(), dto.getPageSize()), dto)
+                .convert(this::translation);
     }
 
     @Override
     public WxCustomerVO findById(String id) {
         return translation(checkExists(id), true);
     }
-
 
     @Override
     public WxCustomerVO translation(WxCustomer wxCustomer) {
@@ -191,10 +206,15 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     @Override
     public void staffDeleteCustomer(WxStaffDeleteCustomerDTO customerDTO) {
 
-        //1、新增流水
+        Date deleteAt = new Date();
+        // 1、新增流水
         Staff staff = staffService.find(customerDTO.getExtCorpId(), customerDTO.getStaffExtId());
-        WxCustomer wxCustomer = Optional.ofNullable(customerService.find(customerDTO.getExtCorpId(), customerDTO.getCustomerExtId())).orElse(new WxCustomer());
-        WxCustomerStaff customerStaff = Optional.ofNullable(customerStaffService.checkExists(wxCustomer.getExtCorpId(), staff.getExtId(), wxCustomer.getExtId())).orElse(new WxCustomerStaff());
+        WxCustomer wxCustomer = Optional
+                .ofNullable(customerService.find(customerDTO.getExtCorpId(), customerDTO.getCustomerExtId()))
+                .orElse(new WxCustomer());
+        WxCustomerStaff customerStaff = Optional.ofNullable(
+                customerStaffService.checkExists(wxCustomer.getExtCorpId(), staff.getExtId(), wxCustomer.getExtId()))
+                .orElse(new WxCustomerStaff());
         WxCustomerLossInfoSaveDTO wxCustomerLossInfoSaveDTO = new WxCustomerLossInfoSaveDTO()
                 .setDeleteByTransfer(customerDTO.getDeleteByTransfer())
                 .setStaffId(Optional.ofNullable(staff).orElse(new Staff()).getId())
@@ -206,12 +226,14 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .setDeleteTime(customerDTO.getDeleteTime())
                 .setAddTime(customerStaff.getCreateTime())
                 .setExtCustomerId(wxCustomer.getExtId())
-                .setTagExtIds(Optional.ofNullable(customerStaffTagService.list(new LambdaQueryWrapper<WxCustomerStaffTag>()
-                        .eq(WxCustomerStaffTag::getExtCorpId, customerDTO.getExtCorpId())
-                        .eq(WxCustomerStaffTag::getExtCustomerId, customerStaff.getExtCustomerId())
-                )).orElse(new ArrayList<>()).stream().map(WxCustomerStaffTag::getExtTagId).collect(Collectors.toList()));
+                .setTagExtIds(Optional
+                        .ofNullable(customerStaffTagService.list(new LambdaQueryWrapper<WxCustomerStaffTag>()
+                                .eq(WxCustomerStaffTag::getExtCorpId, customerDTO.getExtCorpId())
+                                .eq(WxCustomerStaffTag::getExtCustomerId, customerStaff.getExtCustomerId())))
+                        .orElse(new ArrayList<>()).stream().map(WxCustomerStaffTag::getExtTagId)
+                        .collect(Collectors.toList()));
 
-        //客户删除员工
+        // 客户删除员工
         if (Objects.equals(WxCustomerLossInfo.TYPE_CUSTOMER_DELETE_STAFF, customerDTO.getType())) {
             log.info("客户删除员工");
             customerStaff.setIsDeletedStaff(true).setUpdatedAt(new Date());
@@ -220,51 +242,75 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             if (OptionalLong.of(customerStaffService.count(new LambdaQueryWrapper<WxCustomerStaff>()
                     .eq(WxCustomerStaff::getExtCorpId, customerDTO.getExtCorpId())
                     .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId())
-                    .and(wrapper -> wrapper.eq(WxCustomerStaff::getIsDeletedStaff, false).or().isNull(WxCustomerStaff::getIsDeletedStaff))
-            )).orElse(0) < 1) {
+                    .and(wrapper -> wrapper.eq(WxCustomerStaff::getIsDeletedStaff, false).or()
+                            .isNull(WxCustomerStaff::getIsDeletedStaff))))
+                    .orElse(0) < 1) {
                 customerService.updateById(wxCustomer.setIsDeletedStaff(true));
             }
         } else {
             log.info("员工删除客户");
-            //2、判断是否还有别的跟进人员，如果有则删除跟进关系、从客户旅程中移除，如果没有删除跟进关系,客户信息,客户详情信息,客户-标签
-            if (OptionalLong.of(customerStaffService.count(new LambdaQueryWrapper<WxCustomerStaff>().eq(WxCustomerStaff::getExtCorpId, customerDTO.getExtCorpId())
+            // 2、判断是否还有别的跟进人员，如果有则删除跟进关系、从客户旅程中移除，如果没有删除跟进关系,客户信息,客户详情信息,客户-标签
+            if (OptionalLong.of(customerStaffService.count(new LambdaQueryWrapper<WxCustomerStaff>()
+                    .eq(WxCustomerStaff::getExtCorpId, customerDTO.getExtCorpId())
                     .eq(WxCustomerStaff::getExtCustomerId, customerDTO.getCustomerExtId()))).orElse(0) < 2) {
+
+                // 删除客户
+                customerService.update(new LambdaUpdateWrapper<WxCustomer>()
+                        .eq(WxCustomer::getId, wxCustomer.getId())
+                        .set(WxCustomer::getDeletedAt, deleteAt));
                 customerService.removeById(wxCustomer.getId());
 
-                //记录删除的时候的客户旅程信息
+                // 记录删除的时候的客户旅程信息
                 wxCustomerLossInfoSaveDTO.setJourneyStageIds(Optional.ofNullable(journeyStageCustomerService.list(
                         new LambdaQueryWrapper<BrJourneyStageCustomer>()
                                 .eq(BrJourneyStageCustomer::getExtCorpId, customerDTO.getExtCorpId())
-                                .eq(BrJourneyStageCustomer::getCustomerExtId, wxCustomer.getExtId())
-                )).orElse(new ArrayList<>()).stream().map(BrJourneyStageCustomer::getJourneyStageId).collect(Collectors.toList()));
+                                .eq(BrJourneyStageCustomer::getCustomerExtId, wxCustomer.getExtId())))
+                        .orElse(new ArrayList<>()).stream().map(BrJourneyStageCustomer::getJourneyStageId)
+                        .collect(Collectors.toList()));
 
                 journeyStageCustomerService.remove(new LambdaQueryWrapper<BrJourneyStageCustomer>()
                         .eq(BrJourneyStageCustomer::getExtCorpId, customerDTO.getExtCorpId())
-                        .eq(BrJourneyStageCustomer::getCustomerExtId, wxCustomer.getId())
-                );
+                        .eq(BrJourneyStageCustomer::getCustomerExtId, wxCustomer.getId()));
             }
             if (StringUtils.isNotBlank(customerStaff.getId())) {
+                // 删除客户-员工关联
+                customerStaffService.update(new LambdaUpdateWrapper<WxCustomerStaff>()
+                        .eq(WxCustomerStaff::getId, customerStaff.getId())
+                        .set(WxCustomerStaff::getDeletedAt, deleteAt));
                 customerStaffService.removeById(customerStaff.getId());
+
+                // 员工-客户-详情
+                customerInfoService.update(new LambdaUpdateWrapper<WxCustomerInfo>()
+                        .eq(WxCustomerInfo::getExtCorpId, customerStaff.getExtCorpId())
+                        .eq(WxCustomerInfo::getExtStaffId, customerStaff.getExtStaffId())
+                        .eq(WxCustomerInfo::getExtCustomerId, customerStaff.getExtCustomerId())
+                        .set(WxCustomerInfo::getDeletedAt, deleteAt));
                 customerInfoService.remove(new LambdaQueryWrapper<WxCustomerInfo>()
                         .eq(WxCustomerInfo::getExtCorpId, customerStaff.getExtCorpId())
                         .eq(WxCustomerInfo::getExtStaffId, customerStaff.getExtStaffId())
                         .eq(WxCustomerInfo::getExtCustomerId, customerStaff.getExtCustomerId()));
 
+                // 删除客户-员工-标签关联
+                customerStaffTagService.update(new LambdaUpdateWrapper<WxCustomerStaffTag>()
+                        .eq(WxCustomerStaffTag::getExtCorpId, customerStaff.getExtCorpId())
+                        .in(WxCustomerStaffTag::getExtCustomerId, customerStaff.getExtCustomerId())
+                        .set(WxCustomerStaffTag::getDeletedAt, deleteAt));
                 customerStaffTagService.remove(new LambdaQueryWrapper<WxCustomerStaffTag>()
                         .eq(WxCustomerStaffTag::getExtCorpId, customerStaff.getExtCorpId())
                         .in(WxCustomerStaffTag::getExtCustomerId, customerStaff.getExtCustomerId()));
             }
 
-            //3、更新员工的客户数
-            staff.setCustomerCount(Math.toIntExact(OptionalLong.of(customerStaffService.count(new LambdaQueryWrapper<WxCustomerStaff>()
-                    .eq(WxCustomerStaff::getExtCorpId, wxCustomer.getExtCorpId())
-                    .eq(WxCustomerStaff::getExtStaffId, staff.getExtId()))).orElse(0)));
+            // 3、更新员工的客户数
+            staff.setCustomerCount(
+                    Math.toIntExact(OptionalLong.of(customerStaffService.count(new LambdaQueryWrapper<WxCustomerStaff>()
+                            .eq(WxCustomerStaff::getExtCorpId, wxCustomer.getExtCorpId())
+                            .eq(WxCustomerStaff::getExtStaffId, staff.getExtId()))).orElse(0)));
             staffService.updateById(staff);
         }
 
-        WxCustomerLossInfo wxCustomerLossInfo = customerLossInfoService.save(wxCustomerLossInfoSaveDTO.setStaffExtId(staff.getExtId()));
+        WxCustomerLossInfo wxCustomerLossInfo = customerLossInfoService
+                .save(wxCustomerLossInfoSaveDTO.setStaffExtId(staff.getExtId()));
         log.info("新增流失记录,入参：【{}】,出参【{}】", wxCustomerLossInfoSaveDTO, wxCustomerLossInfo);
-
 
     }
 
@@ -278,30 +324,24 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         return baseMapper.findByExtIds(extCorpId, extIds);
     }
 
-    /**
-     * 翻译
-     *
-     * @param wxCustomer 实体
-     * @return WxCustomerVO 结果集
-     * @author xxh
-     * @date 2021-12-22
-     */
-    private WxCustomerVO translation(WxCustomer wxCustomer, boolean hasDetail) {
+    @Override
+    public WxCustomerVO translation(WxCustomer wxCustomer, boolean hasDetail) {
         WxCustomerVO vo = new WxCustomerVO();
         if (wxCustomer == null) {
             return null;
+
         }
         String extCorpId = wxCustomer.getExtCorpId();
         BeanUtils.copyProperties(wxCustomer, vo);
         if (StringUtils.isNotBlank(wxCustomer.getExtCreatorId())) {
-            StaffVO staff = staffService.translation(staffService.find(wxCustomer.getExtCorpId(), wxCustomer.getExtCreatorId()));
+            StaffVO staff = staffService
+                    .translation(staffService.find(wxCustomer.getExtCorpId(), wxCustomer.getExtCreatorId()));
             vo.setExtCreatorAvatar(staff.getAvatarUrl()).setExtCreatorName(staff.getName()).setCreatorStaff(staff);
         }
 
-        WxCustomerStaff customerStaff = customerStaffService.getOne(new LambdaQueryWrapper<WxCustomerStaff>()
-                .eq(WxCustomerStaff::getExtStaffId, wxCustomer.getExtCreatorId())
-                .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId())
-        );
+        WxCustomerStaff customerStaff = customerStaffService.findHasDelete(extCorpId, wxCustomer.getExtId(),
+                wxCustomer.getExtCreatorId());
+
         String addWay = Optional.ofNullable(customerStaff).orElse(new WxCustomerStaff()).getAddWay();
         vo.setAddWay(addWay).setAddWayName(WxCustomerAddWayEnum.getName(addWay));
 
@@ -309,28 +349,32 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .eq(WxCustomerStaff::getExtCorpId, wxCustomer.getExtCorpId())
                 .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId()));
 
-
         if (hasDetail) {
             vo.setCustomerInfo(customerInfoService.getOne(new LambdaQueryWrapper<WxCustomerInfo>()
                     .eq(WxCustomerInfo::getExtCorpId, wxCustomer.getExtCorpId())
                     .eq(WxCustomerInfo::getExtCustomerId, wxCustomer.getExtId())
                     .eq(WxCustomerInfo::getExtStaffId, wxCustomer.getExtCreatorId())));
 
-            //关联群聊列表
-            List<WxGroupChatMemberVO> groupChatMemberList = groupChatMemberService.queryList(new WxGroupChatMemberQueryDTO().setExtCorpId(wxCustomer.getExtCorpId())
-                    .setType(WxGroupChatMember.TYPE_EXTERNAL_CONTACT).setUserId(wxCustomer.getExtId()));
-            List<String> groupExtIds = Optional.ofNullable(groupChatMemberList).orElse(new ArrayList<>()).stream().map(WxGroupChatMemberVO::getExtChatId).collect(Collectors.toList());
+            // 关联群聊列表
+            List<WxGroupChatMemberVO> groupChatMemberList = groupChatMemberService
+                    .queryList(new WxGroupChatMemberQueryDTO().setExtCorpId(wxCustomer.getExtCorpId())
+                            .setType(WxGroupChatMember.TYPE_EXTERNAL_CONTACT).setUserId(wxCustomer.getExtId()));
+            List<String> groupExtIds = Optional.ofNullable(groupChatMemberList).orElse(new ArrayList<>()).stream()
+                    .map(WxGroupChatMemberVO::getExtChatId).collect(Collectors.toList());
             if (ListUtils.isNotEmpty(groupExtIds)) {
-                List<WxGroupChat> list = groupChatService.list(new LambdaQueryWrapper<WxGroupChat>().eq(WxGroupChat::getExtChatId, wxCustomer.getExtCorpId()).in(WxGroupChat::getExtChatId, groupExtIds).orderByDesc(WxGroupChat::getUpdatedAt));
+                List<WxGroupChat> list = groupChatService.list(
+                        new LambdaQueryWrapper<WxGroupChat>().eq(WxGroupChat::getExtChatId, wxCustomer.getExtCorpId())
+                                .in(WxGroupChat::getExtChatId, groupExtIds).orderByDesc(WxGroupChat::getUpdatedAt));
                 vo.setGroupChatList(list);
             }
         }
 
         List<StaffFollowVO> staffFollowVOS = new ArrayList<>();
 
-        //跟进员工列表
+        // 跟进员工列表
         if (ListUtils.isNotEmpty(customerStaffs)) {
-            List<String> extStaffIds = customerStaffs.stream().map(WxCustomerStaff::getExtStaffId).collect(Collectors.toList());
+            List<String> extStaffIds = customerStaffs.stream().map(WxCustomerStaff::getExtStaffId)
+                    .collect(Collectors.toList());
             if (ListUtils.isNotEmpty(extStaffIds)) {
 
                 customerStaffs.forEach(entry -> {
@@ -338,15 +382,19 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                     if (staff != null) {
                         StaffFollowVO staffFollowVO = new StaffFollowVO();
                         BeanUtils.copyProperties(staff, staffFollowVO);
-                        List<WxCustomerStaffTag> staffTags = customerStaffTagService.list(new LambdaQueryWrapper<WxCustomerStaffTag>()
-                                .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
-                                .eq(WxCustomerStaffTag::getExtCustomerId, entry.getExtCustomerId())
-                        );
-                        List<String> tagExtIds = Optional.ofNullable(staffTags).orElse(new ArrayList<>()).stream().map(WxCustomerStaffTag::getExtTagId).distinct().collect(Collectors.toList());
+                        List<WxCustomerStaffTag> staffTags = customerStaffTagService
+                                .list(new LambdaQueryWrapper<WxCustomerStaffTag>()
+                                        .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
+                                        .eq(WxCustomerStaffTag::getExtCustomerId, entry.getExtCustomerId())
+                                        .eq(WxCustomerStaffTag::getExtStaffId, entry.getExtStaffId()));
+                        List<String> tagExtIds = Optional.ofNullable(staffTags).orElse(new ArrayList<>()).stream()
+                                .map(WxCustomerStaffTag::getExtTagId).distinct().collect(Collectors.toList());
                         if (ListUtils.isNotEmpty(tagExtIds)) {
-                            staffFollowVO.setTags(tagService.list(new LambdaQueryWrapper<WxTag>().eq(WxTag::getExtCorpId, extCorpId).in(WxTag::getExtId, tagExtIds)));
+                            staffFollowVO.setTags(tagService.list(new LambdaQueryWrapper<WxTag>()
+                                    .eq(WxTag::getExtCorpId, extCorpId).in(WxTag::getExtId, tagExtIds)));
                         }
-                        staffFollowVO.setAddWay(entry.getAddWay()).setAddWayName(WxCustomerAddWayEnum.getName(entry.getAddWay()));
+                        staffFollowVO.setAddWay(entry.getAddWay())
+                                .setAddWayName(WxCustomerAddWayEnum.getName(entry.getAddWay()));
                         staffFollowVOS.add(staffFollowVO);
                     }
                 });
@@ -354,8 +402,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             }
         }
 
-
-        //设置所有的标签
+        // 设置所有的标签
         if (ListUtils.isNotEmpty(staffFollowVOS)) {
             List<WxTag> tags = new ArrayList<>();
             staffFollowVOS.stream().map(StaffFollowVO::getTags).filter(ListUtils::isNotEmpty).forEach(tags::addAll);
@@ -363,18 +410,16 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             vo.setTags(tags.stream().distinct().collect(Collectors.toList()));
         }
 
-
-        //查询转移情况
-        WxStaffTransferInfo staffTransferInfo = staffTransferInfoService.getOne(new LambdaQueryWrapper<WxStaffTransferInfo>()
-                .eq(WxStaffTransferInfo::getExtCorpId, vo.getExtCorpId())
-                .eq(WxStaffTransferInfo::getCustomerExtId, vo.getExtId())
-                .orderByDesc(WxStaffTransferInfo::getCreateTime)
-                .last("limit 1")
-        );
+        // 查询转移情况
+        WxStaffTransferInfo staffTransferInfo = staffTransferInfoService
+                .getOne(new LambdaQueryWrapper<WxStaffTransferInfo>()
+                        .eq(WxStaffTransferInfo::getExtCorpId, vo.getExtCorpId())
+                        .eq(WxStaffTransferInfo::getCustomerExtId, vo.getExtId())
+                        .orderByDesc(WxStaffTransferInfo::getCreateTime)
+                        .last("limit 1"));
         vo.setStaffTransferInfo(staffTransferInfo);
         return vo;
     }
-
 
     @Override
     public WxCustomer checkExists(String id) {
@@ -393,8 +438,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         return getOne(new LambdaQueryWrapper<WxCustomer>()
                 .eq(WxCustomer::getExtCorpId, extCorpId)
                 .eq(WxCustomer::getExtId, extId)
-                .eq(WxCustomer::getHasFriend, true)
-        );
+                .eq(WxCustomer::getHasFriend, true));
     }
 
     @Override
@@ -405,111 +449,141 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     }
 
     @Override
-    public void sync(String extCorpId) {
+    public void sync(String extCorpId, boolean isSync) {
 
-        //获取该企业，状态为未退出企业的员工
-        List<Staff> list = staffService.list(new LambdaQueryWrapper<Staff>()
-                .eq(Staff::getExtCorpId, extCorpId)
-        //        .ne(Staff::getStatus, 5)
-        );
+        Date deleteAt = new Date();
 
-        //批量遍历同步数据（每次同步100个员工的客户数据）
-        WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(WxCpConfiguration.getCustomerSecretWxCpService());
-        List<Staff> staffList = new ArrayList<>();
-        Optional.of(ListUtils.subCollection(Optional.ofNullable(list).orElse(new ArrayList<>()), 100))
-                .orElse(new ArrayList<>()).stream().filter(ListUtils::isNotEmpty).forEach(staffList::addAll);
-
-        List<String> staffExtIds = staffList.stream().map(Staff::getExtId).collect(Collectors.toList());
         try {
 
             List<WxCpExternalContactBatchInfo.ExternalContactInfo> externalContactList = new ArrayList<>();
-            if (ListUtils.isNotEmpty(staffExtIds)) {
-                //调用批量获取客户信息接口（每次最多只能获取100条数据，因此得递归分页获取所有的）
-                WxCpExternalContactBatchInfo contactDetailBatch = externalContactService.getContactDetailBatch(staffExtIds.toArray(new String[0]), null, 100);
-                externalContactList = contactDetailBatch.getExternalContactList();
-                getContactDetailBatch(externalContactService, externalContactList, staffExtIds, contactDetailBatch.getNextCursor());
+            if (isSync) {
+                // 获取该企业，状态为未退出企业的员工
+                List<Staff> list = staffService.list(new LambdaQueryWrapper<Staff>()
+                        .eq(Staff::getExtCorpId, extCorpId)
+                // .ne(Staff::getStatus, 5)
+                );
+                // 批量遍历同步数据（每次同步100个员工的客户数据）
+                WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(
+                        WxCpConfiguration.getCustomerSecretWxCpService());
+                List<List<Staff>> staffLists = Optional
+                        .of(ListUtils.subCollection(Optional.ofNullable(list).orElse(new ArrayList<>()), 100))
+                        .orElse(new ArrayList<>()).stream().filter(ListUtils::isNotEmpty).collect(Collectors.toList());
+                int size = 0;
+                for (List<Staff> staffList : staffLists) {
+                    List<String> staffExtIds = staffList.stream().map(Staff::getExtId).filter(StringUtils::isNotBlank)
+                            .collect(Collectors.toList());
+
+                    // 调用批量获取客户信息接口（每次最多只能获取100条数据，因此得递归分页获取所有的）
+                    WxCpExternalContactBatchInfo contactDetailBatch = externalContactService
+                            .getContactDetailBatch(staffExtIds.toArray(new String[0]), null, 100);
+                    externalContactList = contactDetailBatch.getExternalContactList();
+                    getContactDetailBatch(externalContactService, externalContactList, staffExtIds,
+                            contactDetailBatch.getNextCursor());
+                    List<WxCpExternalContactBatchInfo.ExternalContactInfo> contactInfos = contactDetailBatch
+                            .getExternalContactList();
+                    if (ListUtils.isNotEmpty(contactInfos)) {
+                        externalContactList.addAll(contactInfos);
+                    }
+                    size = staffExtIds.size() + size;
+                }
+                log.info("【同步客户】员工数量：{}，客户数量：{}", size, externalContactList.size());
+            } else {
+                RList<WxCpExternalContactBatchInfo.ExternalContactInfo> rList = redissonClient
+                        .getList(Constants.WX_CUSTOMER_SYNC_INFOS + extCorpId);
+                externalContactList.addAll(rList);
             }
 
-            log.info("【同步客户】员工数量：{}，客户数量：{}", staffExtIds.size(), externalContactList.size());
-
-            //还存在的客户extId列表
+            // 还存在的客户extId列表
             List<String> existCustomerExtIds = new ArrayList<>();
 
-            //遍历客户信息
+            // 遍历客户信息
             Map<String, List<String>> staffExtIdAndCustomerExtIdsMap = new HashMap<>();
             Optional.ofNullable(externalContactList).orElse(new ArrayList<>()).forEach(externalContactInfo -> {
 
-                //刷新客户信息，客户-标签关联
+                // 刷新客户信息，客户-标签关联
                 WxCustomer customer = refreshCustomer(externalContactInfo, extCorpId);
                 existCustomerExtIds.add(customer.getExtId());
 
                 String extStaffId = externalContactInfo.getFollowInfo().getUserId();
-                List<String> customerExtIds = Optional.ofNullable(staffExtIdAndCustomerExtIdsMap.get(extStaffId)).orElse(new ArrayList<>());
+                List<String> customerExtIds = Optional.ofNullable(staffExtIdAndCustomerExtIdsMap.get(extStaffId))
+                        .orElse(new ArrayList<>());
                 customerExtIds.add(customer.getExtId());
                 staffExtIdAndCustomerExtIdsMap.put(extStaffId, customerExtIds);
             });
 
-            //移除不存在的客户信息（移除客户，客户跟进情况，客户详情，客户-标签，员工客户数量）
+            // 移除不存在的客户信息（移除客户，客户跟进情况，客户详情，客户-标签，员工客户数量）
             List<String> allCustomerExtIds = Optional.ofNullable(list(new LambdaQueryWrapper<WxCustomer>()
-                            .select(WxCustomer::getExtId)
-                            .eq(WxCustomer::getExtCorpId, extCorpId)
-                            .eq(WxCustomer::getHasFriend, true)))
+                    .select(WxCustomer::getExtId)
+                    .eq(WxCustomer::getExtCorpId, extCorpId)
+                    .eq(WxCustomer::getHasFriend, true)))
                     .orElse(new ArrayList<>()).stream().map(WxCustomer::getExtId).collect(Collectors.toList());
             allCustomerExtIds.removeAll(existCustomerExtIds);
 
             if (ListUtils.isNotEmpty(allCustomerExtIds)) {
-                //移除客户
-                remove(new LambdaQueryWrapper<WxCustomer>()
+                // 移除客户
+                update(new LambdaUpdateWrapper<WxCustomer>()
                         .eq(WxCustomer::getExtCorpId, extCorpId)
-                        .in(WxCustomer::getExtId, allCustomerExtIds));
+                        .in(WxCustomer::getExtId, allCustomerExtIds)
+                        .set(WxCustomer::getHasDelete, null)
+                        .set(WxCustomer::getDeletedAt, deleteAt));
 
-                //移除客户-标签
-                customerStaffTagService.remove(new LambdaQueryWrapper<WxCustomerStaffTag>()
+                // 移除客户-标签
+                customerStaffTagService.update(new LambdaUpdateWrapper<WxCustomerStaffTag>()
                         .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
-                        .in(WxCustomerStaffTag::getExtCustomerId, allCustomerExtIds));
+                        .in(WxCustomerStaffTag::getExtCustomerId, allCustomerExtIds)
+                        .set(WxCustomerStaffTag::getHasDelete, null)
+                        .set(WxCustomerStaffTag::getDeletedAt, deleteAt));
 
-                //移除客户跟进情况
-                customerStaffService.remove(new LambdaQueryWrapper<WxCustomerStaff>()
+                // 移除客户跟进情况
+                customerStaffService.update(new LambdaUpdateWrapper<WxCustomerStaff>()
                         .eq(WxCustomerStaff::getExtCorpId, extCorpId)
-                        .in(WxCustomerStaff::getExtCustomerId, allCustomerExtIds));
+                        .in(WxCustomerStaff::getExtCustomerId, allCustomerExtIds)
+                        .set(WxCustomerStaff::getHasDelete, null)
+                        .set(WxCustomerStaff::getDeletedAt, deleteAt));
 
-                //移除客户详情
-                customerInfoService.remove(new LambdaQueryWrapper<WxCustomerInfo>()
+                // 移除客户详情
+                customerInfoService.update(new LambdaUpdateWrapper<WxCustomerInfo>()
                         .eq(WxCustomerInfo::getExtCorpId, extCorpId)
-                        .in(WxCustomerInfo::getExtCustomerId, allCustomerExtIds));
+                        .in(WxCustomerInfo::getExtCustomerId, allCustomerExtIds)
+                        .set(WxCustomerInfo::getHasDelete, null)
+                        .set(WxCustomerInfo::getDeletedAt, deleteAt));
             }
 
             staffExtIdAndCustomerExtIdsMap.forEach((key, value) -> {
-                //移除客户-标签
-                customerStaffTagService.remove(new LambdaQueryWrapper<WxCustomerStaffTag>()
+                // 移除客户-标签
+                customerStaffTagService.update(new LambdaUpdateWrapper<WxCustomerStaffTag>()
                         .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
                         .eq(WxCustomerStaffTag::getExtStaffId, key)
-                        .notIn(ListUtils.isNotEmpty(value), WxCustomerStaffTag::getExtCustomerId, value));
+                        .notIn(ListUtils.isNotEmpty(value), WxCustomerStaffTag::getExtCustomerId, value)
+                        .set(WxCustomerStaffTag::getHasDelete, null)
+                        .set(WxCustomerStaffTag::getDeletedAt, deleteAt));
 
-                //移除客户跟进情况
-                customerStaffService.remove(new LambdaQueryWrapper<WxCustomerStaff>()
+                // 移除客户跟进情况
+                customerStaffService.update(new LambdaUpdateWrapper<WxCustomerStaff>()
                         .eq(WxCustomerStaff::getExtCorpId, extCorpId)
                         .eq(WxCustomerStaff::getExtStaffId, key)
-                        .notIn(ListUtils.isNotEmpty(value), WxCustomerStaff::getExtCustomerId, value));
+                        .notIn(ListUtils.isNotEmpty(value), WxCustomerStaff::getExtCustomerId, value)
+                        .set(WxCustomerStaff::getHasDelete, null)
+                        .set(WxCustomerStaff::getDeletedAt, deleteAt));
 
-                //移除客户详情
-                customerInfoService.remove(new LambdaQueryWrapper<WxCustomerInfo>()
+                // 移除客户详情
+                customerInfoService.update(new LambdaUpdateWrapper<WxCustomerInfo>()
                         .eq(WxCustomerInfo::getExtCorpId, extCorpId)
                         .eq(WxCustomerInfo::getExtStaffId, key)
-                        .notIn(ListUtils.isNotEmpty(value), WxCustomerInfo::getExtCustomerId, value));
-
+                        .notIn(ListUtils.isNotEmpty(value), WxCustomerInfo::getExtCustomerId, value)
+                        .set(WxCustomerInfo::getHasDelete, null)
+                        .set(WxCustomerInfo::getDeletedAt, deleteAt));
 
             });
 
+            // 刷新员工客户数量
+            Optional.ofNullable(customerStaffService.countGroupByStaffExtId(extCorpId)).orElse(new ArrayList<>())
+                    .forEach(countVO -> staffService
+                            .update(new LambdaUpdateWrapper<Staff>().eq(Staff::getExtCorpId, extCorpId)
+                                    .eq(Staff::getExtId, countVO.getExtStaffId())
+                                    .set(Staff::getCustomerCount, Optional.ofNullable(countVO.getTotal()).orElse(0))));
 
-            //刷新员工客户数量
-            Optional.ofNullable(customerStaffService.countGroupByStaffExtId(extCorpId)).orElse(new ArrayList<>()).forEach(countVO ->
-                    staffService.update(new LambdaUpdateWrapper<Staff>().eq(Staff::getExtCorpId, extCorpId)
-                            .eq(Staff::getExtId, countVO.getExtStaffId())
-                            .set(Staff::getCustomerCount, Optional.ofNullable(countVO.getTotal()).orElse(0))));
-
-        } catch (
-                WxErrorException e) {
+        } catch (WxErrorException e) {
             log.error("同步客户信息失败，企业ID：【{}】,异常信息：【{}】", extCorpId, e);
             throw new BaseException("同步客户信息异常");
         }
@@ -517,12 +591,14 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     }
 
     @Override
-    public void sync(String extCorpId, boolean isSync) {
+    public void sync(String extCorpId) {
+        sync(extCorpId);
 
     }
 
     @Validated
-    public WxCustomer refreshCustomer(WxCpExternalContactBatchInfo.ExternalContactInfo externalContactInfo, String extCorpId) {
+    public WxCustomer refreshCustomer(WxCpExternalContactBatchInfo.ExternalContactInfo externalContactInfo,
+            String extCorpId) {
 
         ExternalContact externalContact = externalContactInfo.getExternalContact();
         FollowedUser followInfo = externalContactInfo.getFollowInfo();
@@ -530,7 +606,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         String staffExtId = followInfo.getUserId();
         String customerExtId = externalContact.getExternalUserId();
 
-        //更新客户信息
+        // 更新客户信息
         WxCustomer oldCustomer = customerService.checkExists(extCorpId, customerExtId);
         WxCustomer customer = new WxCustomer();
         BeanUtils.copyProperties(externalContact, customer);
@@ -544,7 +620,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                     .setExtCreatorId(oldCustomer.getExtCreatorId())
                     .setCreatedAt(oldCustomer.getCreatedAt())
                     .setId(oldCustomer.getId())
-                    //头像和性别第三方拿不到，暂时从公众号授权拿
+                    // 头像和性别第三方拿不到，暂时从公众号授权拿
                     .setGender(oldCustomer.getGender())
                     .setAvatar(oldCustomer.getAvatar());
             customerService.updateById(customer);
@@ -554,12 +630,13 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             customerService.save(customer);
         }
 
-        //更新客户员工更进情况数据
+        // 更新客户员工更进情况数据
         WxCustomerStaff oldCustomerStaff = customerStaffService.checkExists(extCorpId, staffExtId, customerExtId);
         WxCustomerStaff customerStaff = new WxCustomerStaff();
         BeanUtils.copyProperties(followInfo, customerStaff);
         customerStaff.setOperUserId(operatorUserId)
-                .setRemarkMobiles(Arrays.asList(Optional.ofNullable(followInfo.getRemarkMobiles()).orElse(new String[]{})))
+                .setRemarkMobiles(
+                        Arrays.asList(Optional.ofNullable(followInfo.getRemarkMobiles()).orElse(new String[] {})))
                 .setExtCreatorId(customer.getExtCreatorId())
                 .setRemarkCorpName(followInfo.getRemarkCompany())
                 .setExtStaffId(staffExtId)
@@ -578,48 +655,49 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         } else {
             customerStaffService.save(customerStaff);
 
-            //刷新员工客户数
-            Staff staff = staffService.getOne(new QueryWrapper<Staff>().lambda().eq(Staff::getExtId, staffExtId).eq(Staff::getExtCorpId, extCorpId));
+            // 刷新员工客户数
+            Staff staff = staffService.getOne(new QueryWrapper<Staff>().lambda().eq(Staff::getExtId, staffExtId)
+                    .eq(Staff::getExtCorpId, extCorpId));
             if (staff != null) {
                 staff.setCustomerCount(Optional.ofNullable(staff.getCustomerCount()).orElse(0) + 1);
                 staffService.updateById(staff);
             }
         }
 
-
-        //更新客户-标签
+        // 更新客户-标签
         List<String> customerStaffTagIds = new ArrayList<>();
-        Optional.of(Arrays.asList(Optional.ofNullable(followInfo.getTagIds()).orElse(new String[]{}))).orElse(new ArrayList<>()).forEach(tagId -> {
-            WxCustomerStaffTag staffTagOld = customerStaffTagService.getOne(new LambdaQueryWrapper<WxCustomerStaffTag>()
-                    .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
-                    .eq(WxCustomerStaffTag::getExtCustomerId, customerExtId)
-                    .eq(WxCustomerStaffTag::getExtStaffId, staffExtId)
-                    .eq(WxCustomerStaffTag::getExtTagId, tagId)
-            );
+        Optional.of(Arrays.asList(Optional.ofNullable(followInfo.getTagIds()).orElse(new String[] {})))
+                .orElse(new ArrayList<>()).forEach(tagId -> {
+                    WxCustomerStaffTag staffTagOld = customerStaffTagService
+                            .getOne(new LambdaQueryWrapper<WxCustomerStaffTag>()
+                                    .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
+                                    .eq(WxCustomerStaffTag::getExtCustomerId, customerExtId)
+                                    .eq(WxCustomerStaffTag::getExtStaffId, staffExtId)
+                                    .eq(WxCustomerStaffTag::getExtTagId, tagId));
 
-            WxCustomerStaffTag staffTag = new WxCustomerStaffTag();
-            if (staffTagOld == null) {
-                staffTag.setId(UUID.get32UUID())
-                        .setExtTagId(tagId)
-                        .setExtCustomerId(customerExtId)
-                        .setExtStaffId(staffExtId)
-                        .setExtCorpId(extCorpId)
-                        .setCreatedAt(new Date());
-                customerStaffTagService.save(staffTag);
-            } else {
-                staffTag.setId(staffTagOld.getId())
-                        .setExtCustomerId(customerExtId)
-                        .setExtStaffId(staffExtId)
-                        .setExtTagId(tagId)
-                        .setCreatedAt(staffTagOld.getCreatedAt())
-                        .setUpdatedAt(new Date())
-                        .setExtCorpId(extCorpId);
-                customerStaffTagService.updateById(staffTag);
-            }
-            customerStaffTagIds.add(tagId);
-        });
+                    WxCustomerStaffTag staffTag = new WxCustomerStaffTag();
+                    if (staffTagOld == null) {
+                        staffTag.setId(UUID.get32UUID())
+                                .setExtTagId(tagId)
+                                .setExtCustomerId(customerExtId)
+                                .setExtStaffId(staffExtId)
+                                .setExtCorpId(extCorpId)
+                                .setCreatedAt(new Date());
+                        customerStaffTagService.save(staffTag);
+                    } else {
+                        staffTag.setId(staffTagOld.getId())
+                                .setExtCustomerId(customerExtId)
+                                .setExtStaffId(staffExtId)
+                                .setExtTagId(tagId)
+                                .setCreatedAt(staffTagOld.getCreatedAt())
+                                .setUpdatedAt(new Date())
+                                .setExtCorpId(extCorpId);
+                        customerStaffTagService.updateById(staffTag);
+                    }
+                    customerStaffTagIds.add(tagId);
+                });
 
-        //移除不存在的客户-标签关联
+        // 移除不存在的客户-标签关联
         List<String> tagIds = customerStaffTagIds.stream().distinct().collect(Collectors.toList());
         customerStaffTagService.remove(new LambdaQueryWrapper<WxCustomerStaffTag>()
                 .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
@@ -627,10 +705,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .eq(WxCustomerStaffTag::getExtStaffId, staffExtId)
                 .notIn(ListUtils.isNotEmpty(tagIds), WxCustomerStaffTag::getExtTagId, tagIds));
 
-
         return customer;
     }
-
 
     @Override
     public WxCustomerVO updateCustomerInfo(WxCustomerInfoUpdateDTO dto) {
@@ -662,20 +738,31 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                     .setUpdatedAt(new Date());
             customerInfoService.updateById(customerInfo);
         }
+
         return translation(customer);
     }
 
     @Override
     public void exportList(WxCustomerExportDTO dto) {
-       /* LambdaQueryWrapper<WxCustomer> wrapper = new QueryWrapper<WxCustomer>().lambda()
-                .eq(StringUtils.isNotBlank(dto.getExtCorpId()), WxCustomer::getExtCorpId, dto.getExtCorpId())
-                .eq(StringUtils.isNotBlank(dto.getExtCreatorId()), WxCustomer::getExtCreatorId, dto.getExtCreatorId())
-                .ge(dto.getCreatedAtBegin() != null, WxCustomer::getCreatedAt, dto.getCreatedAtBegin())
-                .le(dto.getCreatedAtEnd() != null, WxCustomer::getCreatedAt, dto.getCreatedAtEnd())
-                .eq(dto.getGender() != null, WxCustomer::getGender, dto.getGender())
-                .eq(dto.getType() != null, WxCustomer::getType, dto.getType())
-                .like(StringUtils.isNotBlank(dto.getName()), WxCustomer::getName, dto.getName());
-        List<WxCustomerVO> list = Optional.ofNullable(list(wrapper)).orElse(new ArrayList<>()).stream().map(wxCustomer -> translation(wxCustomer, true)).collect(Collectors.toList());*/
+        /*
+         * LambdaQueryWrapper<WxCustomer> wrapper = new
+         * QueryWrapper<WxCustomer>().lambda()
+         * .eq(StringUtils.isNotBlank(dto.getExtCorpId()), WxCustomer::getExtCorpId,
+         * dto.getExtCorpId())
+         * .eq(StringUtils.isNotBlank(dto.getExtCreatorId()),
+         * WxCustomer::getExtCreatorId, dto.getExtCreatorId())
+         * .ge(dto.getCreatedAtBegin() != null, WxCustomer::getCreatedAt,
+         * dto.getCreatedAtBegin())
+         * .le(dto.getCreatedAtEnd() != null, WxCustomer::getCreatedAt,
+         * dto.getCreatedAtEnd())
+         * .eq(dto.getGender() != null, WxCustomer::getGender, dto.getGender())
+         * .eq(dto.getType() != null, WxCustomer::getType, dto.getType())
+         * .like(StringUtils.isNotBlank(dto.getName()), WxCustomer::getName,
+         * dto.getName());
+         * List<WxCustomerVO> list = Optional.ofNullable(list(wrapper)).orElse(new
+         * ArrayList<>()).stream().map(wxCustomer -> translation(wxCustomer,
+         * true)).collect(Collectors.toList());
+         */
 
         List<WxCustomer> wxCustomerList = baseMapper.queryList(dto);
         List<WxCustomerExportVO> exportVOS = new ArrayList<>();
@@ -683,16 +770,17 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             WxCustomerVO vo = new WxCustomerVO();
             BeanUtils.copyProperties(wxCustomer, vo);
             if (StringUtils.isNotBlank(wxCustomer.getExtCreatorId())) {
-                StaffVO staff = staffService.translation(staffService.find(wxCustomer.getExtCorpId(), wxCustomer.getExtCreatorId()));
+                StaffVO staff = staffService
+                        .translation(staffService.find(wxCustomer.getExtCorpId(), wxCustomer.getExtCreatorId()));
                 if (staff != null) {
-//                    vo.setExtCreatorAvatar(staff.getAvatarUrl()).setExtCreatorName("$userName=" + staff.getExtId() + "$");
+                    // vo.setExtCreatorAvatar(staff.getAvatarUrl()).setExtCreatorName("$userName=" +
+                    // staff.getExtId() + "$");
                 }
             }
 
             WxCustomerStaff customerStaff = customerStaffService.getOne(new LambdaQueryWrapper<WxCustomerStaff>()
                     .eq(WxCustomerStaff::getExtStaffId, wxCustomer.getExtCreatorId())
-                    .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId())
-            );
+                    .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId()));
 
             if (customerStaff != null) {
                 String addWay = Optional.ofNullable(customerStaff).orElse(new WxCustomerStaff()).getAddWay();
@@ -702,7 +790,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             }
             WxCustomerExportVO exportVO = new WxCustomerExportVO();
             BeanUtils.copyProperties(vo, exportVO);
-            WxCustomerInfo wxCustomerInfo = customerInfoService.find(wxCustomer.getExtCorpId(), wxCustomer.getExtId(), wxCustomer.getExtCreatorId());
+            WxCustomerInfo wxCustomerInfo = customerInfoService.find(wxCustomer.getExtCorpId(), wxCustomer.getExtId(),
+                    wxCustomer.getExtCreatorId());
             if (wxCustomerInfo != null) {
                 exportVO.setPhoneNumber(wxCustomerInfo.getPhoneNumber())
                         .setGender(wxCustomerInfo.getGender())
@@ -724,7 +813,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
     @Override
     public WxCustomerVO editTag(WxCustomerTagSaveOrUpdateDTO dto) throws WxErrorException {
-        //考虑下标签被删的情况，很多时候是关联过来打标签的，刚好写俩方法了
+        // 考虑下标签被删的情况，很多时候是关联过来打标签的，刚好写俩方法了
         log.info("客户打标签开始，[{}]", JSON.toJSONString(dto));
 
         WxCustomer wxCustomer = syncGetCustomer(dto.getId());
@@ -733,21 +822,26 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             throw new BaseException("找不到客户信息");
         }
         Staff staff = staffService.checkExists(dto.getStaffId());
-        List<String> addTags = Optional.ofNullable(dto.getAddTags()).orElse(new ArrayList<>()).stream().map(tagId -> tagService.checkExists(tagId).getExtId()).collect(Collectors.toList());
-        List<String> removeTags = Optional.ofNullable(dto.getRemoveTags()).orElse(new ArrayList<>()).stream().map(tagId -> tagService.checkExists(tagId).getExtId()).collect(Collectors.toList());
+        List<String> addTags = Optional.ofNullable(dto.getAddTags()).orElse(new ArrayList<>()).stream()
+                .map(tagId -> tagService.checkExists(tagId).getExtId()).collect(Collectors.toList());
+        List<String> removeTags = Optional.ofNullable(dto.getRemoveTags()).orElse(new ArrayList<>()).stream()
+                .map(tagId -> tagService.checkExists(tagId).getExtId()).collect(Collectors.toList());
 
-        //开始打标签
-        WxCpExternalContactServiceImpl externalContactService = new WxCpExternalContactServiceImpl(WxCpConfiguration.getCustomerSecretWxCpService());
-        WxCpBaseResp wxCpBaseResp = externalContactService.markTag(staff.getExtId(), wxCustomer.getExtId(), addTags.toArray(new String[0]), removeTags.toArray(new String[0]));
+        // 开始打标签
+        WxCpExternalContactServiceImpl externalContactService = new WxCpExternalContactServiceImpl(
+                WxCpConfiguration.getCustomerSecretWxCpService());
+        WxCpBaseResp wxCpBaseResp = externalContactService.markTag(staff.getExtId(), wxCustomer.getExtId(),
+                addTags.toArray(new String[0]), removeTags.toArray(new String[0]));
 
-        //删除客户-标签关联标签
+        // 删除客户-标签关联标签
         customerStaffTagService.batchDelete(new BatchDTO<String>().setIds(removeTags));
 
-        //新增客户-标签关联
-        WxCustomerStaff customerStaff = Optional.ofNullable(customerStaffService.getOne(new LambdaQueryWrapper<WxCustomerStaff>()
-                .eq(WxCustomerStaff::getExtStaffId, staff.getExtId())
-                .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId())
-        )).orElse(new WxCustomerStaff());
+        // 新增客户-标签关联
+        WxCustomerStaff customerStaff = Optional
+                .ofNullable(customerStaffService.getOne(new LambdaQueryWrapper<WxCustomerStaff>()
+                        .eq(WxCustomerStaff::getExtStaffId, staff.getExtId())
+                        .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId())))
+                .orElse(new WxCustomerStaff());
 
         List<WxTag> actualAddTags = new ArrayList<>();
         Optional.ofNullable(addTags).orElse(new ArrayList<>()).stream().filter(addTagId -> {
@@ -772,7 +866,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             customerStaffTagService.save(customerStaffTag);
         });
 
-        //客户动态
+        // 客户动态
         if (ListUtils.isNotEmpty(actualAddTags) && Constants.DYNAMIC_TAG_TYPE_MANUAL.equals(dto.getOrigin())) {
             CustomerDynamicInfoDTO dynamicInfoDTO = new CustomerDynamicInfoDTO()
                     .setTagOrigin(dto.getOrigin())
@@ -785,7 +879,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     }
 
     private WxCustomer syncGetCustomer(String id) {
-        //因为异步的，可能添加客户的方法没走完
+        // 因为异步的，可能添加客户的方法没走完
         WxCustomer wxCustomer = wxCustomerService.getByIdNewTr(id);
         int retryTimes = 5;
         while (wxCustomer == null && retryTimes-- > 0) {
@@ -814,13 +908,13 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .setStatus(EditTagThread.WAIT)
                 .setHasPriority(true);
 
-        //存入redis
+        // 存入redis
         redissonClient.getBucket(Constants.EDIT_TAG_REDIS_PRE + id)
                 .set(JSON.toJSONString(editTagThread));
 
         ExecutorList.tagExecutorService.submit(editTagThread);
 
-        //等5秒
+        // 等5秒
         long now = System.currentTimeMillis();
         String execRes;
         FailResultVO result = new FailResultVO();
@@ -852,7 +946,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
         log.debug("异步打标签参数=[{}]", JSON.toJSONString(dto));
 
-        //把已删除的标签剔除掉,这里一般是关联调用的，有可能标签已经被删了
+        // 把已删除的标签剔除掉,这里一般是关联调用的，有可能标签已经被删了
         List<String> addTags = Optional.ofNullable(dto.getAddTags()).orElse(new ArrayList<>()).stream()
                 .filter(e -> tagService.getById(e) != null).collect(Collectors.toList());
         List<String> removeTags = Optional.ofNullable(dto.getRemoveTags()).orElse(new ArrayList<>()).stream()
@@ -869,7 +963,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .setStatus(EditTagThread.WAIT)
                 .setHasPriority(false);
 
-        //存入redis
+        // 存入redis
         redissonClient.getBucket(Constants.EDIT_TAG_REDIS_PRE + id)
                 .set(JSON.toJSONString(editTagThread));
 
@@ -878,12 +972,15 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     }
 
     @Override
-    public void updateRemark(WxCpUpdateRemarkRequest wxCpUpdateRemarkRequest, String extCorpId) throws WxErrorException {
+    public void updateRemark(WxCpUpdateRemarkRequest wxCpUpdateRemarkRequest, String extCorpId)
+            throws WxErrorException {
 
-        WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(WxCpConfiguration.getCustomerSecretWxCpService());
+        WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(
+                WxCpConfiguration.getCustomerSecretWxCpService());
         externalContactService.updateRemark(wxCpUpdateRemarkRequest);
 
-        WxCustomerStaff customerStaff = customerStaffService.checkExists(extCorpId, wxCpUpdateRemarkRequest.getUserId(), wxCpUpdateRemarkRequest.getExternalUserId());
+        WxCustomerStaff customerStaff = customerStaffService.checkExists(extCorpId, wxCpUpdateRemarkRequest.getUserId(),
+                wxCpUpdateRemarkRequest.getExternalUserId());
         if (customerStaff != null) {
             customerStaff.setRemark(wxCpUpdateRemarkRequest.getRemark()).setUpdatedAt(new Date());
             customerStaffService.updateById(customerStaff);
@@ -929,7 +1026,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                     .setRemoveTags(dto.getRemoveTags());
 
             FailResultVO threadRes = priorityEditTag(saveOrUpdateDTO);
-            WxCustomerStaffVO wxCustomerStaffVO = customerStaffService.find(saveOrUpdateDTO.getExtCorpId(), saveOrUpdateDTO.getId(), customerId.getExtStaffId());
+            WxCustomerStaffVO wxCustomerStaffVO = customerStaffService.find(saveOrUpdateDTO.getExtCorpId(),
+                    saveOrUpdateDTO.getId(), customerId.getExtStaffId());
             wxCustomerStaffVO.setFailMsg(threadRes.getFailMsg());
             if (EditTagThread.SUCCESS.equals(threadRes.getStatus())) {
                 result.getSuccessList().add(wxCustomerStaffVO);
@@ -966,18 +1064,22 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         return baseMapper.findByExtIds(extCorpId, extIds);
     }
 
-    private void getContactDetailBatch(WxCpExternalContactService externalContactService, List<WxCpExternalContactBatchInfo.ExternalContactInfo> list, List<String> staffIds, String nextCursor) throws WxErrorException {
+    private void getContactDetailBatch(WxCpExternalContactService externalContactService,
+            List<WxCpExternalContactBatchInfo.ExternalContactInfo> list, List<String> staffIds, String nextCursor)
+            throws WxErrorException {
         if (StringUtils.isBlank(nextCursor)) {
             return;
         }
-        WxCpExternalContactBatchInfo contactDetailBatch = externalContactService.getContactDetailBatch(staffIds.toArray(new String[0]), nextCursor, 100);
-        List<WxCpExternalContactBatchInfo.ExternalContactInfo> externalContactList = contactDetailBatch.getExternalContactList();
+        WxCpExternalContactBatchInfo contactDetailBatch = externalContactService
+                .getContactDetailBatch(staffIds.toArray(new String[0]), nextCursor, 100);
+        List<WxCpExternalContactBatchInfo.ExternalContactInfo> externalContactList = contactDetailBatch
+                .getExternalContactList();
         if (ListUtils.isNotEmpty(externalContactList)) {
             list.addAll(contactDetailBatch.getExternalContactList());
         }
         String next = contactDetailBatch.getNextCursor();
         if (StringUtils.isNotBlank(next)) {
-            getContactDetailBatch(externalContactService, list, staffIds, nextCursor);
+            getContactDetailBatch(externalContactService, list, staffIds, next);
         }
     }
 
@@ -987,29 +1089,30 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
     @Override
     public List<WxCustomer> getCustomerListByCondition(WxMsgTemplateCountCustomerDTO dto) {
-        //企业查询条件
+        // 企业查询条件
         List<WxCustomer> result = list(new QueryWrapper<WxCustomer>().lambda()
                 .eq(WxCustomer::getExtCorpId, dto.getExtCorpId()));
         if (ListUtils.isEmpty(result)) {
             return new ArrayList<>();
         }
-        //选择全部客户
+        // 选择全部客户
         if (dto.getHasAllCustomer()) {
             return result;
         }
-        //客户id查询条件
+        // 客户id查询条件
         if (ListUtils.isNotEmpty(dto.getCustomerIds())) {
-            result = result.stream().filter(customer -> dto.getCustomerIds().contains(customer.getExtId())).collect(Collectors.toList());
+            result = result.stream().filter(customer -> dto.getCustomerIds().contains(customer.getExtId()))
+                    .collect(Collectors.toList());
         }
 
-        //群聊查询条件
+        // 群聊查询条件
         if (ListUtils.isNotEmpty(dto.getChatIds())) {
             List<WxGroupChatMember> list = chatMemberService.list(new QueryWrapper<WxGroupChatMember>().lambda()
                     .in(WxGroupChatMember::getExtChatId, dto.getChatIds()));
             if (ListUtils.isEmpty(list)) {
                 return new ArrayList<>();
             }
-            //获取客户在我们系统的id
+            // 获取客户在我们系统的id
             List<String> customerExtIds = list.stream().map(WxGroupChatMember::getUserId).collect(Collectors.toList());
             result = list(new QueryWrapper<WxCustomer>().lambda()
                     .in(WxCustomer::getExtId, result.stream().map(WxCustomer::getExtId).collect(Collectors.toList()))
@@ -1018,7 +1121,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 return new ArrayList<>();
             }
         }
-        //性别
+        // 性别
         if (dto.getSex() != null) {
             result = list(new QueryWrapper<WxCustomer>().lambda()
                     .in(WxCustomer::getExtId, result.stream().map(WxCustomer::getExtId).collect(Collectors.toList()))
@@ -1027,18 +1130,19 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 return new ArrayList<>();
             }
         }
-        //满足标签查询条件
+        // 满足标签查询条件
         if (ListUtils.isNotEmpty(dto.getChooseTags()) && dto.getChooseTagType() != null) {
 
             LambdaQueryWrapper<WxCustomerStaffTag> queryWrapper = new QueryWrapper<WxCustomerStaffTag>()
                     .lambda().eq(WxCustomerStaffTag::getExtCorpId, dto.getExtCorpId());
-            //满足其一
+            // 满足其一
             if (WxMsgTemplate.CHOOSE_TYPE_ANY.equals(dto.getChooseTagType())) {
                 queryWrapper.in(WxCustomerStaffTag::getExtTagId, dto.getChooseTags());
             } else if (WxMsgTemplate.CHOOSE_TYPE_ALL.equals(dto.getChooseTagType())) {
-                //全满足
-                List<WxCustomerStaffTag> allCustomerStaffTags = staffTagService.list(new QueryWrapper<WxCustomerStaffTag>()
-                        .lambda().eq(WxCustomerStaffTag::getExtCorpId, dto.getExtCorpId()));
+                // 全满足
+                List<WxCustomerStaffTag> allCustomerStaffTags = staffTagService
+                        .list(new QueryWrapper<WxCustomerStaffTag>()
+                                .lambda().eq(WxCustomerStaffTag::getExtCorpId, dto.getExtCorpId()));
                 Map<String, List<String>> allCustomerTagMap = new HashMap<>();
                 allCustomerStaffTags.forEach(e -> {
                     List<String> tagExtIds = allCustomerTagMap.computeIfAbsent(e.getExtCustomerId(),
@@ -1046,7 +1150,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                     tagExtIds.add(e.getExtTagId());
                 });
 
-                //满足条件的extCustomerId
+                // 满足条件的extCustomerId
                 List<String> customerExtIds = new ArrayList<>();
                 allCustomerTagMap.forEach((extCustomerId, tagList) -> {
                     if (tagList.containsAll(dto.getChooseTags())) {
@@ -1059,32 +1163,36 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 }
 
                 queryWrapper.in(WxCustomerStaffTag::getExtCustomerId, customerExtIds);
-            }//没标签的就全查出来
+            } // 没标签的就全查出来
 
             List<WxCustomerStaffTag> customerTagList = staffTagService.list(queryWrapper);
-            //为空就可以返回了
+            // 为空就可以返回了
             if (ListUtils.isEmpty(customerTagList)) {
                 return new ArrayList<>();
             }
-            List<String> customerExtIds = customerTagList.stream().map(WxCustomerStaffTag::getExtCustomerId).collect(Collectors.toList());
-            //查出结果
+            List<String> customerExtIds = customerTagList.stream().map(WxCustomerStaffTag::getExtCustomerId)
+                    .collect(Collectors.toList());
+            // 查出结果
             result = list(new QueryWrapper<WxCustomer>().lambda()
                     .in(WxCustomer::getExtId, result.stream().map(WxCustomer::getExtId).collect(Collectors.toList()))
-                    .in(!WxMsgTemplate.CHOOSE_TYPE_NONE.equals(dto.getChooseTagType()), WxCustomer::getExtId, customerExtIds)
-                    .notIn(WxMsgTemplate.CHOOSE_TYPE_NONE.equals(dto.getChooseTagType()), WxCustomer::getExtId, customerExtIds));
+                    .in(!WxMsgTemplate.CHOOSE_TYPE_NONE.equals(dto.getChooseTagType()), WxCustomer::getExtId,
+                            customerExtIds)
+                    .notIn(WxMsgTemplate.CHOOSE_TYPE_NONE.equals(dto.getChooseTagType()), WxCustomer::getExtId,
+                            customerExtIds));
             if (ListUtils.isEmpty(result)) {
                 return new ArrayList<>();
             }
         }
-        //不满足标签查询条件
+        // 不满足标签查询条件
         if (ListUtils.isNotEmpty(dto.getExcludeTags())) {
-            //先查出在标签里的客户
+            // 先查出在标签里的客户
             List<WxCustomerStaffTag> customerTagList = staffTagService.list(
                     new QueryWrapper<WxCustomerStaffTag>().lambda()
                             .in(WxCustomerStaffTag::getExtTagId, dto.getExcludeTags()));
 
-            List<String> customerExtIds = customerTagList.stream().map(WxCustomerStaffTag::getExtCustomerId).collect(Collectors.toList());
-            //再查出满足条件的
+            List<String> customerExtIds = customerTagList.stream().map(WxCustomerStaffTag::getExtCustomerId)
+                    .collect(Collectors.toList());
+            // 再查出满足条件的
             result = list(new QueryWrapper<WxCustomer>().lambda()
                     .in(WxCustomer::getExtId, result.stream().map(WxCustomer::getExtId).collect(Collectors.toList()))
                     .notIn(ListUtils.isNotEmpty(customerExtIds), WxCustomer::getExtId, customerExtIds));
@@ -1099,8 +1207,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     public WxCustomerVO getDetails(String extCorpId, String extId) {
         WxCustomer customer = getOne(new LambdaQueryWrapper<WxCustomer>()
                 .eq(WxCustomer::getExtCorpId, extCorpId)
-                .eq(WxCustomer::getExtId, extId)
-        );
+                .eq(WxCustomer::getExtId, extId));
         return translation(customer, true);
     }
 
@@ -1125,7 +1232,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
         Staff staff = staffService.checkExists(staffId);
 
-        WxCustomerStaff customerStaff = customerStaffService.checkExists(extCorpId, staff.getExtId(), wxCustomer.getExtId());
+        WxCustomerStaff customerStaff = customerStaffService.checkExists(extCorpId, staff.getExtId(),
+                wxCustomer.getExtId());
         if (customerStaff == null) {
             throw new BaseException("暂无员工跟进");
         }
@@ -1134,7 +1242,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         BeanUtils.copyProperties(wxCustomer, vo);
         if (StringUtils.isNotBlank(wxCustomer.getExtCreatorId())) {
             StaffVO staffVO = staffService.translation(staff);
-            vo.setExtCreatorAvatar(staffVO.getAvatarUrl()).setExtCreatorName(staffVO.getName()).setCreatorStaff(staffVO);
+            vo.setExtCreatorAvatar(staffVO.getAvatarUrl()).setExtCreatorName(staffVO.getName())
+                    .setCreatorStaff(staffVO);
         }
 
         String addWay = customerStaff.getAddWay();
@@ -1149,27 +1258,31 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .eq(WxCustomerStaff::getExtCorpId, wxCustomer.getExtCorpId())
                 .eq(WxCustomerStaff::getExtCustomerId, wxCustomer.getExtId()));
 
-
-        //设置员工客户详情
+        // 设置员工客户详情
         vo.setCustomerInfo(customerInfoService.getOne(new LambdaQueryWrapper<WxCustomerInfo>()
                 .eq(WxCustomerInfo::getExtCorpId, extCorpId)
                 .eq(WxCustomerInfo::getExtCustomerId, wxCustomer.getExtId())
                 .eq(WxCustomerInfo::getExtStaffId, staff.getExtId())));
 
-        //关联群聊列表
-        List<WxGroupChatMemberVO> groupChatMemberList = groupChatMemberService.queryList(new WxGroupChatMemberQueryDTO().setExtCorpId(wxCustomer.getExtCorpId())
-                .setType(WxGroupChatMember.TYPE_EXTERNAL_CONTACT).setUserId(wxCustomer.getExtId()));
-        List<String> groupExtIds = Optional.ofNullable(groupChatMemberList).orElse(new ArrayList<>()).stream().map(WxGroupChatMemberVO::getExtChatId).collect(Collectors.toList());
+        // 关联群聊列表
+        List<WxGroupChatMemberVO> groupChatMemberList = groupChatMemberService
+                .queryList(new WxGroupChatMemberQueryDTO().setExtCorpId(wxCustomer.getExtCorpId())
+                        .setType(WxGroupChatMember.TYPE_EXTERNAL_CONTACT).setUserId(wxCustomer.getExtId()));
+        List<String> groupExtIds = Optional.ofNullable(groupChatMemberList).orElse(new ArrayList<>()).stream()
+                .map(WxGroupChatMemberVO::getExtChatId).collect(Collectors.toList());
         if (ListUtils.isNotEmpty(groupExtIds)) {
-            List<WxGroupChat> list = groupChatService.list(new LambdaQueryWrapper<WxGroupChat>().eq(WxGroupChat::getExtCorpId, wxCustomer.getExtCorpId()).in(WxGroupChat::getExtChatId, groupExtIds).orderByDesc(WxGroupChat::getCreateTime));
+            List<WxGroupChat> list = groupChatService
+                    .list(new LambdaQueryWrapper<WxGroupChat>().eq(WxGroupChat::getExtCorpId, wxCustomer.getExtCorpId())
+                            .in(WxGroupChat::getExtChatId, groupExtIds).orderByDesc(WxGroupChat::getCreateTime));
             vo.setGroupChatList(list);
         }
 
         List<StaffFollowVO> staffFollowVOS = new ArrayList<>();
 
-        //跟进员工列表
+        // 跟进员工列表
         if (ListUtils.isNotEmpty(customerStaffs)) {
-            List<String> extStaffIds = customerStaffs.stream().map(WxCustomerStaff::getExtStaffId).collect(Collectors.toList());
+            List<String> extStaffIds = customerStaffs.stream().map(WxCustomerStaff::getExtStaffId)
+                    .collect(Collectors.toList());
             if (ListUtils.isNotEmpty(extStaffIds)) {
 
                 customerStaffs.forEach(entry -> {
@@ -1179,24 +1292,27 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                     }
                     StaffFollowVO staffFollowVO = new StaffFollowVO();
                     BeanUtils.copyProperties(s, staffFollowVO);
-                    List<WxCustomerStaffTag> staffTags = customerStaffTagService.list(new LambdaQueryWrapper<WxCustomerStaffTag>()
-                            .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
-                            .eq(WxCustomerStaffTag::getExtCustomerId, entry.getExtCustomerId())
-                            .eq(WxCustomerStaffTag::getExtStaffId, entry.getExtStaffId())
-                    );
-                    List<String> tagExtIds = Optional.ofNullable(staffTags).orElse(new ArrayList<>()).stream().map(WxCustomerStaffTag::getExtTagId).distinct().collect(Collectors.toList());
+                    List<WxCustomerStaffTag> staffTags = customerStaffTagService
+                            .list(new LambdaQueryWrapper<WxCustomerStaffTag>()
+                                    .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
+                                    .eq(WxCustomerStaffTag::getExtCustomerId, entry.getExtCustomerId())
+                                    .eq(WxCustomerStaffTag::getExtStaffId, entry.getExtStaffId()));
+                    List<String> tagExtIds = Optional.ofNullable(staffTags).orElse(new ArrayList<>()).stream()
+                            .map(WxCustomerStaffTag::getExtTagId).distinct().collect(Collectors.toList());
                     if (ListUtils.isNotEmpty(tagExtIds)) {
-                        staffFollowVO.setTags(tagService.list(new LambdaQueryWrapper<WxTag>().eq(WxTag::getExtCorpId, extCorpId).in(WxTag::getExtId, tagExtIds)));
+                        staffFollowVO.setTags(tagService.list(new LambdaQueryWrapper<WxTag>()
+                                .eq(WxTag::getExtCorpId, extCorpId).in(WxTag::getExtId, tagExtIds)));
                     }
                     staffFollowVO.setCreatedAt(entry.getCreatedAt());
                     staffFollowVOS.add(staffFollowVO);
-                    staffFollowVO.setAddWay(entry.getAddWay()).setAddWayName(WxCustomerAddWayEnum.getName(entry.getAddWay()));
+                    staffFollowVO.setAddWay(entry.getAddWay())
+                            .setAddWayName(WxCustomerAddWayEnum.getName(entry.getAddWay()));
                 });
                 vo.setFollowStaffList(staffFollowVOS);
             }
         }
 
-        //设置所有的标签
+        // 设置所有的标签
         if (ListUtils.isNotEmpty(staffFollowVOS)) {
             List<WxTag> tags = new ArrayList<>();
             staffFollowVOS.stream().map(StaffFollowVO::getTags).filter(ListUtils::isNotEmpty).forEach(tags::addAll);
@@ -1204,25 +1320,26 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             vo.setTags(tags.stream().distinct().collect(Collectors.toList()));
         }
 
-        //查询转移情况
-        WxStaffTransferInfo staffTransferInfo = staffTransferInfoService.getOne(new LambdaQueryWrapper<WxStaffTransferInfo>()
-                .eq(WxStaffTransferInfo::getExtCorpId, vo.getExtCorpId())
-                .eq(WxStaffTransferInfo::getCustomerExtId, vo.getExtId())
-                .orderByDesc(WxStaffTransferInfo::getCreateTime)
-                .last("limit 1")
-        );
+        // 查询转移情况
+        WxStaffTransferInfo staffTransferInfo = staffTransferInfoService
+                .getOne(new LambdaQueryWrapper<WxStaffTransferInfo>()
+                        .eq(WxStaffTransferInfo::getExtCorpId, vo.getExtCorpId())
+                        .eq(WxStaffTransferInfo::getCustomerExtId, vo.getExtId())
+                        .orderByDesc(WxStaffTransferInfo::getCreateTime)
+                        .last("limit 1"));
         vo.setStaffTransferInfo(staffTransferInfo);
 
         List<BrJourneyStageCustomerVO> journeyStageCustomerList = journeyStageCustomerService.queryList(
                 new BrJourneyStageCustomerQueryDTO()
                         .setExtCorpId(extCorpId)
-                        .setCustomerId(vo.getId())
-        );
+                        .setCustomerId(vo.getId()));
 
         if (ListUtils.isNotEmpty(journeyStageCustomerList)) {
-            List<String> journeyStageIds = journeyStageCustomerList.stream().map(BrJourneyStageCustomerVO::getJourneyStageId).collect(Collectors.toList());
+            List<String> journeyStageIds = journeyStageCustomerList.stream()
+                    .map(BrJourneyStageCustomerVO::getJourneyStageId).collect(Collectors.toList());
             vo.setCustomerStageIdList(journeyStageIds);
-            List<String> journeyIds = journeyStageCustomerList.stream().map(BrJourneyStageCustomerVO::getJourneyId).collect(Collectors.toList());
+            List<String> journeyIds = journeyStageCustomerList.stream().map(BrJourneyStageCustomerVO::getJourneyId)
+                    .collect(Collectors.toList());
             List<WxCustomerJourneyVO> journeyList = new ArrayList<>();
             if (ListUtils.isNotEmpty(journeyIds)) {
                 List<BrJourney> list = journeyService.list(new LambdaQueryWrapper<BrJourney>()
@@ -1242,14 +1359,14 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             vo.setJourneyList(journeyList);
         }
 
-        //查询协助人
+        // 查询协助人
         vo.setAssistStaffList(customerStaffAssistService.queryStaffAssistList(new WxCustomerStaffAssistQueryDTO()
                 .setExtCorpId(vo.getExtCorpId())
                 .setExtStaffId(staff.getExtId())
                 .setExtCustomerId(extId)));
+
         return vo;
     }
-
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -1276,8 +1393,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             long lossTotal = OptionalLong.of(customerLossInfoService.count(new LambdaQueryWrapper<WxCustomerLossInfo>()
                     .eq(WxCustomerLossInfo::getExtCorpId, extCorpId)
                     .lt(WxCustomerLossInfo::getDeleteTime, date)
-                    .ge(WxCustomerLossInfo::getDeleteTime, yesterday))
-            ).orElse(0);
+                    .ge(WxCustomerLossInfo::getDeleteTime, yesterday))).orElse(0);
 
             long saveTotal = customerStaffService.count(extCorpId, yesterday, date, null);
             WxCustomerStatisticsInfoVO statisticsInfo = new WxCustomerStatisticsInfoVO().setDay(DateUtils.getDate(-i))
@@ -1304,9 +1420,15 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
     @Override
     public WxCustomerPullNewStatisticsVO getPullNewStatisticsInfo(WxCustomerPullNewStatisticsDTO dto) {
-        List<WxCustomerPullNewStatisticsInfoVO> last30DaysStatisticsInfo = customerStaffService.getPullNewStatisticsInfo(dto.getExtCorpId(), dto.getTopNum(), DateUtils.getDate(-29), DateUtils.getDate(1));
-        List<WxCustomerPullNewStatisticsInfoVO> last7DaysStatisticsInfo = customerStaffService.getPullNewStatisticsInfo(dto.getExtCorpId(), dto.getTopNum(), DateUtils.getDate(-6), DateUtils.getDate(1));
-        return new WxCustomerPullNewStatisticsVO().setLast30DaysStatisticsInfos(last30DaysStatisticsInfo).setLast7DaysStatisticsInfos(last7DaysStatisticsInfo);
+        List<WxCustomerPullNewStatisticsInfoVO> last30DaysStatisticsInfo = customerStaffService
+                .getPullNewStatisticsInfo(dto.getExtCorpId(),
+                        dto.getTopNum(), DateUtils.getDate(-30), DateUtils.getDate(0));
+        List<WxCustomerPullNewStatisticsInfoVO> last7DaysStatisticsInfo = customerStaffService.getPullNewStatisticsInfo(
+                dto.getExtCorpId(),
+                dto.getTopNum(), DateUtils.getDate(-7), DateUtils.getDate(0));
+        return new WxCustomerPullNewStatisticsVO()
+                .setLast30DaysStatisticsInfos(last30DaysStatisticsInfo)
+                .setLast7DaysStatisticsInfos(last7DaysStatisticsInfo);
     }
 
     @Override
@@ -1320,7 +1442,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
         Staff staff = staffService.find(staffId);
 
-        WxCustomerStaff customerStaff = customerStaffService.findHasDelete(extCorpId, staff.getExtId(), wxCustomer.getExtId());
+        WxCustomerStaff customerStaff = customerStaffService.findHasDelete(extCorpId, staff.getExtId(),
+                wxCustomer.getExtId());
         if (customerStaff == null) {
             throw new BaseException("暂无员工跟进");
         }
@@ -1329,7 +1452,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         BeanUtils.copyProperties(wxCustomer, vo);
         if (StringUtils.isNotBlank(wxCustomer.getExtCreatorId())) {
             StaffVO staffVO = staffService.translation(staff);
-            vo.setExtCreatorAvatar(staffVO.getAvatarUrl()).setExtCreatorName(staffVO.getName()).setCreatorStaff(staffVO);
+            vo.setExtCreatorAvatar(staffVO.getAvatarUrl()).setExtCreatorName(staffVO.getName())
+                    .setCreatorStaff(staffVO);
         }
 
         String addWay = customerStaff.getAddWay();
@@ -1340,7 +1464,7 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .setRemarkCorpName(customerStaff.getRemarkCorpName())
                 .setRemarkMobiles(customerStaff.getRemarkMobiles());
 
-        //设置员工客户详情
+        // 设置员工客户详情
         vo.setCustomerInfo(customerInfoService.find(extCorpId, wxCustomer.getExtId(), staff.getExtId()));
 
         return vo;
@@ -1352,27 +1476,42 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     }
 
     @Override
-    public List<RLock> getCustomerSyncLock(String extCorpId) {
-        //查出全部员工id
+    public List<RLock> getCustomerSyncLock(String extCorpId, boolean needCache) {
+        // 查出全部员工id
         List<Staff> list = staffService.list(new QueryWrapper<Staff>().lambda()
                 .eq(Staff::getExtCorpId, extCorpId)
                 .select(Staff::getExtId));
         List<String> staffExtIds = list.stream().map(Staff::getExtId).collect(Collectors.toList());
 
-        //批量遍历同步数据（每次同步100个员工的客户数据）
-        WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(WxCpConfiguration.getCustomerSecretWxCpService());
+        // 批量遍历同步数据（每次同步100个员工的客户数据）
+        WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(
+                WxCpConfiguration.getCustomerSecretWxCpService());
 
         Set<String> customerExtIds = new HashSet<>();
         ListUtils.subCollection(staffExtIds, 100).forEach(staffIds -> {
 
-            //调用批量获取客户信息接口（每次最多只能获取100条数据，因此得递归分页获取所有的）
+            // 调用批量获取客户信息接口（每次最多只能获取100条数据，因此得递归分页获取所有的）
             WxCpExternalContactBatchInfo contactDetailBatch = null;
             try {
-                contactDetailBatch = externalContactService.getContactDetailBatch(staffIds.toArray(new String[0]), null, 100);
-                List<WxCpExternalContactBatchInfo.ExternalContactInfo> externalContactList = contactDetailBatch.getExternalContactList();
-                getContactDetailBatch(externalContactService, externalContactList, staffIds, contactDetailBatch.getNextCursor());
-
+                contactDetailBatch = externalContactService.getContactDetailBatch(staffIds.toArray(new String[0]), null,
+                        100);
+                List<WxCpExternalContactBatchInfo.ExternalContactInfo> externalContactList = contactDetailBatch
+                        .getExternalContactList();
+                getContactDetailBatch(externalContactService, externalContactList, staffIds,
+                        contactDetailBatch.getNextCursor());
                 externalContactList.forEach(e -> customerExtIds.add(e.getExternalContact().getExternalUserId()));
+                // 把信息放入缓存
+                if (needCache) {
+                    // 获取名称为 "objectList" 的RList实例
+                    RList<WxCpExternalContactBatchInfo.ExternalContactInfo> rList = redissonClient
+                            .getList(Constants.WX_CUSTOMER_SYNC_INFOS + extCorpId);
+                    // 清空已存在的列表数据
+                    rList.delete();
+                    if (ListUtils.isNotEmpty(externalContactList)) {
+                        // 将对象列表添加到RList中
+                        rList.addAll(externalContactList);
+                    }
+                }
             } catch (WxErrorException e) {
                 log.error("获取客户信息失败！", e);
                 throw BaseException.buildBaseException(e.getError(), "获取客户信息失败");
@@ -1380,8 +1519,13 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
         });
 
-        //每个员工都上锁
+        // 每个员工都上锁
         return customerExtIds.stream().map(e -> getCustomerSyncLock(extCorpId, e)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RLock> getCustomerSyncLock(String extCorpId) {
+        return getCustomerSyncLock(extCorpId, false);
     }
 
     @Override
@@ -1395,15 +1539,10 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
     @Override
     public void releaseSyncLock(RLock lock) {
-        //判断要解锁的key是否被当前线程持有。
+        // 判断要解锁的key是否被当前线程持有。
         if (lock.isLocked() && lock.isHeldByCurrentThread()) {
             lock.unlock();
         }
-    }
-
-    @Override
-    public List<RLock> getCustomerSyncLock(String extCorpId, boolean needCache) {
-        return null;
     }
 
     @Override
@@ -1416,13 +1555,16 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     public WxCustomerTodayStatisticsVO getTodayStatisticsInfo(WxCustomerTodayStatisticsDTO dto) {
         String extCorpId = dto.getExtCorpId();
         long total = 0l;
-        LambdaQueryWrapper<WxCustomer> queryWrapper = new LambdaQueryWrapper<WxCustomer>().eq(WxCustomer::getExtCorpId, dto.getExtCorpId());
+        LambdaQueryWrapper<WxCustomer> queryWrapper = new LambdaQueryWrapper<WxCustomer>().eq(WxCustomer::getExtCorpId,
+                dto.getExtCorpId());
         if (Optional.ofNullable(dto.getIsPermission()).orElse(false) && !roleStaffService.isEnterpriseAdmin()) {
-            List<String> extCustomerIds = Optional.ofNullable(customerStaffService.list(new LambdaQueryWrapper<WxCustomerStaff>()
-                    .select(WxCustomerStaff::getExtCustomerId)
-                    .eq(WxCustomerStaff::getExtCorpId, extCorpId)
-                    .eq(WxCustomerStaff::getExtStaffId, JwtUtil.getExtUserId())
-            )).orElse(new ArrayList<>()).stream().map(WxCustomerStaff::getExtCustomerId).collect(Collectors.toList());
+            List<String> extCustomerIds = Optional
+                    .ofNullable(customerStaffService.list(new LambdaQueryWrapper<WxCustomerStaff>()
+                            .select(WxCustomerStaff::getExtCustomerId)
+                            .eq(WxCustomerStaff::getExtCorpId, extCorpId)
+                            .eq(WxCustomerStaff::getExtStaffId, JwtUtil.getExtUserId())))
+                    .orElse(new ArrayList<>()).stream().map(WxCustomerStaff::getExtCustomerId)
+                    .collect(Collectors.toList());
             queryWrapper.in(WxCustomer::getExtId, extCustomerIds);
             if (ListUtils.isNotEmpty(extCustomerIds)) {
                 total = count(queryWrapper.in(WxCustomer::getExtId, extCustomerIds));
@@ -1435,14 +1577,16 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
         Date yesterday = DateUtils.getDate(0);
         long lossTotal = OptionalLong.of(customerLossInfoService.count(new LambdaQueryWrapper<WxCustomerLossInfo>()
                 .eq(WxCustomerLossInfo::getExtCorpId, extCorpId)
-                .eq(Optional.ofNullable(dto.getIsPermission()).orElse(false) && !roleStaffService.isEnterpriseAdmin(), WxCustomerLossInfo::getStaffId, JwtUtil.getUserId())
+                .eq(Optional.ofNullable(dto.getIsPermission()).orElse(false) && !roleStaffService.isEnterpriseAdmin(),
+                        WxCustomerLossInfo::getStaffId, JwtUtil.getUserId())
                 .lt(WxCustomerLossInfo::getDeleteTime, date)
-                .ge(WxCustomerLossInfo::getDeleteTime, yesterday))
-        ).orElse(0);
-        long saveTotal = customerStaffService.count(extCorpId, yesterday, date, Optional.ofNullable(dto.getIsPermission()).orElse(false) && !roleStaffService.isEnterpriseAdmin() ? JwtUtil.getExtUserId() : null);
+                .ge(WxCustomerLossInfo::getDeleteTime, yesterday))).orElse(0);
+        long saveTotal = customerStaffService.count(extCorpId, yesterday, date,
+                Optional.ofNullable(dto.getIsPermission()).orElse(false) && !roleStaffService.isEnterpriseAdmin()
+                        ? JwtUtil.getExtUserId()
+                        : null);
         statisticsVO.setTodayLossTotal(lossTotal).setTodaySaveTotal(saveTotal);
         return statisticsVO;
-
 
     }
 
@@ -1480,7 +1624,8 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
     public IPage<WxCustomerVO> pageAssistList(WxCustomerAssistPageDTO dto) {
         String extUserId = JwtUtil.getExtUserId();
         dto.setLoginStaffExtId(extUserId).setIsEnterpriseAdmin(roleStaffService.isEnterpriseAdmin());
-        return baseMapper.pageAssistList(new Page<>(dto.getPageNum(), dto.getPageSize()), dto).convert(customer -> translation(customer, extUserId));
+        return baseMapper.pageAssistList(new Page<>(dto.getPageNum(), dto.getPageSize()), dto)
+                .convert(customer -> translation(customer, extUserId));
     }
 
     @Override
@@ -1495,7 +1640,6 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 .set(WxStaffTransferInfo::getStatus, dto.getStatus())
                 .set(WxStaffTransferInfo::getTakeoverTime, new Date()));
 
-
         resignedStaffCustomerService.update(new LambdaUpdateWrapper<WxResignedStaffCustomer>()
                 .eq(WxResignedStaffCustomer::getExtCorpId, dto.getExtCorpId())
                 .eq(WxResignedStaffCustomer::getCustomerExtId, dto.getCustomerExtId())
@@ -1508,18 +1652,20 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
 
     @Override
     public void handlerTransfer(String extCorpId, String staffExtId, String customerExtId) {
-        WxStaffTransferInfo staffTransferInfo = staffTransferInfoService.getOne(new LambdaQueryWrapper<WxStaffTransferInfo>()
-                .eq(WxStaffTransferInfo::getExtCorpId, extCorpId)
-                .eq(WxStaffTransferInfo::getCustomerExtId, customerExtId)
-                .eq(WxStaffTransferInfo::getTakeoverStaffExtId, staffExtId)
-                .eq(WxStaffTransferInfo::getType, WxStaffTransferInfo.TYPE_ON_JOB)
-                .eq(WxStaffTransferInfo::getStatus, WxStaffTransferInfo.STATUS_WAITING_TAKE_OVER));
+        WxStaffTransferInfo staffTransferInfo = staffTransferInfoService
+                .getOne(new LambdaQueryWrapper<WxStaffTransferInfo>()
+                        .eq(WxStaffTransferInfo::getExtCorpId, extCorpId)
+                        .eq(WxStaffTransferInfo::getCustomerExtId, customerExtId)
+                        .eq(WxStaffTransferInfo::getTakeoverStaffExtId, staffExtId)
+                        .eq(WxStaffTransferInfo::getType, WxStaffTransferInfo.TYPE_ON_JOB)
+                        .eq(WxStaffTransferInfo::getStatus, WxStaffTransferInfo.STATUS_WAITING_TAKE_OVER));
 
-        WxResignedStaffCustomer resignedStaffCustomer = resignedStaffCustomerService.getOne(new LambdaQueryWrapper<WxResignedStaffCustomer>()
-                .eq(WxResignedStaffCustomer::getExtCorpId, extCorpId)
-                .eq(WxResignedStaffCustomer::getCustomerExtId, customerExtId)
-                .eq(WxResignedStaffCustomer::getTakeoverStaffExtId, staffExtId)
-                .eq(WxResignedStaffCustomer::getStatus, WxResignedStaffCustomer.STATUS_WAITING_TAKE_OVER));
+        WxResignedStaffCustomer resignedStaffCustomer = resignedStaffCustomerService
+                .getOne(new LambdaQueryWrapper<WxResignedStaffCustomer>()
+                        .eq(WxResignedStaffCustomer::getExtCorpId, extCorpId)
+                        .eq(WxResignedStaffCustomer::getCustomerExtId, customerExtId)
+                        .eq(WxResignedStaffCustomer::getTakeoverStaffExtId, staffExtId)
+                        .eq(WxResignedStaffCustomer::getStatus, WxResignedStaffCustomer.STATUS_WAITING_TAKE_OVER));
 
         String handoverStaffExtId = null;
         if (resignedStaffCustomer != null) {
@@ -1528,28 +1674,35 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             handoverStaffExtId = staffTransferInfo.getHandoverStaffExtId();
         }
 
-        //如果有继承，则把原有的标签，及详情修改
+        // 如果有继承，则把原有的标签，及详情修改
         if (StringUtils.isNotBlank(handoverStaffExtId)) {
 
-            //获取原跟进人拥有的标签
-            //设置所有的标签
-            List<String> tagIds = Optional.ofNullable(customerStaffTagService.list(new LambdaQueryWrapper<WxCustomerStaffTag>()
+            // 获取原跟进人拥有的标签
+            // 设置所有的标签
+            List<String> tagIds = Optional
+                    .ofNullable(customerStaffTagService.list(new LambdaQueryWrapper<WxCustomerStaffTag>()
                             .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
                             .eq(WxCustomerStaffTag::getExtStaffId, handoverStaffExtId)
-                            .eq(WxCustomerStaffTag::getExtCustomerId, customerExtId))).orElse(new ArrayList<>())
+                            .eq(WxCustomerStaffTag::getExtCustomerId, customerExtId)))
+                    .orElse(new ArrayList<>())
                     .stream().map(WxCustomerStaffTag::getExtTagId).collect(Collectors.toList());
             if (ListUtils.isNotEmpty(tagIds)) {
-                //开始打标签
-                WxCpExternalContactServiceImpl externalContactService = new WxCpExternalContactServiceImpl(WxCpConfiguration.getCustomerSecretWxCpService());
+                // 开始打标签
+                WxCpExternalContactServiceImpl externalContactService = new WxCpExternalContactServiceImpl(
+                        WxCpConfiguration.getCustomerSecretWxCpService());
                 try {
-                    externalContactService.markTag(staffExtId, customerExtId, tagIds.toArray(new String[0]), new String[]{});
+                    externalContactService.markTag(staffExtId, customerExtId, tagIds.toArray(new String[0]),
+                            new String[] {});
                 } catch (WxErrorException e) {
-                    log.info("处理离职继承/在职继承，打标异常：extCorpId：【{}】,  staffExtId：【{}】,  customerExtId：【{}】，handoverStaffExtId：【{}】" +
-                            ",异常信息：【{}】", extCorpId, staffExtId, customerExtId, handoverStaffExtId, e);
+                    log.info(
+                            "处理离职继承/在职继承，打标异常：extCorpId：【{}】,  staffExtId：【{}】,  customerExtId：【{}】，handoverStaffExtId：【{}】"
+                                    +
+                                    ",异常信息：【{}】",
+                            extCorpId, staffExtId, customerExtId, handoverStaffExtId, e);
                 }
             }
 
-            //更新客户详情
+            // 更新客户详情
             WxCustomerInfo customerInfo = customerInfoService.getOne(new LambdaQueryWrapper<WxCustomerInfo>()
                     .eq(WxCustomerInfo::getExtCorpId, extCorpId)
                     .eq(WxCustomerInfo::getExtCustomerId, customerExtId)
@@ -1563,10 +1716,12 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 customerInfoService.updateById(customerInfo);
             }
 
-            //更新备注
-            WxCustomerStaff customerStaff = customerStaffService.checkExists(extCorpId, handoverStaffExtId, customerExtId);
+            // 更新备注
+            WxCustomerStaff customerStaff = customerStaffService.checkExists(extCorpId, handoverStaffExtId,
+                    customerExtId);
             if (customerStaff != null) {
-                WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(WxCpConfiguration.getCustomerSecretWxCpService());
+                WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(
+                        WxCpConfiguration.getCustomerSecretWxCpService());
                 WxCpUpdateRemarkRequest wxCpUpdateRemarkRequest = new WxCpUpdateRemarkRequest();
                 BeanUtils.copyProperties(customerStaff, wxCpUpdateRemarkRequest);
                 wxCpUpdateRemarkRequest.setUserId(staffExtId);
@@ -1574,18 +1729,21 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
                 try {
                     externalContactService.updateRemark(wxCpUpdateRemarkRequest);
                 } catch (WxErrorException e) {
-                    log.info("处理离职继承/在职继承，更新备注异常：extCorpId：【{}】,  staffExtId：【{}】,  customerExtId：【{}】，handoverStaffExtId：【{}】" +
-                            ",异常信息：【{}】", extCorpId, staffExtId, customerExtId, handoverStaffExtId, e);
+                    log.info(
+                            "处理离职继承/在职继承，更新备注异常：extCorpId：【{}】,  staffExtId：【{}】,  customerExtId：【{}】，handoverStaffExtId：【{}】"
+                                    +
+                                    ",异常信息：【{}】",
+                            extCorpId, staffExtId, customerExtId, handoverStaffExtId, e);
                 }
             }
 
         }
     }
 
-
     private WxCustomerVO translation(WxCustomer wxCustomer, String extUserId) {
         WxCustomerVO translation = translation(wxCustomer);
-        List<String> staffExtIds = Optional.ofNullable(translation.getAssistStaffList()).orElse(new ArrayList<>()).stream().map(Staff::getExtId).collect(Collectors.toList());
+        List<String> staffExtIds = Optional.ofNullable(translation.getAssistStaffList()).orElse(new ArrayList<>())
+                .stream().map(Staff::getExtId).collect(Collectors.toList());
         if (roleStaffService.isEnterpriseAdmin()) {
             if (Objects.equals(translation.getExtCreatorId(), extUserId) || !staffExtIds.contains(extUserId)) {
                 translation.setIsAssist(false);
@@ -1596,8 +1754,65 @@ public class WxCustomerServiceImpl extends ServiceImpl<WxCustomerMapper, WxCusto
             translation.setIsAssist(!Objects.equals(translation.getExtCreatorId(), extUserId));
         }
         translation.setAssistStaffList(Optional.ofNullable(translation.getAssistStaffList())
-                        .orElse(new ArrayList<>()).stream().filter(staff -> !Objects.equals(staff.getExtId(), extUserId)).collect(Collectors.toList()))
-                .setIsAssist(!Objects.equals(translation.getExtCreatorId(), extUserId) && !roleStaffService.isEnterpriseAdmin());
+                .orElse(new ArrayList<>()).stream().filter(staff -> !Objects.equals(staff.getExtId(), extUserId))
+                .collect(Collectors.toList()))
+                .setIsAssist(!Objects.equals(translation.getExtCreatorId(), extUserId)
+                        && !roleStaffService.isEnterpriseAdmin());
         return translation;
     }
+
+    @Override
+    public Long getAddedCountByDate(Date date, String extCorpId) {
+        return baseMapper.addedByDate(date, extCorpId);
+    }
+
+    @Override
+    public List<Map<String, Object>> countByDateAndCorp(Date date) {
+        return this.baseMapper.countByDateAndCorp(date);
+    }
+
+    @Override
+    public WxCustomerVO updateCustomerData(WxCustomerDataUpdateDTO dto) {
+        WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(
+                WxCpConfiguration.getCustomerSecretWxCpService());
+        WxCpUpdateRemarkRequest wxCpUpdateRemarkRequest = new WxCpUpdateRemarkRequest();
+        wxCpUpdateRemarkRequest.setUserId(dto.getStaffExtId());
+        wxCpUpdateRemarkRequest.setExternalUserId(dto.getCustomerExtId());
+        wxCpUpdateRemarkRequest.setRemark(dto.getRemark());
+        wxCpUpdateRemarkRequest.setDescription(dto.getDescription());
+        try {
+            externalContactService.updateRemark(wxCpUpdateRemarkRequest);
+        } catch (WxErrorException e) {
+            log.info("[{}]客户信息同步到企微失败， ", JSONUtils.toJSONString(e), e);
+            throw BaseException.buildBaseException(e.getError(), "客户信息同步到企微失败");
+        }
+
+        WxCustomerStaff wxCustomerStaff = customerStaffService.checkExists(ScrmConfig.getExtCorpID(),
+                dto.getStaffExtId(), dto.getCustomerExtId());
+        wxCustomerStaff.setRemark(dto.getRemark());
+        wxCustomerStaff.setDescription(dto.getDescription());
+        customerStaffService.updateById(wxCustomerStaff);
+
+        WxCustomer wxCustomer = customerService.checkExists(dto.getExtCorpId(), dto.getCustomerExtId());
+        return translation(wxCustomer, dto.getStaffExtId());
+    }
+
+    @Override
+    public Long countByToday() {
+        Date startTime = DateUtils.getTodayStartTime();
+        Date endTime = new Date();
+        return count(new QueryWrapper<WxCustomer>().lambda()
+                .eq(WxCustomer::getExtCorpId, JwtUtil.getExtCorpId())
+                .ge(WxCustomer::getCreatedAt, startTime).le(WxCustomer::getCreatedAt, endTime)
+                .eq(!staffService.isAdmin(), WxCustomer::getExtCreatorId, JwtUtil.getExtUserId()));
+    }
+
+    @Override
+    public List<DailyTotalVO> getLastNDaysCountDaily(Integer days) {
+        Date startTime = DateUtils.getDate(new Date(), -days + 1, "00:00");
+        Date endTime = new Date();
+        List<DailyTotalVO> list = this.baseMapper.getLastNDaysCountDaily(startTime, endTime, JwtUtil.getExtCorpId());
+        return ReportUtil.composeResultToEchart(days, list);
+    }
+
 }

@@ -36,7 +36,10 @@ export default (props) => {
       />
     )
   }
-  const renderSelectedItem = (data) => <UserCell data={data} />
+  const renderSelectedItem = (data) => {
+    // console.log("user-modal", data)
+    return <UserCell data={data} />
+  }
   return (
     <ChooseModal
       leftContent={renderLeftContent}

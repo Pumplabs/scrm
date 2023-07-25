@@ -14,9 +14,9 @@ const getPreTitle = (modalType) => {
 }
 export default (props) => {
   const [form] = Form.useForm();
-  const { modalType, getForm,  name, onCancel, onOk, children, formProps, visible, confirmLoading, ...rest } = props
+  const { modalType, getForm,  name, onCancel, onOk, children, formProps, visible, confirmLoading,afterClose, ...rest } = props
   const formName = useRef(uniqueId("form"))
-
+  const hasInit = useRef(false)
   useEffect(() => {
     if (typeof getForm === 'function') {
       getForm(form)
@@ -26,7 +26,12 @@ export default (props) => {
 
   useEffect(() => {
     if (visible) {
+      hasInit.current = true
       form.resetFields()
+    } else {
+      if (typeof afterClose === 'function' && hasInit.current) {
+        afterClose()
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])

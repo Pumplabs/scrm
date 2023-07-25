@@ -89,6 +89,7 @@
                     <include>**/*.xml</include>
                     <include>**/*.yml</include>
                     <include>**/*.vm</include>
+                    <include>**/*.xls</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>

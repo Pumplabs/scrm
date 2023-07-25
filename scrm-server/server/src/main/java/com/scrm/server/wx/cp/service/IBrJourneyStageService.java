@@ -125,4 +125,6 @@ public interface IBrJourneyStageService extends IService<BrJourneyStage> {
      * @return
      */
     List<BrJourneyStageStatisticsInfoVO> getStatisticsInfo(String extCorpId, String journeyId);
+
+    Integer getMaxSort(String journeyId);
 }

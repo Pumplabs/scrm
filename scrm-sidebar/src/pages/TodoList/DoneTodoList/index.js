@@ -43,25 +43,6 @@ export default () => {
     navigate(`/todoList`)
   }
 
-  const onDetail = (item) => {
-    let url = ''
-    const searchText = createUrlSearchParams({
-      ruleId: item.businessId,
-      executeAt: item.createTime
-        ? Math.floor(moment(item.createTime).valueOf() / 1000)
-        : 0,
-      jobId: item.businessId1,
-    })
-    if (item.type === TODO_TYPE.CUSTOMER_SOP) {
-      url = `/customerSopRemind?${searchText}`
-    } else if (item.type === TODO_TYPE.GROUP_SOP) {
-      url = `/groupSopRemind?${searchText}`
-    }
-    if (url) {
-      navigate(url)
-    }
-  }
-
   return (
     <PageContent>
       <div className={styles['todo-page']}>
@@ -76,7 +57,7 @@ export default () => {
           }}
           listItemClassName={styles['todo-list-item']}
           renderItem={(item) => (
-            <TodoListItem data={item} key={item.id} onDetail={onDetail} />
+            <TodoListItem data={item} key={item.id} />
           )}></InfiniteList>
       </div>
     </PageContent>

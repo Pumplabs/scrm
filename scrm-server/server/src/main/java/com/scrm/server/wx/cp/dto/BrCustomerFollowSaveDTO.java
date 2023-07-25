@@ -35,7 +35,7 @@ public class BrCustomerFollowSaveDTO {
     @ApiModelProperty(value = "分享给的员工的extid")
     private List<String> shareExtStaffIds;
 
-    @ApiModelProperty(value = "跟进类型 1：客户 2：商机")
+    @ApiModelProperty(value = "跟进类型 1：客户 2：商机 3:线索")
     @NotNull(message = "跟进类型不能为空")
     private Integer type;
 

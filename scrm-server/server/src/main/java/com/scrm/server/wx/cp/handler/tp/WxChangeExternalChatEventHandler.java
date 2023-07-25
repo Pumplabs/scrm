@@ -103,7 +103,7 @@ public class WxChangeExternalChatEventHandler extends AbstractHandler {
         String str = UUID.get32UUID();
         log.info("消费MQ:[del_member],事件描述:[成员退群],编号:[{}],企业ID:[{}],message[{}]", str, dto.getExtCorpId(), dto);
         try {
-            WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(wxCpConfiguration.getAddressBookWxCpService());
+            WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(wxCpConfiguration.getWxCpService());
             groupChatService.saveOrUpdate(dto.getExtCorpId(), dto.getChatId(), null, externalContactService);
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,7 +124,7 @@ public class WxChangeExternalChatEventHandler extends AbstractHandler {
         String str = UUID.get32UUID();
         log.info("消费MQ:[add_member],事件描述:[成员入群],编号:[{}],企业ID:[{}],message[{}]", str, dto.getExtCorpId(), dto);
         try {
-            WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(wxCpConfiguration.getAddressBookWxCpService());
+            WxCpExternalContactService externalContactService = new WxCpExternalContactServiceImpl(wxCpConfiguration.getWxCpService());
             groupChatService.saveOrUpdate(dto.getExtCorpId(), dto.getChatId(), null, externalContactService);
         } catch (Exception e) {
             e.printStackTrace();

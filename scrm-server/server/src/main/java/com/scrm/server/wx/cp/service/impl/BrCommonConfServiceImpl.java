@@ -2,6 +2,7 @@ package com.scrm.server.wx.cp.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -9,10 +10,7 @@ import com.scrm.common.dto.BatchDTO;
 import com.scrm.common.exception.BaseException;
 import com.scrm.common.util.JwtUtil;
 import com.scrm.common.util.UUID;
-import com.scrm.server.wx.cp.dto.BrCommonConfPageDTO;
-import com.scrm.server.wx.cp.dto.BrCommonConfQueryDTO;
-import com.scrm.server.wx.cp.dto.BrCommonConfSaveDTO;
-import com.scrm.server.wx.cp.dto.BrCommonConfUpdateDTO;
+import com.scrm.server.wx.cp.dto.*;
 import com.scrm.server.wx.cp.entity.BrCommonConf;
 import com.scrm.server.wx.cp.entity.BrOpportunity;
 import com.scrm.server.wx.cp.mapper.BrCommonConfMapper;
@@ -50,11 +48,9 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
                 .eq(BrCommonConf::getTypeCode, dto.getTypeCode())
                 .eq(StringUtils.isNotBlank(dto.getGroupId()), BrCommonConf::getGroupId, dto.getGroupId())
                 .orderByAsc(BrCommonConf::getSort);
-
         IPage<BrCommonConf> page = page(new Page<>(dto.getPageNum(), dto.getPageSize()), wrapper);
         return page.convert(this::translation);
     }
-
 
     @Override
     public List<BrCommonConfVO> queryList(BrCommonConfQueryDTO dto) {
@@ -73,12 +69,20 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
         return translation(checkExists(id));
     }
 
+    @Override
+    public BrCommonConfVO findByCode(String extCorpId, String typeCode, Integer code) {
+        LambdaQueryWrapper<BrCommonConf> wrapper = new QueryWrapper<BrCommonConf>()
+                .lambda().eq(BrCommonConf::getExtCorpId, extCorpId)
+                .eq(BrCommonConf::getTypeCode, typeCode)
+                .eq(BrCommonConf::getCode, code);
+        return translation(getOne(wrapper));
+    }
 
     @Override
     public BrCommonConf save(BrCommonConfSaveDTO dto) {
 
         //校验数据
-        checkRepeat(null, dto.getExtCorpId(), dto.getName(), dto.getGroupId(), dto.getTypeCode());
+        checkRepeat(null, dto.getExtCorpId(), dto.getName(), dto.getGroupId(), dto.getTypeCode(), dto.getCode());
 
         //封装数据
         BrCommonConf brCommonConf = new BrCommonConf();
@@ -87,6 +91,14 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
                 .setUpdatedAt(new Date())
                 .setCreatedAt(new Date())
                 .setCreator(JwtUtil.getUserId());
+
+        if (dto.getSort() == null) {
+            brCommonConf.setSort(getMaxSort(dto.getExtCorpId(), dto.getGroupId(), dto.getTypeCode()) + 1);
+        }
+
+        if (dto.getCode() == null) {
+            brCommonConf.setCode(getMaxCode(dto.getExtCorpId(), dto.getGroupId(), dto.getTypeCode()) + 1);
+        }
 
         if (dto.getIsSystem() == null) {
             brCommonConf.setIsSystem(false);
@@ -104,7 +116,7 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
 
         //校验参数
         BrCommonConf old = checkExists(dto.getId());
-        checkRepeat(dto.getId(), dto.getExtCorpId(), dto.getName(), dto.getGroupId(), dto.getTypeCode());
+        checkRepeat(dto.getId(), dto.getExtCorpId(), dto.getName(), dto.getGroupId(), dto.getTypeCode(), dto.getCode());
 
         //封装数据
         BrCommonConf brCommonConf = new BrCommonConf();
@@ -113,10 +125,8 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
                 .setCreator(old.getCreator())
                 .setUpdatedAt(new Date())
                 .setEditor(JwtUtil.getUserId());
-
         //入库
         updateById(brCommonConf);
-
         return brCommonConf;
     }
 
@@ -128,30 +138,36 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
      * @param name      名称
      * @param groupId   分组id
      * @param typeCode  类型编码
+     * @param code      编码
      * @author ouyang
      */
-    private void checkRepeat(String id, String extCorpId, String name, String groupId, String typeCode) {
+    private void checkRepeat(String id, String extCorpId, String name, String groupId, String typeCode, Integer code) {
         if (OptionalLong.of(count(new LambdaQueryWrapper<BrCommonConf>()
                 .ne(id != null, BrCommonConf::getId, id)
                 .eq(StringUtils.isNotBlank(groupId), BrCommonConf::getGroupId, groupId)
                 .eq(BrCommonConf::getTypeCode, typeCode)
                 .eq(BrCommonConf::getName, name)
                 .eq(BrCommonConf::getExtCorpId, extCorpId))).orElse(0) > 0) {
-            throw new BaseException(String.format("配置：【%s】已存在,请重命名", name));
+            throw new BaseException(String.format("配置【%s】已存在,请重命名", name));
+        }
+        if (OptionalLong.of(count(new LambdaQueryWrapper<BrCommonConf>()
+                .ne(id != null, BrCommonConf::getId, id)
+                .eq(StringUtils.isNotBlank(groupId), BrCommonConf::getGroupId, groupId)
+                .eq(BrCommonConf::getTypeCode, typeCode)
+                .eq(BrCommonConf::getCode, code)
+                .eq(BrCommonConf::getExtCorpId, extCorpId))).orElse(0) > 0) {
+            throw new BaseException("编码已存在,请修改");
         }
     }
 
 
     @Override
     public void delete(String id) {
-
         //校验参数
         BrCommonConf brCommonConf = checkExists(id);
         checkRelateExists(brCommonConf);
-
         //删除
         removeById(id);
-
     }
 
 
@@ -172,13 +188,15 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
      * 判断是否有关联数据
      */
     public void checkRelateExists(BrCommonConf brCommonConf) {
+        int count = 0;
         if (BrCommonConf.OPPORTUNITY_STAGE.equals(brCommonConf.getTypeCode())) {
-            int count = (int) opportunityService.count(new LambdaQueryWrapper<BrOpportunity>()
+            count = (int) opportunityService.count(new LambdaQueryWrapper<BrOpportunity>()
                     .eq(BrOpportunity::getExtCorpId, brCommonConf.getExtCorpId())
                     .eq(BrOpportunity::getStageId, brCommonConf.getId()));
-            if (count > 0) {
-                throw new BaseException("配置存在关联商机数据，无法删除！");
-            }
+        }
+
+        if (count > 0) {
+            throw new BaseException("配置存在关联数据，无法删除！");
         }
     }
 
@@ -214,5 +232,28 @@ public class BrCommonConfServiceImpl extends ServiceImpl<BrCommonConfMapper, BrC
             throw new BaseException("配置不存在");
         }
         return byId;
+    }
+
+
+    private Integer getMaxSort(String extCorpId, String groupId, String typeCode) {
+        return Optional.ofNullable(this.baseMapper.getMaxSort(extCorpId, groupId, typeCode)).orElse(0);
+    }
+
+    private Integer getMaxCode(String extCorpId, String groupId, String typeCode) {
+        return Optional.ofNullable(this.baseMapper.getMaxCode(extCorpId, groupId, typeCode)).orElse(0);
+    }
+
+
+    @Override
+    public void updateSort(BrCommonConfUpdateSortDTO brCommonConfUpdateSortDTO) {
+        if (count(new QueryWrapper<BrCommonConf>().lambda().eq(BrCommonConf::getGroupId, brCommonConfUpdateSortDTO.getGroupId())) > 0) {
+            final Integer[] sort = {0};
+            Optional.ofNullable(brCommonConfUpdateSortDTO.getBrCommonConfList()).orElse(new ArrayList<BrCommonConf>()).forEach(brCommonConf -> {
+                sort[0] = sort[0] + 1;
+                this.update(new UpdateWrapper<BrCommonConf>().lambda().eq(BrCommonConf::getId, brCommonConf.getId()).set(BrCommonConf::getSort, sort[0]));
+            });
+        }
+
+
     }
 }

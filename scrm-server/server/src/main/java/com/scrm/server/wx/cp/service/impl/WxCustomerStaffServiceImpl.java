@@ -76,7 +76,7 @@ public class WxCustomerStaffServiceImpl extends ServiceImpl<WxCustomerStaffMappe
 
     @Override
     public WxCustomerStaff findHasDelete(String extCorpId, String extStaffId, String extCustomerId) {
-        return baseMapper.findHasDelete(extCorpId,extStaffId,extCustomerId);
+        return baseMapper.findHasDelete(extCorpId, extStaffId, extCustomerId);
     }
 
     @Override
@@ -104,22 +104,21 @@ public class WxCustomerStaffServiceImpl extends ServiceImpl<WxCustomerStaffMappe
 
         return translation(
                 getOne(new QueryWrapper<WxCustomerStaff>().lambda()
-                .eq(WxCustomerStaff::getExtCorpId, exrCorpId)
-                .eq(WxCustomerStaff::getCustomerId, customerId)
-                .eq(WxCustomerStaff::getExtStaffId, extStaffId))
+                        .eq(WxCustomerStaff::getExtCorpId, exrCorpId)
+                        .eq(WxCustomerStaff::getCustomerId, customerId)
+                        .eq(WxCustomerStaff::getExtStaffId, extStaffId))
         );
     }
 
 
-
     @Override
     public List<WxCustomerPullNewStatisticsInfoVO> getPullNewStatisticsInfo(String extCorpId, Integer topNum, Date beginDate, Date endDate) {
-        return baseMapper.getPullNewStatisticsInfo(extCorpId,topNum,beginDate,endDate);
+        return baseMapper.getPullNewStatisticsInfo(extCorpId, topNum, beginDate, endDate);
     }
 
     @Override
     public long count(String extCorpId, Date begin, Date end, String staffExtId) {
-        return baseMapper.countByExtCorpId(extCorpId,begin,end,staffExtId);
+        return baseMapper.countByExtCorpId(extCorpId, begin, end, staffExtId);
     }
 
     private WxCustomerStaffVO translation(WxCustomerStaff wxCustomerStaff) {

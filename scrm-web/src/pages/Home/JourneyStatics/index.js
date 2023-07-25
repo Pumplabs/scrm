@@ -14,8 +14,8 @@ export default () => {
       <div>
         {journeyStaticsList.length
           ? journeyStaticsList.map((item, idx) => (
-              <JourneyItem key={item.name} data={item} bgColor={COLORS[idx]} />
-            ))
+            <JourneyItem key={item.name} data={item} bgColor={COLORS[idx]} />
+          ))
           : '暂无'}
       </div>
     </StaticsCard>
@@ -34,7 +34,7 @@ const JourneyItem = ({ data = {}, bgColor }) => {
   }, [stageList])
   return (
     <div className={styles['journey-item']}>
-      <div className={styles['journey-item-header']}>
+      {/* <div className={styles['journey-item-header']}>
         <span
           className={styles['journey-name']}
           style={{ backgroundColor: bgColor }}>
@@ -43,30 +43,30 @@ const JourneyItem = ({ data = {}, bgColor }) => {
             ({totalCustomerNum})
           </span>
         </span>
-      </div>
+      </div> */}
       <div className={styles['journey-item-content']}>
         <DescriptionsList mode="wrap">
           {stageList.length
             ? stageList.map((item) => (
-                <div className={styles['stage-item']} key={item.name}>
-                  <DescriptionsList.Item
-                    label={
-                      <Tooltip title={item.name} placement="topLeft">
-                        <span className={styles['stage-name']}>
-                          {item.name}
-                        </span>
-                      </Tooltip>
-                    }
-                    labelStyle={{
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}>
-                    <span className={styles['stage-num']}>
-                      {item.customerNum}
-                    </span>
-                  </DescriptionsList.Item>
-                </div>
-              ))
+              <div className={styles['stage-item']} key={item.name}>
+                <DescriptionsList.Item
+                  label={
+                    <Tooltip title={item.name} placement="topLeft">
+                      <span className={styles['stage-name']}>
+                        {item.name}
+                      </span>
+                    </Tooltip>
+                  }
+                  labelStyle={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}>
+                  <span className={styles['stage-num']}>
+                    {item.customerNum}
+                  </span>
+                </DescriptionsList.Item>
+              </div>
+            ))
             : '暂无阶段'}
         </DescriptionsList>
       </div>

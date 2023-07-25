@@ -1,10 +1,13 @@
 package com.scrm.api.wx.cp.vo;
 
 import com.scrm.api.wx.cp.entity.WxStaffTransferInfo;
+import com.scrm.api.wx.cp.entity.WxTag;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import io.swagger.annotations.ApiModel;
+
+import java.util.List;
 
 /**
  * @author xxh
@@ -23,5 +26,9 @@ public class WxStaffTransferInfoVO extends WxStaffTransferInfo {
 
     @ApiModelProperty(value = "原添加成员")
     private StaffVO handover;
+
+    @ApiModelProperty(value = "客户标签列表")
+    private List<WxTag> tags;
+
 
 }

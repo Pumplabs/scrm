@@ -20,7 +20,7 @@ public class BrCommonConfQueryDTO {
     @NotBlank(message = "企业id不能为空")
     private String extCorpId;
 
-    @ApiModelProperty(value = "类型编码")
+    @ApiModelProperty(value = "类型编码 OPPORTUNITY_STAGE:商机阶段 OPPORTUNITY_FAIL_REASON:商机输单原因 CLUE_SOURCE:线索来源")
     @NotBlank(message = "类型编码不能为空")
     private String typeCode;
 

@@ -1,0 +1,18 @@
+package ${package}.vo;
+
+import ${package}.entity.${entity};
+import lombok.Data;
+import lombok.experimental.Accessors;
+import io.swagger.annotations.ApiModel;
+
+/**
+ * @author ${author}
+ * @since ${date}
+ */
+@Data
+@Accessors(chain = true)
+@ApiModel(value = "$!{table.comment}结果集")
+public class ${entity}VO extends ${entity}{
+
+
+}

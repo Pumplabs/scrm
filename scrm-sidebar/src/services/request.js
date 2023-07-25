@@ -8,6 +8,7 @@ let handleResponseUrlMap = {}
 const instance = axios.create();
 // 拦截器
 instance.interceptors.request.use(function ({ headers, ...rest }) {
+  console.log('token', localStorage.getItem(TOKEN_KEY))
   // TODO: 在发送请求之前做些什么
   return {
     ...rest,

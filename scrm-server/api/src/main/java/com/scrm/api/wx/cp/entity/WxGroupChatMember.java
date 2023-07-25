@@ -76,6 +76,9 @@ public class WxGroupChatMember implements Serializable {
     @TableLogic(value = "0", delval = "null")
     private Boolean hasDelete;
 
+    @ApiModelProperty(value = "企业自定义的state参数")
+    private String state;
+
     /**
      * 群成员类型 1 - 企业成员
      */

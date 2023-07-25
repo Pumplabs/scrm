@@ -4,11 +4,16 @@ import { List } from 'antd-mobile'
 import styles from './index.module.less'
 
 const MyList = forwardRef((props = {}, ref) => {
+  const { theme, className, style = {}, ...rest } = props
   return (
     <List
       ref={ref}
-      style={{ '--border-top': 'none', '--border-bottom': 'none' }}
-      {...props}
+      className={cls({
+        [className]: className,
+        [styles[`theme-${theme}`]]: theme
+      })}
+      style={{ '--border-top': 'none', '--border-bottom': 'none', ...style }}
+      {...rest}
     ></List>
   )
 })

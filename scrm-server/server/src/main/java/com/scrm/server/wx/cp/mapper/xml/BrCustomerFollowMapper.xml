@@ -7,4 +7,18 @@
         id, ext_corp_id, ext_customer_id, content, share_ext_staff_ids, creator_ext_id, created_at, updated_at, deleted_at, type, isTodo, remind_at, job_id
     </sql>
 
+
+    <select id="addedByDate" resultType="java.lang.Long">
+        select count(*) addedCount
+        from br_customer_follow
+        where DATEDIFF(created_at, #{date}) = 0 and ext_corp_id = #{extCorpId}
+    </select>
+    <select id="countByDateAndCorp" resultType="java.util.HashMap">
+        select count(*) total , date(created_at), ext_corp_id from br_customer_follow where  DATEDIFF(created_at, #{date}) = 0 group by created_at, ext_corp_id;
+    </select>
+
+    <select id="getStaffTotalFollowUpByDates" resultType="com.scrm.server.wx.cp.vo.TopNStatisticsVo">
+        select count(*) total,bc.creator_ext_id as staff_ext_id from br_customer_follow as bc where DATE_SUB(CURDATE(),INTERVAL #{dates} DAY) &lt; DATE(created_at) and ext_corp_id =  #{extCorpId} GROUP BY bc.creator_ext_id   ORDER BY total DESC  LIMIT #{topN};
+    </select>
+
 </mapper>

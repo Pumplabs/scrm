@@ -134,10 +134,10 @@ public class WxResignedStaffGroupChatServiceImpl extends ServiceImpl<WxResignedS
         StaffTransferGroupChatVO vo = new StaffTransferGroupChatVO();
 
         //校验参数
-        Staff takeoverStaff = staffService.checkExists(dto.getTakeoverStaffExtId(),dto.getExtCorpId());
-        if (takeoverStaff.getStatus() != 1) {
+        staffService.checkExists(dto.getTakeoverStaffExtId(), dto.getExtCorpId());
+        /*if (takeoverStaff.getStatus() != 1) {
             throw new BaseException("继承给的新群主，必须有激活企业微信");
-        }
+        }*/
         List<WxGroupChat> groupChatList = dto.getGroupChatExtIds().stream().map(extId -> groupChatService.find(dto.getExtCorpId(), extId)).collect(Collectors.toList());
         if (ListUtils.isEmpty(groupChatList) || groupChatList.size() != dto.getGroupChatExtIds().size()) {
             throw new BaseException("客户群聊不存在");

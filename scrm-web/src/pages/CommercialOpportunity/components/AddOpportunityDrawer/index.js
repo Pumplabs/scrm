@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useMemo } from 'react'
+import { useRef, useState, useEffect, useMemo } from "react";
 import {
   Form,
   Input,
@@ -9,21 +9,21 @@ import {
   InputNumber,
   DatePicker,
   Switch,
-} from 'antd'
-import moment from 'moment'
-import { useRequest } from 'ahooks'
-import { get } from 'lodash'
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
-import MySelect from 'components/MySelect'
-import DrawerForm from 'components/DrawerForm'
-import OpenEle from 'components/OpenEle'
-import UserSelect from '../UserSelect'
-import CustomerSelect from '../CustomerSelect'
-import { GetConfigAllList } from 'services/modules/commercialOpportunityConfiguration'
-import { PRIORITY_OPTIONS } from '../../constants'
-import styles from './index.module.less'
+} from "antd";
+import moment from "moment";
+import { useRequest } from "ahooks";
+import { get } from "lodash";
+import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
+import MySelect from "components/MySelect";
+import DrawerForm from "components/DrawerForm";
+import OpenEle from "components/OpenEle";
+import UserSelect from "../UserSelect";
+import CustomerSelect from "../CustomerSelect";
+import { GetConfigAllList } from "services/modules/commercialOpportunityConfiguration";
+import { PRIORITY_OPTIONS } from "../../constants";
+import styles from "./index.module.less";
 
-const { Option } = Select
+const { Option } = Select;
 export default (props) => {
   const {
     visible,
@@ -33,9 +33,9 @@ export default (props) => {
     onOk,
     isEdit,
     ...rest
-  } = props
-  const formRef = useRef(null)
-  const currentGroupIdRef = useRef('')
+  } = props;
+  const formRef = useRef(null);
+  const currentGroupIdRef = useRef("");
   const {
     data: stageList = [],
     loading: stageLoading,
@@ -45,62 +45,64 @@ export default (props) => {
   } = useRequest(GetConfigAllList, {
     manual: true,
     onSuccess: (res = []) => {
-      mutateStage(res.sort((a, b) => a.isSystem - b.isSystem))
-      if (res[0] && !formRef.current.getFieldValue('stageId')) {
-        const firstStageId = res[0].id
-        setCurStageId(firstStageId)
+      mutateStage(res.sort((a, b) => a.isSystem - b.isSystem));
+      if (res[0] && !formRef.current.getFieldValue("stageId")) {
+        const firstStageId = res[0].id;
+        setCurStageId(firstStageId);
         formRef.current.setFieldsValue({
           stageId: firstStageId,
-        })
+        });
       }
     },
-  })
+  });
   const { data: failReasonList = [] } = useRequest(GetConfigAllList, {
     defaultParams: [
       {
-        typeCode: 'OPPORTUNITY_FAIL_REASON',
+        typeCode: "OPPORTUNITY_FAIL_REASON",
       },
     ],
-  })
+  });
   // 创建人
-  const [creator, setCreator] = useState('')
-  const [curStageId, setCurStageId] = useState('')
+  const [creator, setCreator] = useState("");
+  const [curStageId, setCurStageId] = useState("");
   // 协作人
-  const [cooperator, setCooperator] = useState([])
-  const [{ groupId: stageGroupId } = {}] = stageParams
-  const defaultStageId = stageList.length ? stageList[0].id : undefined
+  const [cooperator, setCooperator] = useState([]);
+  const [{ groupId: stageGroupId } = {}] = stageParams;
+  const defaultStageId = stageList.length ? stageList[0].id : undefined;
 
   const getStageListByGroupId = (groupId) => {
     runGetStageList({
       groupId,
-      typeCode: 'OPPORTUNITY_STAGE',
-    })
-  }
+      typeCode: "OPPORTUNITY_STAGE",
+    });
+  };
   useEffect(() => {
     if (visible && isEdit) {
-      refillForm(data)
+      refillForm(data);
     }
     if (!visible) {
-      setCooperator([])
-      setCreator([])
-      setCurStageId(defaultStageId)
+      setCooperator([]);
+      setCreator("");
+      setCurStageId(defaultStageId);
     }
-    const [{ groupId } = {}] = stageParams
-    currentGroupIdRef.current = defaultGroupId
+    const [{ groupId } = {}] = stageParams;
+    currentGroupIdRef.current = defaultGroupId;
     if (visible && groupId !== defaultGroupId) {
-      getStageListByGroupId(defaultGroupId)
+      getStageListByGroupId(defaultGroupId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, isEdit])
+  }, [visible, isEdit]);
 
   const lossStageId = useMemo(() => {
-    const item = stageList.find((item) => item.isSystem && item.name === '输单')
-    return item ? item.id : ''
-  }, [stageList])
+    const item = stageList.find(
+      (item) => item.isSystem && item.name === "输单"
+    );
+    return item ? item.id : "";
+  }, [stageList]);
 
   const refillForm = async (detailData = {}) => {
-    const { expectDealDate, cooperatorList = [] } = detailData
-    let cooperatorIds = []
+    const { expectDealDate, cooperatorList = [] } = detailData;
+    let cooperatorIds = [];
     const usersId = Array.isArray(cooperatorList)
       ? cooperatorList.map((ele) => {
           cooperatorIds = [
@@ -109,7 +111,7 @@ export default (props) => {
               id: ele.id,
               extId: ele.cooperatorId,
             },
-          ]
+          ];
           return {
             id: ele.id,
             editabled: ele.canUpdate,
@@ -117,16 +119,16 @@ export default (props) => {
             isOld: true,
             extId: ele.cooperatorId,
             key: `user_${ele.cooperatorId}`,
-            name: get(ele, 'cooperatorStaff.name'),
-          }
+            name: get(ele, "cooperatorStaff.name"),
+          };
         })
-      : []
-    setCurStageId(detailData.stageId)
-    setCooperator(cooperatorIds)
-    setCreator(detailData.owner)
+      : [];
+    setCurStageId(detailData.stageId);
+    setCooperator(cooperatorIds);
+    setCreator(detailData.owner);
     const initialValues = {
       expectDealTime: expectDealDate
-        ? moment(expectDealDate, 'YYYY-MM-DD HH:mm:dd')
+        ? moment(expectDealDate, "YYYY-MM-DD HH:mm:dd")
         : null,
       expectMoney: detailData.expectMoney,
       stageId: detailData.stageId,
@@ -146,69 +148,69 @@ export default (props) => {
       cooperatorIds: usersId,
       name: detailData.name,
       dealChance: detailData.dealChance,
-    }
+    };
     if (formRef.current) {
-      formRef.current.setFieldsValue(initialValues)
+      formRef.current.setFieldsValue(initialValues);
     }
-  }
+  };
 
   const onValuesChange = (vals) => {
-    const [[key, val]] = Object.entries(vals)
+    const [[key, val]] = Object.entries(vals);
     switch (key) {
-      case 'ownerInfo':
-        setCreator(val.length ? val[0].extId : '')
-        if (formRef.current && formRef.current.getFieldValue('customerInfo')) {
+      case "ownerInfo":
+        setCreator(val.length ? val[0].extId : "");
+        if (formRef.current && formRef.current.getFieldValue("customerInfo")) {
           formRef.current.setFieldsValue({
             customerInfo: [],
-          })
+          });
         }
-        break
-      case 'cooperatorIds':
-        setCooperator(vals.cooperatorIds)
-        break
-      case 'groupId':
-        currentGroupIdRef.current = val
+        break;
+      case "cooperatorIds":
+        setCooperator(vals.cooperatorIds);
+        break;
+      case "groupId":
+        currentGroupIdRef.current = val;
         if (val) {
-          getStageListByGroupId(val)
+          getStageListByGroupId(val);
         }
-        setCurStageId('')
+        setCurStageId("");
         if (formRef.current) {
           formRef.current.setFieldsValue({
             stageId: undefined,
-          })
+          });
         }
-        break
-      case 'stageId':
-        setCurStageId(val)
-        break
+        break;
+      case "stageId":
+        setCurStageId(val);
+        break;
       default:
-        break
+        break;
     }
-  }
+  };
 
   const handleOk = (vals) => {
-    if (typeof onOk === 'function') {
-      onOk(vals)
+    if (typeof onOk === "function") {
+      onOk(vals);
     }
-  }
+  };
 
   const initialValues = {
-    expectMoney: '',
+    expectMoney: "",
     expectDealTime: moment(),
     dealChance: 1,
     stageId: defaultStageId,
     groupId: defaultGroupId,
-  }
+  };
 
   const disabledDate = (currentDate) => {
-    return currentDate.isBefore(moment(), 'days')
-  }
+    return currentDate.isBefore(moment(), "days");
+  };
 
-  const disabledCooperatorIds = creator ? [`user_${creator}`] : []
-  const disabledCreator = cooperator.map((ele) => `user_${ele.extId}`)
+  const disabledCooperatorIds = creator ? [`user_${creator}`] : [];
+  const disabledCreator = cooperator.map((ele) => `user_${ele.extId}`);
   const currentStageList =
-    currentGroupIdRef.current === stageGroupId ? stageList : []
-  const showFailReason = lossStageId && lossStageId === curStageId
+    currentGroupIdRef.current === stageGroupId ? stageList : [];
+  const showFailReason = lossStageId && lossStageId === curStageId;
   return (
     <DrawerForm
       visible={visible}
@@ -225,7 +227,8 @@ export default (props) => {
         wrapperCol: {
           span: 18,
         },
-      }}>
+      }}
+    >
       <Row>
         <Col span={24}>
           <Form.Item
@@ -234,9 +237,10 @@ export default (props) => {
             rules={[
               {
                 required: true,
-                message: '请输入商机名称',
+                message: "请输入商机名称",
               },
-            ]}>
+            ]}
+          >
             <Input
               maxLength={20}
               placeholder={`请输入不超过20个字符`}
@@ -253,9 +257,10 @@ export default (props) => {
             rules={[
               {
                 required: true,
-                message: '请选择所有者',
+                message: "请选择所有者",
               },
-            ]}>
+            ]}
+          >
             <UserSelect
               placeholder="请选择所有者"
               disabledValues={disabledCreator}
@@ -271,12 +276,15 @@ export default (props) => {
             rules={[
               {
                 required: true,
-                type: 'array',
-                message: '请选择客户',
+                type: "array",
+                message: "请选择客户",
               },
-            ]}>
-            <CustomerSelect placeholder="请选择客户"
-            staffId={creator}
+            ]}
+          >
+            <CustomerSelect
+              placeholder="请选择客户"
+              staffId={creator}
+              disabled={!creator}
             />
           </Form.Item>
         </Col>
@@ -289,14 +297,16 @@ export default (props) => {
             rules={[
               {
                 required: false,
-                message: '请选择商机分组',
+                message: "请选择商机分组",
               },
-            ]}>
+            ]}
+          >
             <Select
               allowClear={true}
               disabled={isEdit}
               optionFilterProp="label"
-              placeholder="请选择">
+              placeholder="请选择"
+            >
               {groupList.map((ele) => (
                 <Option key={ele.id} value={ele.id}>
                   {ele.name}
@@ -313,7 +323,8 @@ export default (props) => {
               allowClear={true}
               optionFilterProp="label"
               loading={stageLoading}
-              placeholder="请选择">
+              placeholder="请选择"
+            >
               {currentStageList.map((ele) => (
                 <Option key={ele.id} value={ele.id}>
                   {ele.name}
@@ -332,14 +343,16 @@ export default (props) => {
               rules={[
                 {
                   required: true,
-                  message: '请选择输单原因',
+                  message: "请选择输单原因",
                 },
-              ]}>
+              ]}
+            >
               <Select
                 allowClear={true}
                 optionFilterProp="label"
                 placeholder="请选择"
-                loading={stageLoading}>
+                loading={stageLoading}
+              >
                 {failReasonList.map((ele) => (
                   <Option key={ele.id} value={ele.id}>
                     {ele.name}
@@ -357,56 +370,58 @@ export default (props) => {
               type="user"
               title="添加协作人"
               fileldNames={{
-                value: 'extId',
+                value: "extId",
               }}
               placeholder="请选择协作人"
               onlyChooseUser={true}
               disabledValues={disabledCooperatorIds}
-              style={{ width: '100%' }}>
+              style={{ width: "100%" }}
+            >
               {({ tags, onAddTags, onCloseTag, updateTags }) => {
                 return (
-                  <div className={styles['cooperator-select']}>
+                  <div className={styles["cooperator-select"]}>
                     {tags.length ? (
-                      <ul className={styles['cooperator-ul']}>
+                      <ul className={styles["cooperator-ul"]}>
                         {tags.map((ele) => {
                           const onSwitchChange = (checked) => {
                             updateTags(
                               tags.map((item) => {
                                 if (item.extId === ele.extId) {
-                                  item.editabled = checked
-                                  return item
+                                  item.editabled = checked;
+                                  return item;
                                 } else {
-                                  return item
+                                  return item;
                                 }
                               })
-                            )
-                          }
+                            );
+                          };
                           const onRemove = () => {
-                            onCloseTag(ele)
-                          }
+                            onCloseTag(ele);
+                          };
                           return (
                             <li
                               key={ele.extId}
-                              className={styles['cooperator-li']}>
+                              className={styles["cooperator-li"]}
+                            >
                               <OpenEle type="userName" openid={ele.name} />
-                              <div className={styles['cooperator-extra']}>
-                                <span className={styles['switch-item']}>
+                              <div className={styles["cooperator-extra"]}>
+                                <span className={styles["switch-item"]}>
                                   <Switch
                                     checked={ele.editabled}
                                     onChange={onSwitchChange}
-                                    className={styles['switch-ele']}
+                                    className={styles["switch-ele"]}
                                   />
-                                  <span className={styles['switch-item-name']}>
+                                  <span className={styles["switch-item-name"]}>
                                     是否可以编辑
                                   </span>
                                 </span>
                                 <MinusCircleOutlined
                                   onClick={onRemove}
-                                  className={styles['cooperator-action']}
+                                  className={styles["cooperator-action"]}
                                 />
                               </div>
                             </li>
-                          )
+                          );
                         })}
                       </ul>
                     ) : null}
@@ -414,7 +429,7 @@ export default (props) => {
                       添加协作人
                     </Button>
                   </div>
-                )
+                );
               }}
             </MySelect>
           </Form.Item>
@@ -425,7 +440,7 @@ export default (props) => {
           <Form.Item label="预计金额" name="expectMoney">
             <InputNumber
               placeholder="请输入"
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               max={Number.MAX_SAFE_INTEGER}
               min={0.01}
               precision={2}
@@ -440,7 +455,7 @@ export default (props) => {
               placeholder="请输入"
               max={100}
               min={1}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               precision={0}
             />
           </Form.Item>
@@ -449,7 +464,7 @@ export default (props) => {
       <Row>
         <Col span={24}>
           <Form.Item label="预计成交日期" name="expectDealTime">
-            <DatePicker disabledDate={disabledDate} style={{ width: '100%' }} />
+            <DatePicker disabledDate={disabledDate} style={{ width: "100%" }} />
           </Form.Item>
         </Col>
       </Row>
@@ -459,7 +474,8 @@ export default (props) => {
             <Select
               allowClear={true}
               optionFilterProp="label"
-              placeholder="请选择">
+              placeholder="请选择"
+            >
               {PRIORITY_OPTIONS.map((ele) => (
                 <Option key={ele.value} value={ele.value}>
                   {ele.label}
@@ -481,5 +497,5 @@ export default (props) => {
         </Col>
       </Row>
     </DrawerForm>
-  )
-}
+  );
+};

@@ -36,6 +36,11 @@ const NORMAL_MATERIAL_TYPES = [
     needRemote: true,
     value: MATERIAL_TYPE_EN_VALS.LINK,
   },
+  {
+    label: '小程序',
+    needRemote: true,
+    value: MATERIAL_TYPE_EN_VALS.MINI_APP,
+  },
 ]
 const TRACK_MATERIAL_TYPES = [
   {
@@ -93,6 +98,9 @@ const MATERIAL_TO_RULETYPE = {
   // 普通素材-链接
   [`${MATERIAL_TABS.NORMAL}_${MATERIAL_TYPE_EN_VALS.LINK}`]:
     ATTACH_RULE_TYPE.LINK,
+  // 普通素材-小程序
+  [`${MATERIAL_TABS.NORMAL}_${MATERIAL_TYPE_EN_VALS.MINI_APP}`]:
+    ATTACH_RULE_TYPE.MINI_APP,
   // 轨迹素材-文章
   [`${MATERIAL_TABS.TRACK}_${MATERIAL_TYPE_EN_VALS.ARTICLE}`]:
     ATTACH_RULE_TYPE.LINK,
@@ -266,14 +274,11 @@ export default (props) => {
         ...tab,
         subTab: tab.subTab.map((item) => {
           const ruleType = MATERIAL_TO_RULETYPE[`${tab.key}_${item.value}`]
-          const subTabDisabled = !Reflect.has(
-            couldChooseMap,
-            ruleType
-          )
-          return ({
+          const subTabDisabled = !Reflect.has(couldChooseMap, ruleType)
+          return {
             ...item,
-            disabled: subTabDisabled
-          })
+            disabled: subTabDisabled,
+          }
         }),
       }
     })
@@ -291,8 +296,7 @@ export default (props) => {
       }}
       {...rest}
       width={740}
-      className={styles['material-drawer']}
-    >
+      className={styles['material-drawer']}>
       <Tabs activeKey={materialTab} onChange={onMaterialTypeChange}>
         {tabsConfig.map((item) => (
           <TabPane tab={item.tab} key={item.key}>

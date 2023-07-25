@@ -25,7 +25,7 @@ import {
 } from 'services/modules/customer'
 import { AddStageCustomer } from 'services/modules/customerJourney'
 import { GetCustomerFollowList } from 'services/modules/follow'
-import { compareArray } from 'src/utils'
+import { compareArray, callPhone } from 'src/utils'
 import { useInfiniteHook, useModalHook, useBack } from 'src/hooks'
 import { createUrlSearchParams, encodeUrl } from 'src/utils/paths'
 import { actionRequestHookOptions } from 'services/utils'
@@ -34,8 +34,9 @@ import { getTagsByStaffId } from './utils'
 import { FOLLOW_TYPES } from 'src/pages/FollowList/constants'
 import SpinContent from './SpinContent'
 import { CallPhoneIcon, CarbonTaskIcon, ChatIcon } from 'components/MyIcons'
-import styles from './index.module.less'
 import { EditJourneyCustomer } from 'services/modules/customer'
+
+import styles from './index.module.less'
 
 export default observer(() => {
   const { UserStore, ModifyStore } = useContext(MobXProviderContext)
@@ -225,18 +226,7 @@ export default observer(() => {
   }
 
   const onCallCustomer = () => {
-    if (!baseInfo.phoneNumber) {
-      Toast.show({
-        icon: 'fail',
-        content: '没有电话信息，无法拨打电话',
-      })
-      return
-    }
-    let a = document.createElement('a')
-    a.href = `tel:${baseInfo.phoneNumber}`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    callPhone(baseInfo.phoneNumber)
   }
 
   const onOpenChat = () => {
@@ -578,15 +568,15 @@ export const TagSection = ({ onSelectTag, onRemoveTag, tagsArr = [] }) => {
     <div className={styles['tags-section']} onClick={onSelectTag}>
       {tagsArr.length
         ? tagsArr.map((ele) => (
-            <MyTag
-              color="primary"
-              key={ele.id}
-              className={styles['tags-ele']}
-              closable={true}
-              onClose={() => onRemoveTag(ele)}>
-              {ele.name}
-            </MyTag>
-          ))
+          <MyTag
+            color="primary"
+            key={ele.id}
+            className={styles['tags-ele']}
+            closable={true}
+            onClose={() => onRemoveTag(ele)}>
+            {ele.name}
+          </MyTag>
+        ))
         : '无'}
       <RightOutline className={styles['tags-arrow']} />
     </div>

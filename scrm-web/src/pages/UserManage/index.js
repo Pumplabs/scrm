@@ -115,12 +115,8 @@ export default () => {
       }),
     }
   )
-  const {run: runExportUser} = useRequest(ExportUser, {
+  const { run: runExportUser } = useRequest(ExportUser, {
     manual: true,
-    onSuccess: res => {
-      exportByLink(res)
-      message.info('正在导出中...')
-    },
     onError: (e) => getRequestError(e, '导出异常')
   })
 
@@ -182,7 +178,7 @@ export default () => {
     {
       title: '客户数量',
       dataIndex: 'customerCount',
-      render: val => val > 0 ?  val : 0
+      render: val => val > 0 ? val : 0
     },
     {
       title: '性别',
@@ -294,7 +290,7 @@ export default () => {
                 <Button key="export" onClick={onExport} type="primary" ghost>
                   <ExportOutlined />
                   导出excel
-                </Button>,
+                </Button>
               ]}
             />
           </div>

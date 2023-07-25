@@ -234,6 +234,9 @@ public class WxMsgTemplateServiceImpl extends ServiceImpl<WxMsgTemplateMapper, W
                     wxCpMsgTemplateAddResult = contactService.addMsgTemplate(wxCpMsgTemplate);
                     log.info("[{}]创建群发任务结果=[{}]", JSON.toJSONString(wxCpMsgTemplate), JSON.toJSONString(wxCpMsgTemplateAddResult));
                 } catch (WxErrorException e) {
+                    if (Objects.equals(WxErrorEnum.CODE_90207.getCode(), e.getError().getErrorCode())) {
+                        throw new BaseException(WxErrorEnum.CODE_90207.getMsg());
+                    }
                     log.error("[{}]创建群发任务失败", JSON.toJSONString(wxCpMsgTemplate), e);
                     failMsg = BaseException.getErrorMsgByCode(e.getError().getErrorCode(), "创建失败");
                 }

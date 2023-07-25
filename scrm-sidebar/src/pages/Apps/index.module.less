@@ -1,0 +1,85 @@
+ .actions-ul {
+     display: flex;
+     flex-direction: row;
+     justify-content: start;
+     background-color: #ffffff;
+     padding: 14px 12px;
+     border-radius: @border-radius-base;
+     flex-wrap: wrap;
+     gap: 36px;
+
+
+     .action-item {
+         text-align: center;
+         cursor: pointer;
+
+         &.customer-action-item {
+             .action-item-icon-wrap {
+                 background-color: #F0BF42;
+             }
+         }
+
+         &.group-action-item {
+             .action-item-icon-wrap {
+                 background-color: @blue;
+             }
+         }
+
+         &.circle-action-item {
+             .action-item-icon-wrap {
+                 background-color: #57A65B;
+             }
+         }
+
+         &.follow-action-item {
+             .action-item-icon-wrap {
+                 background-color: #DD4377;
+             }
+         }
+
+         &.product-action-item {
+             .action-item-icon-wrap {
+                 background-color: @green;
+             }
+         }
+
+         &.opp-action-item {
+             .action-item-icon-wrap {
+                 background-color: @red;
+             }
+         }
+
+         &.order-action-item {
+             .action-item-icon-wrap {
+                 background-color: @blue;
+             }
+         }
+         &.talkTrick-action-item {
+            .action-item-icon-wrap {
+                background-color: #7132F8;
+            }
+         }
+     }
+
+     .action-item-icon-wrap {
+         width: 60px;
+         height: 60px;
+         border-radius: 10px;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         margin-bottom: 5px;
+     }
+
+     .action-item-icon {
+         width: 32px;
+         height: 32px;
+
+     }
+
+     .action-item-name {
+         font-size: 12px;
+         line-height: 12px;
+         color: @heading-color;
+     }
+ }

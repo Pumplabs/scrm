@@ -35,10 +35,12 @@
 
     <select id="pageAssistList" resultType="com.scrm.api.wx.cp.entity.WxCustomer">
         select c.id, c.ext_corp_id, m.ext_staff_id as ext_creator_id, c.ext_id, c.name, c.position, c.corp_name,
-        c.avatar,c.type, c.gender, c.unionid, c.external_profile, m.create_time as created_at, c.updated_at, c.has_delete,
+        c.avatar,c.type, c.gender, c.unionid, c.external_profile, m.create_time as created_at, c.updated_at,
+        c.has_delete,
         m.is_deleted_staff from wx_customer c
         left join wx_customer_staff m on c.id = m.customer_id
-        left join wx_customer_staff_assist a on m.ext_corp_id = a.ext_corp_id and m.ext_staff_id = a.ext_staff_id and m.ext_customer_id = a.ext_customer_id
+        left join wx_customer_staff_assist a on m.ext_corp_id = a.ext_corp_id and m.ext_staff_id = a.ext_staff_id and
+        m.ext_customer_id = a.ext_customer_id
         <where>
             m.has_delete is not null and c.has_delete is not null and c.has_friend = 1
             <if test="dto.extCorpId != null and dto.extCorpId != ''">
@@ -279,6 +281,35 @@
         where c.ext_corp_id = #{extCorpId}
           and c.has_delete IS NOT NULL
           and m.has_delete IS NOT NULL
+          and c.ext_creator_id IS NOT NULL
+    </select>
+
+
+    <select id="addedByDate" resultType="java.lang.Long">
+        select count(*) addedCount
+        from wx_customer
+        where has_delete = 0
+          and DATEDIFF(created_at, #{date}) = 0
+          and ext_creator_id IS NOT NULL
+          and ext_corp_id = #{extCorpId}
+    </select>
+    <select id="countByDateAndCorp" resultType="java.util.HashMap">
+        select count(*) total, date (created_at), ext_corp_id
+        from wx_customer
+        where DATEDIFF(created_at, #{date}) = 0 and ext_creator_id IS NOT NULL and has_delete = 0
+        group by created_at, ext_corp_id;
+    </select>
+
+    <!-- 获取客户最近N天增长趋势-->
+    <select id="getLastNDaysCountDaily" resultType="com.scrm.server.wx.cp.vo.DailyTotalVO">
+        SELECT COUNT(id) as saveTotal, date (created_at) as day
+        FROM wx_customer
+        WHERE has_delete = 0
+          and is_deleted_staff = 0
+          AND (ext_corp_id = #{extCorpId}
+          AND created_at >= #{startTime}
+          AND created_at &lt;= #{endTime})
+        group by date (created_at)
     </select>
 
 

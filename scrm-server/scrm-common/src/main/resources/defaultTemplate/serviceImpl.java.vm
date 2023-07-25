@@ -1,0 +1,155 @@
+package ${package.ServiceImpl};
+
+import lombok.extern.slf4j.Slf4j;
+import ${package.Entity}.${entity};
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.scrm.api.wx.cp.dto.*;
+
+import ${package.Entity.replace("entity","dto")}.${entity}PageDTO;
+import ${package.Entity.replace("entity","dto")}.${entity}SaveDTO;
+import ${package.Entity.replace("entity","dto")}.${entity}UpdateDTO;
+
+import ${package.Entity.replace("entity","dto")}.${entity}QueryDTO;
+import ${package.Entity.replace("entity","vo")}.${entity}VO;
+
+import lombok.extern.slf4j.Slf4j;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import com.scrm.common.util.UUID;
+import com.scrm.common.exception.BaseException;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import java.util.stream.Collectors;
+
+/**
+ * $!{table.comment} 服务实现类
+ * @author ${author}
+ * @since ${date}
+ */
+@Slf4j
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class ${table.serviceImplName} extends ${superServiceImplClass}<${table.mapperName}, ${entity}> implements ${table.serviceName} {
+
+    @Override
+    public IPage<${entity}VO> pageList(${entity}PageDTO dto){
+        LambdaQueryWrapper<${entity}> wrapper = new QueryWrapper<${entity}>()
+        .lambda().eq(${entity}::getExtCorpId, dto.getExtCorpId());
+        IPage<${entity}> page = page(new Page<>(dto.getPageNum(), dto.getPageSize()),wrapper);
+        return page.convert(this::translation);
+    }
+
+
+    @Override
+    public List<${entity}VO> queryList(${entity}QueryDTO dto){
+        LambdaQueryWrapper<${entity}> wrapper = new QueryWrapper<${entity}>()
+        .lambda().eq(${entity}::getExtCorpId, dto.getExtCorpId());
+        return Optional.ofNullable(list(wrapper)).orElse(new ArrayList<>()).stream().map(this::translation).collect(Collectors.toList());
+    }
+
+
+    @Override
+    public ${entity}VO findById(String id){
+        return translation(checkExists(id));
+    }
+
+
+    @Override
+    public ${entity} save(${entity}SaveDTO dto){
+
+        //封装数据
+        ${entity} ${table.entityPath} = new ${entity}();
+        BeanUtils.copyProperties(dto,${table.entityPath});
+        ${table.entityPath}.setId(UUID.get32UUID());
+
+        //入库
+        save(${table.entityPath});
+
+        return ${table.entityPath};
+    }
+
+
+    @Override
+    public ${entity} update(${entity}UpdateDTO dto){
+
+        //校验参数
+        ${entity} old = checkExists(dto.getId());
+
+        //封装数据
+        ${entity} ${table.entityPath} = new ${entity}();
+        BeanUtils.copyProperties(dto, ${table.entityPath});
+//        ${table.entityPath}.setCreateTime(old.getCreateTime())
+//        .setCreator(old.getCreator());
+
+
+        //TODO
+
+        //入库
+        updateById(${table.entityPath});
+
+        return ${table.entityPath};
+    }
+
+
+    @Override
+    public void delete(String id){
+
+        //校验参数
+        ${entity} ${table.entityPath} = checkExists(id);
+
+        //删除
+        removeById(id);
+
+    }
+
+
+    @Override
+    public void batchDelete(BatchDTO<String> dto){
+
+        //校验参数
+        List<${entity}> ${table.entityPath}List = new ArrayList<>();
+        Optional.ofNullable(dto.getIds()).orElse(new ArrayList<>()).forEach(id -> ${table.entityPath}List.add(checkExists(id)));
+
+        //删除
+        removeByIds(dto.getIds());
+    }
+
+
+    /**
+     * 翻译
+     * @param ${table.entityPath} 实体
+     * @return ${entity}VO 结果集
+     * @author ${author}
+     * @date ${date}
+     */
+    private ${entity}VO translation(${entity} ${table.entityPath}){
+        ${entity}VO vo = new ${entity}VO();
+        BeanUtils.copyProperties(${table.entityPath}, vo);
+        return vo;
+    }
+
+
+    @Override
+    public ${entity} checkExists(String id){
+        if (StringUtils.isBlank(id)) {
+            return null;
+        }
+        ${entity} byId = getById(id);
+        if (byId == null) {
+            throw new BaseException("$!{table.comment}不存在");
+        }
+        return byId;
+    }
+}

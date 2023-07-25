@@ -8,8 +8,11 @@ import com.scrm.server.wx.cp.dto.BrCustomerFollowSaveDTO;
 import com.scrm.server.wx.cp.dto.BrCustomerFollowUpdateDTO;
 import com.scrm.server.wx.cp.entity.BrCustomerFollow;
 import com.scrm.server.wx.cp.vo.BrCustomerFollowVO;
+import com.scrm.server.wx.cp.vo.TopNStatisticsVo;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 客户跟进 服务类
@@ -80,4 +83,15 @@ public interface IBrCustomerFollowService extends IService<BrCustomerFollow> {
      */
     BrCustomerFollow checkExists(String id);
 
+
+    Long getAddedCountByDate(Date date, String extCorpId);
+
+    List<Map<String, Object>> countByDateAndCorp(Date date);
+
+
+    List<TopNStatisticsVo> getStaffTotalFollowUpByDates(String extCorpId, Integer dates, Integer topN);
+
+    Long countByDateAndStaff();
+
+    Long countByToday();
 }

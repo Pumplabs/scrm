@@ -43,26 +43,6 @@ const TabPaneContent = ({ status }) => {
       status: status,
     },
   })
-
-  const onDetail = (item) => {
-    let url = ''
-    const searchText = createUrlSearchParams({
-      ruleId: item.businessId,
-      executeAt: item.createTime
-        ? Math.floor(moment(item.createTime).valueOf() / 1000)
-        : 0,
-      jobId: item.businessId1,
-    })
-    if (item.type === TODO_TYPE.CUSTOMER_SOP) {
-      url = `/customerSopRemind?${searchText}`
-    } else if (item.type === TODO_TYPE.GROUP_SOP) {
-      url = `/groupSopRemind?${searchText}`
-    }
-    if (url) {
-      navigate(url)
-    }
-  }
-
   return (
     <InfiniteList
       loading={loading}
@@ -73,7 +53,6 @@ const TabPaneContent = ({ status }) => {
         <TodoListItem
           data={item}
           key={item.id}
-          onDetail={onDetail}
           status={status}
         />
       )}></InfiniteList>

@@ -102,4 +102,5 @@ public interface IWxCustomerStaffService extends IService<WxCustomerStaff> {
                                                                      Date beginDate, Date endDate);
 
     long count(String extCorpId, Date begin, Date end, String staffExtId);
+
 }

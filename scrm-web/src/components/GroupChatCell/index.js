@@ -7,11 +7,19 @@ import styles from './index.module.less'
 import { UNSET_GROUP_NAME } from 'utils/constants'
 
 /**
- * @param {Object} data
- * * @param {String} name 群组名称
- * * @param {Object} ownerInfo 群主信息
+ * @typedef {Object} Data
+ @property {string} title
  */
-export default ({ data, needCount, borded = true, style }) => {
+
+
+
+
+/**
+ * @param  {Data} data
+ * @param {String} name 群组名称
+ * @param {Object} ownerInfo 群主信息
+ */
+export default ({ data, needCount, borded = true, style, needOwner = true }) => {
   if (!data) {
     return null
   }
@@ -38,12 +46,16 @@ export default ({ data, needCount, borded = true, style }) => {
           <span className={styles['user-count']}>({data.total})</span>
         ) : null}
       </div>
-      <span className={styles['owner-text']}>
-        群主：
-        <Tooltip title={ownerEle} placement="topLeft">
-          <span className={styles['owner-name']}>{ownerEle}</span>
-        </Tooltip>
-      </span>
+      {
+        needOwner ? (
+          <span className={styles['owner-text']}>
+            群主：
+            <Tooltip title={ownerEle} placement="topLeft">
+              <span className={styles['owner-name']}>{ownerEle}</span>
+            </Tooltip>
+          </span>
+        ) : null
+      }
     </div>
   )
 }

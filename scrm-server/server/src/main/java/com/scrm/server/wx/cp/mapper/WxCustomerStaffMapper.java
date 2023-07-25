@@ -36,4 +36,6 @@ public interface WxCustomerStaffMapper extends BaseMapper<WxCustomerStaff> {
     WxCustomerStaff findById(@Param("id") String id);
 
     long countByExtCorpId(@Param("extCorpId") String extCorpId, @Param("begin") Date begin, @Param("end") Date end, @Param("staffExtId") String staffExtId);
+
+
 }

@@ -78,7 +78,7 @@
     <select id="getPullNewStatisticsInfo" resultType="com.scrm.api.wx.cp.vo.WxCustomerPullNewStatisticsInfoVO">
         select count(1) as newCustomerTotal, ext_staff_id as extStaffId
         from wx_customer_staff
-        where ext_corp_id = #{extCorpId}
+        where ext_corp_id = #{extCorpId} and has_delete = 0 and is_deleted_staff = 0
         <if test="beginDate != null">
             and create_time &gt;= #{beginDate}
         </if>

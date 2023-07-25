@@ -109,7 +109,7 @@ export default observer((props) => {
         valuePropName="fileList">
         <UploadFormItem
           showLabel={false}
-          acceptTypeList={['.jpg', '.png']}
+          acceptTypeList={['.jpg', '.png', '.jpeg']}
           className={styles['video-upload']}
           maxFileCount={1}
           attachmentConfig={{
@@ -129,8 +129,8 @@ export default observer((props) => {
         }
         rules={[{ required: true, message: `${categoryName}名称不能为空` }]}>
         <Input placeholder={`请输入${categoryName}名称`} maxLength={20}
-         clearable={true}
-         />
+          clearable={true}
+        />
       </FormItem>
       <FormItem label={<FormLabel label="分类标签" />}>
         <TagSection

@@ -23,11 +23,18 @@ import { getRequestError } from 'services/utils'
 import { MATERIAL_TYPE_EN_VALS } from '../../constants'
 import { SUCCESS_CODE } from 'utils/constants'
 
+const handleList = async (dataSource) => {
+  const mediaIds = dataSource.map((ele) => ele.mediaId)
+  const res = await getFileUrl(mediaIds)
+  return dataSource.map((ele) => ({
+    ...ele,
+    filePath: res[ele.mediaId],
+  }))
+}
 export default () => {
   const { screenHeight } = useGetWindowInfo()
   const [searchForm] = Form.useForm()
   const preTableData = useRef([])
-
   const {
     openModal,
     closeModal,
@@ -42,38 +49,36 @@ export default () => {
     mutate,
     refresh,
     params: searchParams,
-  } = useTable(
-    GetTrackMaterialList,
-    {
-      fixedParams: {
-        type: MATERIAL_TYPE_EN_VALS.MINI_APP,
-      },
-      form: searchForm,
-      pageSize: 10,
-      onBefore() {
-        preTableData.current = tableProps.dataSource
-      },
-      onFinally([pager = { current: 1 }]) {
-        const refreshData = async () => {
-          const dataSource = tableProps.dataSource
-          const mediaIds = dataSource.map((ele) => ele.mediaId)
-          const res = await getFileUrl(mediaIds)
-          const newList = dataSource.map((ele) => ({
-            ...ele,
-            filePath: res[ele.mediaId],
-          }))
-          mutate({
-            list:
-              pager.current === 1
-                ? newList
-                : [...preTableData.current, tableProps.dataSource],
-            total: tableProps.pagination.total,
-          })
-        }
-        refreshData()
-      },
-    }
-  )
+  } = useTable(GetTrackMaterialList, {
+    handleList,
+    fixedParams: {
+      type: MATERIAL_TYPE_EN_VALS.MINI_APP,
+    },
+    form: searchForm,
+    pageSize: 10,
+    onBefore() {
+      preTableData.current = tableProps.dataSource
+    },
+    onFinally([pager = { current: 1 }]) {
+      const refreshData = async () => {
+        const dataSource = tableProps.dataSource
+        const mediaIds = dataSource.map((ele) => ele.mediaId)
+        const res = await getFileUrl(mediaIds)
+        const newList = dataSource.map((ele) => ({
+          ...ele,
+          filePath: res[ele.mediaId],
+        }))
+        mutate({
+          list:
+            pager.current === 1
+              ? newList
+              : [...preTableData.current, tableProps.dataSource],
+          total: tableProps.pagination.total,
+        })
+      }
+      refreshData()
+    },
+  })
   const { dataSource: tableList } = tableProps
   const { run: runRemove } = useRequest(RemoveTrackMaterial, {
     manual: true,
@@ -248,16 +253,16 @@ export default () => {
           </Button>,
         ]}>
         <ItemsList
-                {...tableProps}
-                  renderItem={(ele) => (
-                    <MiniAppItem
-                      data={ele}
-                      onEdit={onEditItem}
-                      onRemove={onRemoveItem}
-                      onDetail={onDetailItem}
-                    />
-                  )}
-                />
+          {...tableProps}
+          renderItem={(ele) => (
+            <MiniAppItem
+              data={ele}
+              onEdit={onEditItem}
+              onRemove={onRemoveItem}
+              onDetail={onDetailItem}
+            />
+          )}
+        />
       </SimplePageCard>
     </>
   )

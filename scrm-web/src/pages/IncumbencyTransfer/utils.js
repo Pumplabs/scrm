@@ -27,7 +27,7 @@ export const transferRequestData = ({ successFn }) => {
   return {
     onSuccess: (res) => {
       if (res.code === SUCCESS_CODE && res.data) {
-        const { succeedTotal, failTotal } = res.data
+        const { succeedTotal, failTotal,failList = []} = res.data
         const total = succeedTotal + failTotal
         if (total > 1 && failTotal) {
           Modal.info({
@@ -46,7 +46,10 @@ export const transferRequestData = ({ successFn }) => {
               successFn()
             }
           } else {
-            message.error('分配失败')
+            // 90508
+            const errMsg = failList?.length ? failList[0].errMsg : '分配失败'
+            const msg = errMsg ? errMsg : '分配失败'
+            message.error(msg)
           }
         }
       } else {

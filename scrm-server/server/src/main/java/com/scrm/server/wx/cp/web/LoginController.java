@@ -88,7 +88,8 @@ public class LoginController {
     @Log(modelName = "扫码登录相关接口", operatorType = "根据code获取员工信息")
     @PassToken
     @GetMapping("/v2/getStaffByCode")
-    public R<WxStaffResVo> getStaffByCodeV2(@RequestParam String code){
-        return R.data(loginService.getStaffByCodeV2(code));
+    public R<WxStaffResVo> getStaffByCodeV2(@RequestParam String code,@RequestParam(required = false) String loginFromWeb){
+        boolean isLoginFromWeb = loginFromWeb == null ? false:true;
+        return R.data(loginService.getStaffByCodeV2(code,isLoginFromWeb));
     }
 }

@@ -7,6 +7,7 @@ import styles from './index.module.less'
 export default forwardRef((props, ref) => {
   const { placeholder = '请选择', style, ...rest } = props
   const sectionProps = {
+    disabled: rest.disabled,
     style,
   }
   return (

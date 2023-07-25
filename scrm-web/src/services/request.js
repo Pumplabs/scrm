@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Modal } from 'antd'
+import { Modal, message } from 'antd'
 import { TOKEN_KEY } from 'src/utils/constants'
 import store from 'store'
 
@@ -58,7 +58,8 @@ instance.interceptors.response.use(
     const errorMessage = msg || errorMsg || '服务器错误'
     switch (response.status) {
       case 401:
-        showUserExpiredModal()
+        store.UserStore.logout()
+        // showUserExpiredModal()
         break
       case 500:
         if (msg.includes('token')) {
@@ -98,6 +99,7 @@ instance.interceptors.response.use(
           showUserExpiredModal(errorMessage)
           // 如果没有用户信息
         } else {
+          message.error(msg)
           return Promise.reject(error)
         }
         break

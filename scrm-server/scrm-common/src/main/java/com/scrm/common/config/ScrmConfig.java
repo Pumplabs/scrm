@@ -87,6 +87,11 @@ public class ScrmConfig {
     private static String mainAgentSecret;
 
     /**
+     * 会话存档
+     */
+    private static String msgAuditSecret;
+
+    /**
      * 短的回调地址的token
      */
     private static String shortCallbackToken;
@@ -257,22 +262,6 @@ public class ScrmConfig {
         this.version = version;
     }
 
-    public String getCopyrightYear() {
-        return copyrightYear;
-    }
-
-    public void setCopyrightYear(String copyrightYear) {
-        this.copyrightYear = copyrightYear;
-    }
-
-    public boolean isDemoEnabled() {
-        return demoEnabled;
-    }
-
-    public void setDemoEnabled(boolean demoEnabled) {
-        this.demoEnabled = demoEnabled;
-    }
-
     public static String getProfile() {
         return File.separator.equals("/") ? linuxFilePath : windowsFilePath;
     }
@@ -293,13 +282,6 @@ public class ScrmConfig {
         ScrmConfig.downloadUrl = downloadUrl;
     }
 
-    public static boolean isAddressEnabled() {
-        return addressEnabled;
-    }
-
-    public void setAddressEnabled(boolean addressEnabled) {
-        ScrmConfig.addressEnabled = addressEnabled;
-    }
 
     public static String getExtCorpID() {
         return extCorpID;
@@ -563,6 +545,14 @@ public class ScrmConfig {
 
     public void setHasTest(String hasTest) {
         ScrmConfig.hasTest = hasTest;
+    }
+
+    public static String getMsgAuditSecret() {
+        return msgAuditSecret;
+    }
+
+    public void setMsgAuditSecret(String msgAuditSecret) {
+        ScrmConfig.msgAuditSecret = msgAuditSecret;
     }
 
     /**

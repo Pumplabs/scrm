@@ -23,15 +23,18 @@
     </sql>
 
     <select id="getStatisticsInfo" resultType="com.scrm.server.wx.cp.vo.BrJourneyStageStatisticsInfoVO">
-        select j.id, j.journey_id, j.name, j.remark, j.sort, COUNT(c.id) customer_num
+        select j.id, j.journey_id, j.name, j.remark, j.sort,COUNT(c.id) as customer_num
         from br_journey_stage j
-        join br_journey_stage_customer c on j.ext_corp_id = c.ext_corp_id  and  j.id = c.journey_stage_id and c.deleted_at is null
-        join wx_customer wc on wc.ext_id = c.customer_ext_id and wc.has_delete is not null
+        left join br_journey_stage_customer c on j.ext_corp_id = c.ext_corp_id  and  j.id = c.journey_stage_id and c.deleted_at is null
+       left join wx_customer wc on wc.ext_id = c.customer_ext_id and wc.has_delete is not null
         where j.deleted_at is null
           and j.journey_id = #{journeyId}
           and j.ext_corp_id  = #{extCorpId}
         group by j.id
         order by j.sort
+    </select>
+    <select id="getMaxSort" resultType="java.lang.Integer">
+        select MAX(sort) from br_journey_stage where journey_id = #{journeyId} and deleted_at is null
     </select>
 
 </mapper>

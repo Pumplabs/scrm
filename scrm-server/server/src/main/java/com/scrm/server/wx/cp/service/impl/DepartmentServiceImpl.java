@@ -1,5 +1,6 @@
 package com.scrm.server.wx.cp.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -351,6 +352,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         } else {
             results = TreeUtil.createTreeList(treeVOS);
         }
+        log.debug(JSONObject.toJSONString(results));
         sortTree(results);
         return results;
     }
@@ -390,15 +392,13 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
         //查询用户列表
         Map<String, List<Staff>> departmentIdAndStaffIds = new HashMap<>();
-        List<Staff> staffList = new ArrayList<>();
+        List<Staff> staffList;
         if (StringUtils.isNotBlank(staffName)) {
-            List<String> staffExtIds = staffService.contactSearch(extCorpId, staffName);
-            if (ListUtils.isNotEmpty(staffExtIds)) {
-                staffList = Optional.ofNullable(staffService.list(new LambdaQueryWrapper<Staff>()
-                        .eq(Staff::getExtCorpId, extCorpId)
-                        .in(Staff::getExtId, staffExtIds)
-                )).orElse(new ArrayList<>());
-            }
+            staffList = Optional.ofNullable(staffService.list(new LambdaQueryWrapper<Staff>()
+                    .eq(Staff::getExtCorpId, extCorpId)
+                    .like(Staff::getName, staffName)
+            )).orElse(new ArrayList<>());
+
         } else {
             staffList = Optional.ofNullable(staffService.list(new LambdaQueryWrapper<Staff>()
                     .eq(Staff::getExtCorpId, extCorpId))).orElse(new ArrayList<>());

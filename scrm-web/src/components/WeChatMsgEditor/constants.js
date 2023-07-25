@@ -1,4 +1,4 @@
-// 在编辑器中附件的类型值
+// 在编辑器中附件组件的类型值
 export const ATTACH_TYPE_EN_VAL = {
   IMAGE: 'img',
   TEXT: 'text',
@@ -18,7 +18,7 @@ export const ATTACH_TYPE_CN_VAL = {
 }
 export const NINAME_LABEL = '用户昵称'
 export const MAX_ATTACH_COUNT = 9
-// 编辑器中附件规则
+// 编辑器中附件规则， 对应后台参数
 export const ATTACH_RULE_TYPE = {
   // 图片
   IMAGE: 'img',
@@ -35,18 +35,22 @@ export const ATTACH_RULE_TYPE = {
 export const ATTACH_MENU_OPTIONS = [
   {
     type: ATTACH_RULE_TYPE.IMAGE,
+    editType: ATTACH_TYPE_EN_VAL.IMAGE,
     name: '图片'
   },
   {
     type: ATTACH_RULE_TYPE.LINK,
+    editType: ATTACH_TYPE_EN_VAL.LINK,
     name: '链接'
   },
-  // {
-  //   type: ATTACH_RULE_TYPE.MINI_APP,
-  //   name: '小程序'
-  // },
+  {
+    type: ATTACH_RULE_TYPE.MINI_APP,
+    editType: ATTACH_TYPE_EN_VAL.MINI_APP,
+    name: '小程序'
+  },
   {
     type: ATTACH_RULE_TYPE.VIDEO,
+    editType: ATTACH_TYPE_EN_VAL.VIDEO,
     name: '视频'
   }
 ]
@@ -58,7 +62,7 @@ export const EDITOR_TYPE_TO_RULE_TYPE = {
   [ATTACH_TYPE_EN_VAL.LINK]: ATTACH_RULE_TYPE.LINK,
   [ATTACH_TYPE_EN_VAL.TRACK_MATERIAL]:  ATTACH_RULE_TYPE.LINK,
   [ATTACH_TYPE_EN_VAL.MINI_APP]: ATTACH_RULE_TYPE.MINI_APP,
-  [ATTACH_RULE_TYPE.VIDEO]: [ATTACH_TYPE_EN_VAL.VIDEO],
+  [ATTACH_TYPE_EN_VAL.VIDEO]: ATTACH_RULE_TYPE.VIDEO,
 }
 export const ATTACH_RULE_OPTIONS = Object.values(ATTACH_RULE_TYPE).map(key => ({
   type: key,

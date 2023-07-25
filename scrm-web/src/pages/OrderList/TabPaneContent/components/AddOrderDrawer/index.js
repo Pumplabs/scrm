@@ -58,8 +58,16 @@ export default (props) => {
   }, [visible])
 
   const onDiscountChange = (e) => {
-    setProductDiscount(e.target.value)
+    const value = parseFloat(e.target.value)
+    setProductDiscount(value)
   }
+
+
+  const handleDiscountChange = value => {
+
+    setProductDiscount(value)
+  }
+
 
   const refillForm = () => {
     const {
@@ -181,6 +189,7 @@ export default (props) => {
 
   const initVals = {
     discount: 100,
+    collectionAmount: 0
   }
 
   return (
@@ -256,18 +265,18 @@ export default (props) => {
             getValueFromEvent={(e) => {
               return Array.isArray(e)
                 ? e.map((item) => {
-                    let data = {
-                      ...item,
-                    }
-                    if (!item.count) {
-                      data.count = 1
-                    }
-                    if (!item.discount) {
-                      data.discount = 100
-                    }
-                    data.newPrice = calcPrice(data.price, data.discount)
-                    return data
-                  })
+                  let data = {
+                    ...item,
+                  }
+                  if (!item.count) {
+                    data.count = 1
+                  }
+                  if (!item.discount) {
+                    data.discount = 100
+                  }
+                  data.newPrice = calcPrice(data.price, data.discount)
+                  return data
+                })
                 : e
             }}>
             <ProductSelect>
@@ -322,6 +331,8 @@ export default (props) => {
                             max={100}
                             min={1}
                             precision={0}
+                            onBlur={onDiscountChange}
+                            onChange={handleDiscountChange}
                           />
                         </Form.Item>
                         <div className={styles['info-item']}>
@@ -346,14 +357,14 @@ export default (props) => {
       <Row>
         <Col span={24}>
           <Form.Item
-            label="收款金额"
+            label="已收款金额"
             name="collectionAmount"
             rules={[
               {
                 required: true,
                 validator: async (_, value) => {
                   const numVal = value * 1
-                  if (Number.isNaN(numVal) || numVal === 0) {
+                  if (Number.isNaN(numVal)) {
                     throw new Error('请输入收款金额')
                   } else if (value > orderAmountRef.current) {
                     throw new Error('收款金额不能大于订单金额')
@@ -365,7 +376,7 @@ export default (props) => {
             ]}>
             <InputNumber
               placeholder="请输入"
-              min={1}
+              min={0}
               max={Number.MAX_SAFE_INTEGER}
               precision={2}
             />

@@ -15,6 +15,8 @@ import java.util.List;
  */
 public interface BrJourneyStageMapper extends BaseMapper<BrJourneyStage> {
 
+    Integer getMaxSort (@Param("journeyId") String journeyId);
+
     /**
      * 获取统计信息
      *

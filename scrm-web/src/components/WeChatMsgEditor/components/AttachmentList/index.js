@@ -6,10 +6,12 @@ import {
   PlusOutlined,
 } from '@ant-design/icons'
 import cls from 'classnames'
+import { get } from 'lodash'
+
 import SortableList from './SortableList'
 import {
   ATTACH_TYPE_CN_VAL,
-  ATTACH_TYPE_EN_VAL,
+  ATTACH_TYPE_EN_VAL
 } from '../../constants'
 import { validShouldAddAttach } from '../../valid'
 import styles from './index.module.less'
@@ -29,9 +31,10 @@ export default (props) => {
     onClickMenu({ key: 'normalmaterial' })
   }
 
-  const onClickMenu = ({ key }) => {
+  const onClickMenu = ({ key, item }) => {
+    const editorType = item ? get(item, 'props.data-type') : key
     if (typeof onSelectMenu === 'function') {
-      onSelectMenu(key)
+      onSelectMenu(editorType)
     }
   }
 
@@ -47,13 +50,20 @@ export default (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataSource, attachmentRules])
 
+  const items = menuOptions.map(ele => ({
+    key: ele.type,
+    title: ele.name,
+    label: ele.name,
+    'data-type': ele.editType,
+    disabled: ele.disabled
+  }))
   const menu = (
-    <Menu onClick={onClickMenu}>
-      {menuOptions.map((ele) => (
+    <Menu onClick={onClickMenu} items={items}>
+      {/* {menuOptions.map((ele) => (
         <Menu.Item key={ele.type} disabled={ele.disabled}>
           {ele.name}
         </Menu.Item>
-      ))}
+      ))} */}
     </Menu>
   )
   return (

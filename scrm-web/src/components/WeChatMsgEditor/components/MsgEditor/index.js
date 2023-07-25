@@ -14,7 +14,10 @@ import {
 } from '../AttachmentFileModal'
 import { MATERIAL_TABS } from '../AttachmentFileModal/ChooseMaterialDrawer'
 import AttachmentList from '../AttachmentList'
-import { ATTACH_TYPE_EN_VAL, NINAME_LABEL } from '../../constants'
+import {
+  ATTACH_TYPE_EN_VAL,
+  NINAME_LABEL
+} from '../../constants'
 import { MATERIAL_TYPE_EN_VALS } from 'pages/SaleOperations/constants'
 import { useModalHook } from 'src/hooks'
 import store from 'store'
@@ -25,11 +28,11 @@ import styles from './index.module.less'
 const initModalType = [
   'chooseText',
   'img',
-  'app',
+  ATTACH_TYPE_EN_VAL.MINI_APP,
+  `edit${ATTACH_TYPE_EN_VAL.MINI_APP}`,
   'video',
   'link',
   'editimg',
-  'editapp',
   'editlink',
   'editvideo',
   'material',
@@ -217,7 +220,7 @@ export default forwardRef((props, ref) => {
   }
 
   const onAddMiniAppOk = (values) => {
-    setNewMediaList('app', values)
+    setNewMediaList(ATTACH_TYPE_EN_VAL.MINI_APP, values)
   }
 
   const onAddLinkOk = ({ isAdvancedSet, href, ...values }) => {
@@ -459,9 +462,9 @@ export default forwardRef((props, ref) => {
         onCancel={closeModal}
       />
       <AddMiniApp
-        title={`${modalInfo.type === 'app' ? '新增' : '编辑'}小程序附件`}
+        title={`${modalInfo.type === ATTACH_TYPE_EN_VAL.MINI_APP ? '新增' : '编辑'}小程序附件`}
         data={modalInfo.data}
-        visible={visibleMap.appVisible || visibleMap.editappVisible}
+        visible={visibleMap[`${ATTACH_TYPE_EN_VAL.MINI_APP}Visible`] || visibleMap[`edit${ATTACH_TYPE_EN_VAL.MINI_APP}Visible`]}
         onOk={onAddMiniAppOk}
         onCancel={closeModal}
       />

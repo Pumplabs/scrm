@@ -91,7 +91,7 @@ public class BrJourneyStageServiceImpl extends ServiceImpl<BrJourneyStageMapper,
     public BrJourneyStage save(BrJourneyStageSaveDTO dto) {
 
         //校验数据
-        checkRepeat(null, dto.getName(), dto.getExtCorpId(), dto.getJourneyId());
+        checkRepeat(null, dto.getExtCorpId(),  dto.getName(),dto.getJourneyId());
         BrJourney brJourney = journeyService.checkExists(dto.getJourneyId());
 
         //校验数据
@@ -105,10 +105,13 @@ public class BrJourneyStageServiceImpl extends ServiceImpl<BrJourneyStageMapper,
         //封装数据
         BrJourneyStage brJourneyStage = new BrJourneyStage();
         BeanUtils.copyProperties(dto, brJourneyStage);
+        Integer sort = baseMapper.getMaxSort(brJourney.getId());
         brJourneyStage.setId(UUID.get32UUID())
                 .setUpdatedAt(new Date())
                 .setCreatedAt(new Date())
-                .setCreator(JwtUtil.getUserId());
+                .setCreator(JwtUtil.getUserId())
+                .setSort(sort+1);
+
 
         //入库
         save(brJourneyStage);
@@ -128,11 +131,12 @@ public class BrJourneyStageServiceImpl extends ServiceImpl<BrJourneyStageMapper,
      * @date 2022/4/6 19:49
      */
     private void checkRepeat(String id, String extCorpId, String name, String journeyId) {
-        if (OptionalLong.of(count(new LambdaQueryWrapper<BrJourneyStage>()
-                .ne(id != null, BrJourneyStage::getId, id)
+        long count = count(new LambdaQueryWrapper<BrJourneyStage>()
                 .eq(BrJourneyStage::getName, name)
                 .eq(BrJourneyStage::getJourneyId, journeyId)
-                .eq(BrJourneyStage::getExtCorpId, extCorpId))).orElse(0) > 0) {
+                .eq(BrJourneyStage::getExtCorpId, extCorpId));
+        log.info("count is {}",count);
+        if (OptionalLong.of(count).orElse(0) > 0) {
             throw new BaseException(String.format("阶段：【%s】已存在,请重命名", name));
         }
     }
@@ -143,7 +147,7 @@ public class BrJourneyStageServiceImpl extends ServiceImpl<BrJourneyStageMapper,
         //校验参数
         BrJourneyStage old = checkExists(dto.getId());
         //校验数据
-        checkRepeat(null, dto.getName(), dto.getExtCorpId(), dto.getJourneyId());
+        checkRepeat(null, dto.getExtCorpId(), dto.getName(), dto.getJourneyId());
         journeyService.checkExists(dto.getJourneyId());
 
         //封装数据
@@ -201,7 +205,7 @@ public class BrJourneyStageServiceImpl extends ServiceImpl<BrJourneyStageMapper,
         dto.getIds().forEach(id -> {
             BrJourneyStage brJourneyStage = checkExists(id);
             if (journeyStageCustomerService.queryList(new BrJourneyStageCustomerQueryDTO().setJourneyStageId(id)).size() > 0) {
-                throw new BaseException(String.format("旅程阶段'%s'还存在客户,不允许删除", brJourneyStage.getName()));
+                throw new BaseException(String.format("旅程阶段'%s'还存在客户,请先移除该旅程阶段的客户", brJourneyStage.getName()));
             }
             journeyIds.add(brJourneyStage.getJourneyId());
         });
@@ -305,5 +309,9 @@ public class BrJourneyStageServiceImpl extends ServiceImpl<BrJourneyStageMapper,
                     customerDynamicInfoDTO);
 
         });
+    }
+
+    public Integer getMaxSort(String journeyId) {
+        return this.baseMapper.getMaxSort(journeyId);
     }
 }

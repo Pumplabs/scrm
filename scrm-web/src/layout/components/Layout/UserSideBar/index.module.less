@@ -1,6 +1,7 @@
 @import 'style/theme.less';
 
 @iconColor: #949494;
+
 .userSideBar {
   width: 60px;
   background: #E4E6E8;
@@ -22,6 +23,7 @@
     border-radius: 50%;
     margin-bottom: 12px;
   }
+
   .userSiderBarFooter {
     position: absolute;
     bottom: 10px;
@@ -34,16 +36,20 @@
     font-size: 24px;
     cursor: pointer;
     padding: 4px 0px;
+
     &:hover {
       color: @primary-color;
     }
+
     &.active-icon {
       color: @primary-color;
     }
   }
+
   .sys-icon {
     margin-bottom: 10px;
   }
+
   .notice-icon {
     margin-bottom: 10px;
   }
@@ -51,19 +57,24 @@
 
 .user-popover-content-overlay {
   width: 160px;
+
   :global {
     .ant-popover-inner-content {
       padding: 6px 0px;
     }
   }
 }
+
 .user-popover-content {
   .menu-item {
     cursor: pointer;
     padding: 6px 0px 6px 12px;
+    color: #ff0000;
+
     .menu-item-icon {
       margin-right: 10px;
     }
+
     &:hover {
       background-color: #fafafa;
       color: @primary-color;

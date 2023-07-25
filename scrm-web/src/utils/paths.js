@@ -50,7 +50,7 @@ export const createUrlByType = (options = {}) => {
     if (data.extId) {
       basePreviewParams.staffId = data.extId
     }
-    return createSearchUrl(`${baseUrl}/preview.html`, basePreviewParams)
+    return createSearchUrl(`${baseUrl}/h5/preview/index.html`, basePreviewParams)
   } else if (type === 'application') {
     return baseUrl + '/middle-page.html'
   } else {

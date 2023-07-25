@@ -23,12 +23,12 @@ import java.util.Date;
 @Accessors(chain = true)
 @ApiModel(value = "企业微信客户详情信息")
 @TableName("wx_customer_info")
-public class WxCustomerInfo implements Serializable{
+public class WxCustomerInfo implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "'ID'")
-    @TableId(value = "id",type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private String id;
 
     @ApiModelProperty(value = "客户ID")
@@ -86,11 +86,10 @@ public class WxCustomerInfo implements Serializable{
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedAt;
 
-//    @ApiModelProperty(value = "'删除时间'")
-//    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-//    @TableLogic
-//    private Date deletedAt;
+    @ApiModelProperty(value = "'删除时间'")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date deletedAt;
 
     @TableLogic(value = "0", delval = "null")
     private Boolean hasDelete;

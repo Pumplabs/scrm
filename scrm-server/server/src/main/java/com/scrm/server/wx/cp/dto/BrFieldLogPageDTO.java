@@ -21,10 +21,12 @@ public class BrFieldLogPageDTO extends BasePageDTO{
     @NotBlank(message = "企业id不能为空")
     private String extCorpId;
 
-    @ApiModelProperty(value = "数据库表名 br_opportunity:商机")
+    @ApiModelProperty(value = "数据库表名 br_opportunity:商机 br_clue:线索")
+    @NotBlank(message = "数据库表名不能为空")
     private String tableName;
 
-    @ApiModelProperty("数据id")
+    @ApiModelProperty("数据主键id")
+    @NotBlank(message = "数据主键id不能为空")
     private String dataId;
 }
 

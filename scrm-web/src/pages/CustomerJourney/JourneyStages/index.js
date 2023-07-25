@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useContext } from 'react'
-import { PlusOutlined, TableOutlined, ProjectOutlined } from '@ant-design/icons'
-import { Button, Modal, Tooltip, Divider, Select } from 'antd'
+import { PlusOutlined, TableOutlined, ProjectOutlined, SettingOutlined } from '@ant-design/icons'
+import { Button, Form, Modal, Tooltip, Divider, Select } from 'antd'
 import { get } from 'lodash'
-import { useAntdTable, useRequest } from 'ahooks'
+import { useAntdTable, useRequest, usePrevious } from 'ahooks'
 import cls from 'classnames'
 import SimplePageCard from 'components/SimplePageCard'
 import { Table } from 'components/TableContent'
@@ -18,11 +18,12 @@ import {
   GetJourneyStageCustomer,
   AddJourneyCustomer,
   EditJourneyCustomer,
-  RemoveJourneyCustomer
+  RemoveJourneyCustomer,
+  // GetJourneyAllStage,
 } from 'services/modules/customerJourney'
 import styles from './index.module.less'
 
-export default ({ selectedJourney }) => {
+export default ({ selectedJourney, getAllJourney, onStageConfig }) => {
   const [mode, setMode] = useState('table')
   const stageListRef = useRef(null)
   const searchFormVals = useRef({})
@@ -35,6 +36,7 @@ export default ({ selectedJourney }) => {
     setConfirm,
     confirmLoading,
   } = useModalHook(['add', 'edit', 'detail'])
+  // 获取阶段客户表格数据
   const {
     tableProps,
     run: runGetTableData,
@@ -47,9 +49,19 @@ export default ({ selectedJourney }) => {
         journeyId: selectedJourney.id,
       }),
     {
-      pageSize: 10
+      pageSize: 10,
+      // form: searchForm,
     }
   )
+  const preSearchParams = usePrevious(searchParams)
+  // 阶段信息
+  // const { run: runGetJourneyStageList, data: stageList } = useRequest(
+  //   GetJourneyAllStage,
+  //   {
+  //     manual: true,
+  //   }
+  // )
+  // 新增阶段客户
   const { run: runAddJourneyCustomer } = useRequest(AddJourneyCustomer, {
     manual: true,
     onBefore() {
@@ -73,6 +85,7 @@ export default ({ selectedJourney }) => {
     }),
   })
 
+  // 删除阶段客户
   const { run: runRemoveJourneyCustomer } = useRequest(RemoveJourneyCustomer, {
     manual: true,
     ...actionRequestHookOptions({
@@ -89,6 +102,7 @@ export default ({ selectedJourney }) => {
     }),
   })
 
+  // 修改
   const { run: runEditJourneyCustomer } = useRequest(EditJourneyCustomer, {
     manual: true,
     onBefore() {
@@ -112,6 +126,10 @@ export default ({ selectedJourney }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, selectedJourney.id])
+
+  const onDetailRecord = (record) => {
+    openModal('detail', record)
+  }
 
   const onCloseCustomerModal = (hasEdit) => {
     if (hasEdit) {
@@ -159,9 +177,8 @@ export default ({ selectedJourney }) => {
     const newStageName = item ? item.name : ''
     Modal.confirm({
       title: '提示',
-      content: `确定要将客户“${get(record, 'customer.name')}”的阶段更改为${
-        newStageName ? '“' + newStageName + '”' : ''
-      }吗？`,
+      content: `确定要将客户“${get(record, 'customer.name')}”的阶段更改为${newStageName ? '“' + newStageName + '”' : ''
+        }吗？`,
       centered: true,
       onOk: () => {
         runEditJourneyCustomer({
@@ -264,8 +281,16 @@ export default ({ selectedJourney }) => {
           <span>
             <ModeItem mode={mode} onChange={onModeChange} />
             <span style={{ marginLeft: 10 }}>
-              自动化规则
-              <Divider type="vertical" />0
+            </span>
+            <span className={styles['view-mode-box']}>
+              <SettingOutlined
+                onClick={() => {
+                  onStageConfig(selectedJourney)
+                }}
+                className={cls({
+                  [styles['mode-item']]: true,
+                })}
+              />
             </span>
           </span>
         }

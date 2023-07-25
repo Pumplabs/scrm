@@ -24,6 +24,7 @@ import com.scrm.server.wx.cp.mapper.BrCustomerFollowMapper;
 import com.scrm.server.wx.cp.service.*;
 import com.scrm.server.wx.cp.utils.WxMsgUtils;
 import com.scrm.server.wx.cp.vo.BrCustomerFollowVO;
+import com.scrm.server.wx.cp.vo.TopNStatisticsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -201,8 +202,9 @@ public class BrCustomerFollowServiceImpl extends ServiceImpl<BrCustomerFollowMap
             customerDynamicService.save(BrCustomerDynamicModelEnum.TASK_TREASURE.getCode(),
                     BrCustomerDynamicTypeEnum.ADD_FOLLOW.getCode(), dto.getExtCorpId(), JwtUtil.getExtUserId(),
                     extCustomerStaff.getExtCustomerId(), dynamicInfoDTO);
-        }//商机跟进
-        else if (BrCustomerFollow.OPPORTUNITY_TYPE.equals(dto.getType())) {
+        }
+        //商机跟进
+        if (BrCustomerFollow.OPPORTUNITY_TYPE.equals(dto.getType())) {
             fieldLogService.save(BrFieldLog.OPPORTUNITY_TABLE_NAME, brCustomerFollow.getExtCustomerId(), BrFieldLog.ADD_FOLLOW,
                     new BrFieldLogInfoDTO().setContentId(brCustomerFollow.getId()).setContent(WxMsgUtils.changeToText(brCustomerFollow.getContent(), null).getContent()),
                     brCustomerFollow.getCreatedAt(), brCustomerFollow.getCreatorExtId());
@@ -324,8 +326,6 @@ public class BrCustomerFollowServiceImpl extends ServiceImpl<BrCustomerFollowMap
 
             //客户跟进任务没有待办
             brCustomerFollow.setIsTodo(false);
-        }//商机跟进
-        else if (BrCustomerFollow.OPPORTUNITY_TYPE.equals(old.getType())) {
         }
 
         //入库
@@ -488,4 +488,44 @@ public class BrCustomerFollowServiceImpl extends ServiceImpl<BrCustomerFollowMap
         }
         return byId;
     }
+
+
+
+    @Override
+    public Long getAddedCountByDate(Date date,String extCorpId) {
+        return baseMapper.addedByDate(date,extCorpId);
+    }
+
+    @Override
+    public  List<Map<String, Object>> countByDateAndCorp(Date date){
+        return this.baseMapper.countByDateAndCorp(date);
+    }
+
+    @Override
+    public List<TopNStatisticsVo> getStaffTotalFollowUpByDates(String extCorpId, Integer dates, Integer topN) {
+        return baseMapper.getStaffTotalFollowUpByDates(extCorpId,dates,topN);
+    }
+
+    @Override
+    public Long countByDateAndStaff() {
+        String extStaffId =  JwtUtil.getExtUserId();
+        String extCorpId = JwtUtil.getExtCorpId();
+        Date startTime = DateUtils.getYesterdayTime(true);
+        Date endTime = DateUtils.getYesterdayTime(false);
+        return count(new QueryWrapper<BrCustomerFollow>().lambda()
+                .eq(BrCustomerFollow::getExtCorpId,extCorpId)
+                .eq(BrCustomerFollow::getExtStaffId,extStaffId)
+                .ge(BrCustomerFollow::getCreatedAt,startTime).le(BrCustomerFollow::getCreatedAt,endTime));
+    }
+
+    @Override
+    public Long countByToday(){
+        Date startTime = DateUtils.getTodayStartTime();
+        Date endTime = new Date();
+        return count(new QueryWrapper<BrCustomerFollow>().lambda()
+                .eq(BrCustomerFollow::getExtCorpId, JwtUtil.getExtCorpId())
+                .ge(BrCustomerFollow::getCreatedAt, startTime).le(BrCustomerFollow::getCreatedAt, endTime)
+                .eq(!staffService.isAdmin(),BrCustomerFollow::getCreatorExtId,JwtUtil.getExtUserId()));
+    }
+
 }

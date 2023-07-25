@@ -27,9 +27,10 @@ import {
 import { DoneTask } from 'services/modules/follow'
 import { encodeUrl } from 'src/utils'
 import { actionRequestHookOptions } from 'services/utils'
+import { TABLE_NAME } from 'src/pages/Opportunity/components/LiveItem/constants'
+
 import styles from './index.module.less'
 
-// const LOSS_TYPE_CODE = 'OPPORTUNITY_STAGE'
 export default observer(() => {
   const { UserStore } = useContext(MobXProviderContext)
   const { id: oppParId } = useParams()
@@ -77,7 +78,7 @@ export default observer(() => {
     manual: true,
     defaultPageSize: 20,
     rigidParams: {
-      tableName: 'br_opportunity',
+      tableName: TABLE_NAME.OPP
     },
     // onFinally: (_, res = { list: [] }) => {
     //   setPanelKeys((arr) => [...arr, ...res.list.map((item) => item.id)])

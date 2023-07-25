@@ -37,7 +37,7 @@ echarts.use([
  */
 export default (props) => {
   const containerRef = useRef(null)
-  const { dataSource = [], loading = false, fieldNames = {}, needLegend = true, needZoom = false, options: baseOptions = {}, ...rest } = props
+  const { dataSource = [], loading = false, fieldNames = {}, needLegend = false, needZoom = false, options: baseOptions = {}, ...rest } = props
   const { value: valueKey = 'id', label: labelKey = 'name' } = fieldNames
   useEffect(() => {
     setOption()
@@ -49,7 +49,7 @@ export default (props) => {
       const legendData = seriesData.map(item => item.name)
       return {
         legend: {
-          data:legendData,
+          data: legendData,
           right: 0,
           top: 20
         },
@@ -116,7 +116,7 @@ export default (props) => {
             moveHandleSize: 5
           }
         ],
-      }): {}),
+      }) : {}),
       tooltip: {
         trigger: 'axis',
       },

@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberExportDTO;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberPageDTO;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberQueryDTO;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberSaveDTO;
+import com.scrm.api.wx.cp.dto.*;
 import com.scrm.api.wx.cp.entity.Staff;
 import com.scrm.api.wx.cp.entity.WxCustomer;
 import com.scrm.api.wx.cp.entity.WxGroupChat;
@@ -189,5 +186,15 @@ public class WxGroupChatMemberServiceImpl extends ServiceImpl<WxGroupChatMemberM
     @Override
     public List<String> queryTodayQuitIds(String extCorpId, String chatId) {
         return baseMapper.queryTodayQuitIds(extCorpId, chatId);
+    }
+
+    @Override
+    public List<String> queryTodayQuitExtIds(String extCorpId, String chatId) {
+        return baseMapper.queryTodayQuitExtIds(extCorpId, chatId);
+    }
+
+    @Override
+    public List<WxGroupChatMember> listByCondition(JoinWayConditionDTO conditionDTO) {
+        return baseMapper.listByCondition(conditionDTO);
     }
 }

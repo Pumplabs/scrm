@@ -17,6 +17,12 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-sleuth</artifactId>
+            <version>2.2.6.RELEASE</version>
+        </dependency>
+
         <!--Lombok依赖-->
         <dependency>
             <groupId>org.projectlombok</groupId>

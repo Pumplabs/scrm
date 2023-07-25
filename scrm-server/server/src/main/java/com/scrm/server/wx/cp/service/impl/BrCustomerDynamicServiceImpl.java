@@ -50,7 +50,6 @@ public class BrCustomerDynamicServiceImpl extends ServiceImpl<BrCustomerDynamicM
     @Autowired
     private IWxDynamicMediaService dynamicMediaService;
 
-
     @Autowired
     private IWxCustomerService customerService;
     

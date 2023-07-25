@@ -1,23 +1,30 @@
 package com.scrm.server.wx.cp.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.scrm.api.wx.cp.entity.WxCustomer;
 import com.scrm.common.dto.BatchDTO;
 import com.scrm.common.exception.BaseException;
+import com.scrm.common.util.DateUtils;
 import com.scrm.common.util.JwtUtil;
 import com.scrm.common.util.ListUtils;
 import com.scrm.common.util.UUID;
 import com.scrm.server.wx.cp.dto.*;
+import com.scrm.server.wx.cp.entity.BrOpportunity;
 import com.scrm.server.wx.cp.entity.BrOrder;
 import com.scrm.server.wx.cp.entity.BrOrderAttachment;
 import com.scrm.server.wx.cp.entity.BrOrderProduct;
 import com.scrm.server.wx.cp.mapper.BrOrderMapper;
 import com.scrm.server.wx.cp.service.*;
+import com.scrm.server.wx.cp.utils.ReportUtil;
 import com.scrm.server.wx.cp.vo.BrOrderVO;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
+import com.scrm.server.wx.cp.vo.TopNStatisticsVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -62,7 +69,12 @@ public class BrOrderServiceImpl extends ServiceImpl<BrOrderMapper, BrOrder> impl
 
     @Override
     public IPage<BrOrderVO> pageList(BrOrderPageDTO dto) {
-        LambdaQueryWrapper<BrOrder> wrapper = new LambdaQueryWrapper<BrOrder>().eq(BrOrder::getExtCorpId, dto.getExtCorpId()).eq(dto.getStatus() != null, BrOrder::getStatus, dto.getStatus()).eq(!roleStaffService.isEnterpriseAdmin(), BrOrder::getManagerStaffExtId, JwtUtil.getExtUserId()).like(StringUtils.isNotBlank(dto.getOrderCode()), BrOrder::getOrderCode, dto.getOrderCode()).orderByDesc(BrOrder::getUpdatedAt);
+        LambdaQueryWrapper<BrOrder> wrapper = new LambdaQueryWrapper<BrOrder>()
+                .eq(BrOrder::getExtCorpId, dto.getExtCorpId())
+                .eq(dto.getStatus() != null, BrOrder::getStatus, dto.getStatus())
+                .eq(!roleStaffService.isEnterpriseAdmin(), BrOrder::getManagerStaffExtId, JwtUtil.getExtUserId())
+                .like(StringUtils.isNotBlank(dto.getOrderCode()), BrOrder::getOrderCode, dto.getOrderCode())
+                .orderByDesc(BrOrder::getUpdatedAt);
         IPage<BrOrder> page = page(new Page<>(dto.getPageNum(), dto.getPageSize()), wrapper);
         return page.convert(this::translation);
     }
@@ -119,21 +131,21 @@ public class BrOrderServiceImpl extends ServiceImpl<BrOrderMapper, BrOrder> impl
                 BrOrder.STATUS_HAS_IDENTIFIED,
                 BrOrder.STATUS_FINISHED,
                 BrOrder.STATUS_AUDIT_FAILED).contains(dto.getStatus())) {
-            throw new BaseException("订单状态非法");
+            throw new BaseException("订单状态非法" );
         }
         if (Arrays.asList(BrOrder.STATUS_HAS_IDENTIFIED,
                 BrOrder.STATUS_FINISHED,
                 BrOrder.STATUS_AUDIT_FAILED).contains(dto.getStatus()) &&
                 !roleStaffService.isEnterpriseAdmin()) {
-            throw new BaseException("操作非法");
+            throw new BaseException("操作非法" );
         }
 
         if (Objects.equals(old.getStatus(), BrOrder.STATUS_HAS_IDENTIFIED)) {
             if (!roleStaffService.isEnterpriseAdmin()) {
-                throw new BaseException("订单处于已确认状态，请联系管理员修改");
+                throw new BaseException("订单处于已确认状态，请联系管理员修改" );
             }
         } else if (Objects.equals(old.getStatus(), BrOrder.STATUS_FINISHED)) {
-            throw new BaseException("订单处于已完成不允许修改");
+            throw new BaseException("订单处于已完成不允许修改" );
         } else if (Objects.equals(old.getStatus(), BrOrder.STATUS_AUDIT_FAILED)) {
             //如果是审核不通过，修改了之后就变成待审核状态
             dto.setStatus(BrOrder.STATUS_PENDING_REVIEW);
@@ -163,7 +175,7 @@ public class BrOrderServiceImpl extends ServiceImpl<BrOrderMapper, BrOrder> impl
     }
 
     private BigDecimal getOrderAmount(List<BrOrderProduct> orderProducts, String discount) {
-        BigDecimal orderAmount = new BigDecimal("0");
+        BigDecimal orderAmount = new BigDecimal("0" );
         if (ListUtils.isNotEmpty(orderProducts)) {
             orderAmount = orderProducts.stream().map(product -> StringUtils.isBlank(product.getProductPrice()) ? BigDecimal.ZERO :
                     new BigDecimal(product.getProductPrice()).multiply(new BigDecimal(product.getProductNum())).multiply(new BigDecimal(product.getDiscount()))).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -241,7 +253,7 @@ public class BrOrderServiceImpl extends ServiceImpl<BrOrderMapper, BrOrder> impl
         if (StringUtils.isBlank(value)) {
             return "0.00";
         }
-        DecimalFormat df = new DecimalFormat("0.00");
+        DecimalFormat df = new DecimalFormat("0.00" );
         df.setRoundingMode(RoundingMode.HALF_UP);
         return df.format(Double.valueOf(value));
     }
@@ -254,12 +266,61 @@ public class BrOrderServiceImpl extends ServiceImpl<BrOrderMapper, BrOrder> impl
         }
         BrOrder byId = getById(id);
         if (byId == null) {
-            throw new BaseException("订单不存在");
+            throw new BaseException("订单不存在" );
         }
         return byId;
     }
 
     private synchronized String buildCode() {
         return System.currentTimeMillis() + "";
+    }
+
+    @Override
+    public Long getAddedCountByDate(Date date, String extCorpId) {
+        return baseMapper.addedByDate(date, extCorpId);
+    }
+
+
+    public List<Map<String, Object>> countByDateAndCorp(Date date) {
+        return this.baseMapper.countByDateAndCorp(date);
+    }
+
+    @Override
+    public List<TopNStatisticsVo> getStaffTotalAmountByDates(String extCorpId, Integer dates, Integer topN) {
+        return baseMapper.getStaffTotalAmountByDates(extCorpId, dates, topN);
+    }
+
+
+    @Override
+    public Long countByDateAndStaff() {
+        String extStaffId = JwtUtil.getExtUserId();
+        String extCorpId = JwtUtil.getExtCorpId();
+        Date startTime = DateUtils.getYesterdayTime(true);
+        Date endTime = DateUtils.getYesterdayTime(false);
+        return count(new QueryWrapper<BrOrder>().lambda()
+                .eq(BrOrder::getExtCorpId, extCorpId)
+                .eq(BrOrder::getManagerStaffExtId, extStaffId)
+                .ge(BrOrder::getCreatedAt, startTime).le(BrOrder::getCreatedAt, endTime));
+    }
+
+
+    @Override
+    public Long countByToday() {
+        Date startTime = DateUtils.getTodayStartTime();
+        Date endTime = new Date();
+        return count(new QueryWrapper<BrOrder>().lambda()
+                .eq(BrOrder::getExtCorpId, JwtUtil.getExtCorpId())
+                .ge(BrOrder::getCreatedAt, startTime).le(BrOrder::getCreatedAt, endTime)
+                .eq(!staffService.isAdmin(), BrOrder::getCreator, JwtUtil.getUserId()).or(w -> {
+                    w.eq(BrOrder::getManagerStaffExtId, JwtUtil.getExtUserId());
+                }));
+    }
+
+    @Override
+    public List<DailyTotalVO> getLastNDaysCountDaily(Integer days) {
+        Date startTime = DateUtils.getDate(new Date(), -days + 1, "00:00" );
+        Date endTime = new Date();
+        List<DailyTotalVO> list = this.baseMapper.getLastNDaysCountDaily(startTime, endTime,JwtUtil.getExtCorpId());
+        return ReportUtil.composeResultToEchart(days,list);
     }
 }

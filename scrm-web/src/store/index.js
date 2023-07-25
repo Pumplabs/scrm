@@ -8,4 +8,5 @@ class RootStore{
     this.WxWorkStore = new WxWorkStore(this)
   }
 }
-export default new RootStore()
+const rootStore = new RootStore()
+export default rootStore

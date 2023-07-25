@@ -19,21 +19,30 @@ import material from './modules/material'
 import opportunityConfig from './modules/opportunity'
 import product from './modules/product'
 import order from './modules/order'
-import massRoutes from './modules/mass'
 const Home = lazy(() => import('src/pages/Home'))
+// 日报
 const SaleDailyReport = lazy(() => import('src/pages/SaleDailyReport'))
+// 客户动态
 const CustomerMoment = lazy(() => import('src/pages/CustomerMoment'))
+// 首页通知
 const HomeNotice = lazy(() => import('src/pages/NoticeSection'))
+// 工作台
 const Workbench = lazy(() => import('src/pages/Workbench'))
+
+const Apps = lazy(() => import('src/pages/Apps'))
+// 首页客户列表
 const HomeCustomerList = lazy(() => import('src/pages/CustomerList'))
+// 话术库
 const TalkScript = lazy(() => import('src/pages/TalkScript'))
-const CustomerSopRemind = lazy(() => import('src/pages/TaskRemind/CustomerSop'))
-const UserMomentsRemind = lazy(() => import('src/pages/TaskRemind/UserMoments'))
-const GroupSopRemind = lazy(() => import('src/pages/TaskRemind/GroupSop'))
+// 群欢迎语提醒
 const GroupWelComeTip = lazy(() => import('src/pages/TaskRemind/GroupWelCome'))
+// 待办列表
 const TodoList = lazy(() => import('src/pages/TodoList'))
+// 客户群详情
 const GroupDetail = lazy(() => import('src/pages/GroupDetail'))
+// 单聊会话详情
 const ChatDetail = lazy(() => import('src/pages/ChatDetail'))
+// 选择客户
 const SelectCustomer = lazy(() =>
   import('src/pages/SelectPages/SelectedCustomer')
 )
@@ -41,6 +50,22 @@ const SelectCustomer = lazy(() =>
 const SelectUser = lazy(() => import('src/pages/SelectPages/SelectUser'))
 // 选择标签
 const SelectTag = lazy(() => import('src/pages/SelectPages/SelectTag'))
+// 客户群发
+const CustomerMass = lazy(() => import('src/pages/CustomerMass'))
+// 新增客户群发
+const AddCustomerMass = lazy(() => import('src/pages/CustomerMass/AddCustomerMass'))
+// 客户群发成功界面
+const CustomerMassSuccess = lazy(() => import('src/pages/CustomerMass/CustomerMassSuccess'))
+// 客户群发详情
+const CustomerMassDetail = lazy(() => import('src/pages/CustomerMass/CustomerMassDetail'))
+// 群发基本信息详情
+const CustomerMassInfoDetail = lazy(() => import('src/pages/CustomerMass/CustomerMassInfoDetail'))
+// 客户群群发
+const GroupMass = lazy(() => import('src/pages/GroupMass'))
+// 新增客户群群发
+const AddGroupMass = lazy(() => import('src/pages/GroupMass/AddGroupMass'))
+const GroupMassDetail = lazy(() => import('src/pages/GroupMass/GroupMassDetail'))
+const GroupMassInfoDetail = lazy(() => import('src/pages/GroupMass/GroupMassInfoDetail'))
 
 const config = [
   {
@@ -66,6 +91,13 @@ const config = [
     path: '/missingParam',
     element: <MissingParam />,
   },
+  // {
+  //   path: '/noAuth',
+  //   element: <NoAuthPage />,
+  //   meta: {
+  //     title: '账号无权限',
+  //   },
+  // },
   {
     path: '/noInstallApp',
     element: <NoInstallApp />,
@@ -111,6 +143,10 @@ const config = [
         element: <LazyLoad comp={HomeNotice} />,
       },
       {
+        path: 'apps',
+        element: <LazyLoad comp={Apps} />,
+      },
+      {
         path: '*',
         element: <NoFound />,
       },
@@ -121,6 +157,8 @@ const config = [
     element: <Layout />,
     children: [
       { path: 'talkScript', element: <LazyLoad comp={TalkScript} /> },
+      // 话术库
+      { path: 'talkScriptList', element: <LazyLoad comp={TalkScript} /> },
       {
         path: 'selectCustomer',
         element: <LazyLoad comp={SelectCustomer} />,
@@ -133,22 +171,11 @@ const config = [
         path: 'selectTag',
         element: <LazyLoad comp={SelectTag} />,
       },
+      // 群欢迎语提醒
       {
         path: 'groupWelComeTip',
         element: <LazyLoad comp={GroupWelComeTip} />,
-      },
-      {
-        path: 'groupSopRemind',
-        element: <LazyLoad comp={GroupSopRemind} />,
-      },
-      {
-        path: 'userMomentsRemind',
-        element: <LazyLoad comp={UserMomentsRemind} />,
-      },
-      {
-        path: 'customerSopRemind',
-        element: <LazyLoad comp={CustomerSopRemind} />,
-      },
+      }, 
       {
         path: 'customerMoment',
         meta: {
@@ -164,17 +191,55 @@ const config = [
         ),
       },
       ...material,
-      // 跟进
+      // 根进
       ...followConfig,
       // 客户
       ...customerConfig,
       // 待办列表
       ...opportunityConfig,
-      // 客户群发、客户群群发
-      ...massRoutes,
       {
         path: 'todoList',
-        element: <LazyLoad comp={TodoList}  meta={{ title: '我的待办' }}/>,
+        element: <LazyLoad comp={TodoList} meta={{ title: '我的待办' }} />,
+      },
+      // 客户群发
+      {
+        path: 'customerMass',
+        element: <LazyLoad comp={CustomerMass} meta={{ title: '客户群发' }} />,
+      },
+      // 新增客户群发
+      {
+        path: 'addCustomerMass',
+        element: <LazyLoad comp={AddCustomerMass} meta={{ title: '新增客户群发' }} />,
+      },
+      // 发送结果
+      {
+        path: 'customerMassSuccess',
+        element: <LazyLoad comp={CustomerMassSuccess} meta={{ title: '发送结果' }} />,
+      },
+      // 群发详情
+      {
+        path: 'customerMassInfoDetail/:id',
+        element: <LazyLoad comp={CustomerMassInfoDetail} meta={{ title: '群发详情' }} />,
+      },
+      {
+        path: 'customerMassDetail/:id',
+        element: <LazyLoad comp={CustomerMassDetail} meta={{ title: '群发详情' }} />,
+      },
+      {
+        path: 'groupMass',
+        element: <LazyLoad comp={GroupMass} meta={{ title: '客户群群发' }} />,
+      },
+      {
+        path: 'addGroupMass',
+        element: <LazyLoad comp={AddGroupMass} meta={{ title: '新增客户群群发' }} />,
+      },
+      {
+        path: 'groupMassDetail/:id',
+        element: <LazyLoad comp={GroupMassDetail} meta={{ title: '群发详情' }} />,
+      },
+      {
+        path: 'groupMassInfoDetail/:id',
+        element: <LazyLoad comp={GroupMassInfoDetail} meta={{ title: '群发详情' }} />,
       },
       {
         path: 'groupDetail',
@@ -188,7 +253,7 @@ const config = [
       ...order,
       {
         path: 'saleReport',
-        element: <LazyLoad comp={SaleDailyReport}/>
+        element: <LazyLoad comp={SaleDailyReport} />
       },
       {
         path: '*',

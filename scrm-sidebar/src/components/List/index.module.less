@@ -1,74 +1,86 @@
 @import "style/theme.less";
 
-.list {
-  background-color: #fff;
-  padding: 0px @body-spacing;
-  border-radius: @border-radius-base;
-}
+// .list {
+//   background-color: #fff;
+//   padding: 0px @body-spacing;
+//   border-radius: @border-radius-base;
+//   &.info {
+//     background-color: @info-bg;
+//   }
+//   :global {
+//     .adm-list-body {
+//       height: 300px;
+//       background-color: @info-bg;
+//     }
+//   }
+// }
 
-.list-item {
-  min-height: 32px;
-  position: relative;
-  border-bottom: 1px solid #d9d9d9;
-  @arrowSize: 20px;
-  &.list-large-item {
-    padding: 20px 0px 20px 0px;
-    &.has-arrow {
-      padding-right: 20px + @arrowSize;
-    }
-  }
-  &.list-small-item {
-    padding: 10px 0px 10px 0px;
-    &.has-arrow {
-      padding-right: 10px + @arrowSize;
-    }
-  }
-  &:nth-last-of-type(1) {
-    border-bottom: none;
-  }
+// .list-item {
+//   min-height: 32px;
+//   position: relative;
+//   border-bottom: 1px solid #d9d9d9;
+//   @arrowSize: 20px;
+//   &.list-large-item {
+//     padding: 20px 0px 20px 0px;
+//     &.has-arrow {
+//       padding-right: 20px + @arrowSize;
+//     }
+//   }
+//   &.list-small-item {
+//     padding: 10px 0px 10px 0px;
+//     &.has-arrow {
+//       padding-right: 10px + @arrowSize;
+//     }
+//   }
+//   &:nth-last-of-type(1) {
+//     border-bottom: none;
+//   }
 
-  .list-item-title {
-    color: @heading-color;
-    font-size: 14px;
-    line-height: 14px;
-    margin-right: 12px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    font-weight: 500;
-  }
-  .list-item-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .list-item-label {
-    overflow: hidden;
-  }
-  .list-item-subTitle {
-    color: @text-color-secondary;
-    font-size: 10px;
-    text-overflow: ellipsis;
-  }
+//   .list-item-title {
+//     color: @heading-color;
+//     font-size: 14px;
+//     line-height: 14px;
+//     margin-right: 12px;
+//     white-space: nowrap;
+//     text-overflow: ellipsis;
+//     overflow: hidden;
+//     font-weight: 500;
+//   }
+//   .list-item-content {
+//     display: flex;
+//     justify-content: space-between;
+//     align-items: center;
+//   }
+//   .list-item-label {
+//     overflow: hidden;
+//   }
+//   .list-item-subTitle {
+//     color: @text-color-secondary;
+//     font-size: 10px;
+//     text-overflow: ellipsis;
+//   }
  
-  .list-item-extra {
-    color: @text-color-secondary;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: keep-all;
-    white-space: nowrap;
-  }
+//   .list-item-extra {
+//     color: @text-color-secondary;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     word-break: keep-all;
+//     white-space: nowrap;
+//   }
 
-  .list-arrow {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
+//   .list-arrow {
+//     position: absolute;
+//     right: 14px;
+//     top: 50%;
+//     transform: translateY(-50%);
+//   }
+// }
+
+.theme-info {
+  .my-list-item  {
+    background-color: @info-bg;
   }
 }
-
-
-
 .my-list-item {
   color: @heading-color;
 }

@@ -14,7 +14,12 @@ import com.scrm.server.wx.cp.vo.BrOrderVO;
 import com.scrm.api.wx.cp.dto.*;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
+import com.scrm.server.wx.cp.vo.TopNStatisticsVo;
+
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 订单 服务类
@@ -93,4 +98,21 @@ public interface IBrOrderService extends IService<BrOrder> {
      */
     BrOrder checkExists(String id);
 
+
+    Long getAddedCountByDate(Date date, String extCorpId);
+
+    List<Map<String, Object>> countByDateAndCorp(Date date);
+
+
+    List<TopNStatisticsVo> getStaffTotalAmountByDates(String extCorpId, Integer dates, Integer topN);
+
+    Long countByDateAndStaff();
+    Long countByToday();
+
+    /**
+     * 获取订单个数趋势
+     * @param days
+     * @return
+     */
+    List<DailyTotalVO> getLastNDaysCountDaily(Integer days);
 }

@@ -1,5 +1,6 @@
 package com.scrm.server.wx.cp.handler.tp;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.scrm.api.wx.cp.dto.DepartmentSaveDTO;
 import com.scrm.api.wx.cp.dto.DepartmentUpdateDTO;
@@ -16,9 +17,12 @@ import com.scrm.server.wx.cp.service.*;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
+import me.chanjar.weixin.cp.api.WxCpDepartmentService;
 import me.chanjar.weixin.cp.api.WxCpService;
 import me.chanjar.weixin.cp.api.WxCpUserService;
+import me.chanjar.weixin.cp.api.impl.WxCpDepartmentServiceImpl;
 import me.chanjar.weixin.cp.api.impl.WxCpUserServiceImpl;
+import me.chanjar.weixin.cp.bean.WxCpDepart;
 import me.chanjar.weixin.cp.bean.WxCpUser;
 import me.chanjar.weixin.cp.bean.message.WxCpXmlMessage;
 import me.chanjar.weixin.cp.bean.message.WxCpXmlMessage;
@@ -62,22 +66,12 @@ public class WxChangeContactEventHandler extends AbstractHandler {
     @Autowired
     private IBrCorpAccreditService accreditService;
 
-    @Autowired
-    private IStaffDepartmentService staffDepartmentService;
-
-    @Autowired
-    private IWxCustomerStaffService customerStaffService;
-
-    @Autowired
-    private IWxGroupChatService groupChatService;
 
     @Override
     public WxCpXmlOutMessage handle(WxCpXmlMessage wxMessage, Map<String, Object> map, WxCpService wxCpService, WxSessionManager wxSessionManager) throws WxErrorException {
-
         WxCpXmlOutMessageDTO dto = new WxCpXmlOutMessageDTO();
         BeanUtils.copyProperties(wxMessage, dto);
         dto.setExtCorpId(ScrmConfig.getExtCorpID());
-
         rabbitTemplate.convertAndSend(wxMessage.getChangeType(), dto);
         try {
             String content = "感谢反馈，您的信息已收到！";
@@ -87,6 +81,9 @@ public class WxChangeContactEventHandler extends AbstractHandler {
             return null;
         }
     }
+
+
+
 
     /**
      * 监听事件: 创建部门
@@ -98,6 +95,7 @@ public class WxChangeContactEventHandler extends AbstractHandler {
     public void createPartyListener(WxCpXmlOutMessageDTO dto) {
         String str = UUID.get32UUID();
         log.info("消费MQ:[create_party],事件描述:[创建部门],编号:[{}],企业ID:[{}],message[{}]", str, dto.getExtCorpId(), dto);
+        log.info("======================{}", JSONObject.toJSONString(dto));
         try {
             Department department = departmentService.getOne(new QueryWrapper<Department>().lambda()
                     .eq(Department::getExtId, Long.valueOf(dto.getId()))
@@ -106,9 +104,9 @@ public class WxChangeContactEventHandler extends AbstractHandler {
                 DepartmentSaveDTO departmentSaveDTO = new DepartmentSaveDTO()
                         .setExtId(Long.valueOf(dto.getId()))
                         .setExtCorpId(dto.getExtCorpId())
-                        .setExtParentId(StringUtils.isNotBlank(dto.getParentId()) ? Long.valueOf(dto.getParentId()) : null)
-                        .setName(dto.getName())
-                        .setOrder(dto.getOrder() != null ? Long.valueOf(dto.getOrder()) : null)
+                        .setExtParentId(Long.valueOf(dto.getParentId()))
+                        .setName(dto.getId())
+                        .setOrder(1l)
                         .setCreateTime(dto.getCreateTime() == null ? new Date() : new Date(dto.getCreateTime() * 1000))
                         .setNeedSynToWx(false);
                 departmentService.save(departmentSaveDTO);
@@ -142,16 +140,15 @@ public class WxChangeContactEventHandler extends AbstractHandler {
                 DepartmentSaveDTO departmentSaveDTO = new DepartmentSaveDTO()
                         .setExtId(Long.valueOf(dto.getId()))
                         .setExtCorpId(dto.getExtCorpId())
-                        .setExtParentId(StringUtils.isNotBlank(dto.getParentId()) ? Long.valueOf(dto.getParentId()) : null)
-                        .setName(dto.getName())
-                        .setOrder(dto.getOrder() != null ? Long.valueOf(dto.getOrder()) : null)
+                        .setExtParentId(Long.valueOf(dto.getParentId()))
+                        .setName(dto.getId())
+                        .setOrder(1l)
                         .setCreateTime(dto.getCreateTime() == null ? new Date() : new Date(dto.getCreateTime() * 1000))
                         .setNeedSynToWx(false);
                 departmentService.save(departmentSaveDTO);
             } else {
-                department.setName(dto.getName())
-                        .setExtParentId(StringUtils.isNotBlank(dto.getParentId()) ? Long.valueOf(dto.getParentId()) : null)
-                        .setOrder(dto.getOrder() != null ? Long.valueOf(dto.getOrder()) : department.getOrder());
+                department.setName(dto.getId())
+                        .setExtParentId(Long.valueOf(dto.getParentId()));
                 DepartmentUpdateDTO updateDTO = new DepartmentUpdateDTO();
                 BeanUtils.copyProperties(department, updateDTO);
                 departmentService.update(updateDTO.setNeedSynToWx(false));
@@ -208,7 +205,7 @@ public class WxChangeContactEventHandler extends AbstractHandler {
             WxCpUserService userService = new WxCpUserServiceImpl(WxCpConfiguration.getAddressBookWxCpService());
             WxCpUser user = userService.getById(dto.getUserId());
             staffService.saveOrUpdateUser(user, dto.getExtCorpId());
-            accreditService.getSeeStaffFromRedis(dto.getExtCorpId(), true);
+//            accreditService.getSeeStaffFromRedis(dto.getExtCorpId(), true);
         } catch (WxErrorException e) {
             e.printStackTrace();
             log.error("消费MQ异常:[update_user],事件描述:[用户修改],编号:[{}],企业ID:[{}],message[{}],异常原因:[{}],异常描述:[{}]", str, dto.getExtCorpId(), dto.toString(), "调用企业微信接口异常", e);
@@ -256,10 +253,16 @@ public class WxChangeContactEventHandler extends AbstractHandler {
         String str = UUID.get32UUID();
         log.info("消费MQ:[create_user],事件描述:[用户新增],编号:[{}],企业ID:[{}],message[{}]", str, dto.getExtCorpId(), dto.toString());
         try {
-            WxCpUserService userService = new WxCpUserServiceImpl(wxCpConfiguration.getAddressBookWxCpService());
+            WxCpUserService userService = new WxCpUserServiceImpl(wxCpConfiguration.getWxCpService());
+
+
+            /**
+             * TODO
+             * 用户可见范围问题
+             */
             WxCpUser user = userService.getById(dto.getUserId());
             staffService.saveOrUpdateUser(user, dto.getExtCorpId());
-            accreditService.getSeeStaffFromRedis(dto.getExtCorpId(), true);
+//            accreditService.getSeeStaffFromRedis(dto.getExtCorpId(), true);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("消费MQ异常:[create_user],事件描述:[用户新增],编号:[{}],企业ID:[{}],message[{}],异常原因:[{}],异常描述:[{}]", str, dto.getExtCorpId(), dto.toString(), "系统异常", e);
@@ -279,7 +282,7 @@ public class WxChangeContactEventHandler extends AbstractHandler {
         log.info("消费MQ:[update_tag],事件描述:[标签变更],编号:[{}],企业ID:[{}],message[{}]", str, dto.getExtCorpId(), dto.toString());
         try {
             staffService.sync(dto.getExtCorpId());
-            accreditService.getSeeStaffFromRedis(dto.getExtCorpId(), true);
+//            accreditService.getSeeStaffFromRedis(dto.getExtCorpId(), true);
         } catch (Exception e) {
             e.printStackTrace();
             log.error("消费MQ异常:[update_tag],事件描述:[标签变更],编号:[{}],企业ID:[{}],message[{}],异常原因:[{}],异常描述:[{}]", str, dto.getExtCorpId(), dto.toString(), "系统异常", e);

@@ -1,14 +1,14 @@
 import { useState, forwardRef } from 'react'
 import { Switch } from 'antd'
-import { cloneElement } from 'src/utils/reactNode'
+import { cloneElement } from 'utils/reactNode'
 
 /**
  * 带有开关控制的组件
  * @param {Boolean} preserve 是否保留字段值
  * @param {Boolean} showContentOnChecked 当打开开关的时候展示内容
  * @param {Object} value
- * * @param {Boolean} checked 是否开启开关
- * * @param {Any} data 其它的值
+ * @param {Boolean} checked 是否开启开关
+ * @param {Any} data 其它的值
  * @param {Boolean} responeChildren 响应children的onChange事件，默认为true
  */
 export default forwardRef((props, ref) => {
@@ -22,6 +22,9 @@ export default forwardRef((props, ref) => {
     valuePropName = 'value',
     trigger = 'onChange'
   } = props
+  //@BM
+  //selfValue??
+  //defindvalue?
   const [selfValue, setSelfValue] = useState({})
   const hasDefinedValue = typeof value === 'undefined'
   const curValue = hasDefinedValue ? selfValue : value
@@ -57,14 +60,14 @@ export default forwardRef((props, ref) => {
 
   const nextChildren = children && responeChildren
     ? cloneElement(children, {
-        [trigger]: onContentChange,
-        [valuePropName]: curValue.data,
-        ...(!shouldShowContent ? { style: { display: 'none' } } : {}),
-      })
+      [trigger]: onContentChange,
+      [valuePropName]: curValue.data,
+      ...(!shouldShowContent ? { style: { display: 'none' } } : {}),
+    })
     : children
 
   return (
-    <div ref={ref}>
+    <div ref={ref} style={{ padding: 8 }}>
       <Switch
         checked={curValue.checked}
         onChange={onSwitchChange}

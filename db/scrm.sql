@@ -1801,7 +1801,7 @@ CREATE TABLE `wx_staff` (
   `status` tinyint DEFAULT NULL COMMENT '激活状态: 1=已激活，2=已禁用，4=未激活，5=退出企业。已激活代表已激活企业微信或已关注微工作台（原企业号）。未激活代表既未激活企业微信又未关注微工作台（原企业号）。',
   `mobile` varchar(11) DEFAULT NULL COMMENT '手机号',
   `qr_code_url` varchar(255) DEFAULT NULL COMMENT '二维码',
-  `telephone` char(32) DEFAULT NULL COMMENT '电话',
+  `telephone` char(11) DEFAULT NULL COMMENT '电话',
   `enable` tinyint unsigned DEFAULT NULL,
   `signature` char(128) DEFAULT NULL COMMENT '微信返回的内容签名',
   `external_position` longtext,

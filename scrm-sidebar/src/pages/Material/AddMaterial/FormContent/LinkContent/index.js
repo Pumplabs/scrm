@@ -132,10 +132,10 @@ export default observer((props) => {
           },
         ]}
         valuePropName="fileList"
-        >
+      >
         <UploadFormItem
           showLabel={false}
-          acceptTypeList={['.jpg', '.png']}
+          acceptTypeList={['.jpg', '.png', '.jpeg']}
           className={styles['file-upload']}
           maxFileCount={1}
           attachmentConfig={{

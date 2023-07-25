@@ -40,6 +40,7 @@ const WeChatEle = (props) => {
   return (
     <div
       className={cls({
+        'wechat-cell': true,
         [styles['wechat-cell']]: true,
         [styles[`wechat-cell-${size}`]]: size,
         [styles['has-extra']]: extra
@@ -47,7 +48,10 @@ const WeChatEle = (props) => {
       <img
         src={avatarUrl ? avatarUrl : defaultAvatorUrl}
         alt=""
-        className={styles['wechat-cell-img']}
+        className={cls({
+          'wechat-cell-img': true,
+          [styles['wechat-cell-img']]: true,
+        })}
         style={{
           position: 'absolute',
           left: 0,

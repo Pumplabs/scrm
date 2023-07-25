@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.scrm.server.wx.cp.config.XxlJobConfig;
 import com.scrm.common.util.ListUtils;
-import com.scrm.server.wx.cp.dto.BrSopMsgTaskDto;
 import com.scrm.server.wx.cp.dto.XxlJobInfoDTO;
 import com.scrm.server.wx.cp.dto.XxlJobQueryDto;
 import com.scrm.server.wx.cp.entity.XxlJobInfo;

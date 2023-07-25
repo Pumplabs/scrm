@@ -1,19 +1,12 @@
 package com.scrm.server.wx.cp.service;
 
-import com.scrm.common.dto.BatchDTO;
-import com.scrm.server.wx.cp.entity.BrCommonConf;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-
-import com.scrm.server.wx.cp.dto.BrCommonConfPageDTO;
-import com.scrm.server.wx.cp.dto.BrCommonConfSaveDTO;
-import com.scrm.server.wx.cp.dto.BrCommonConfUpdateDTO;
-
-import com.scrm.server.wx.cp.dto.BrCommonConfQueryDTO;
+import com.scrm.common.dto.BatchDTO;
+import com.scrm.server.wx.cp.dto.*;
+import com.scrm.server.wx.cp.entity.BrCommonConf;
 import com.scrm.server.wx.cp.vo.BrCommonConfVO;
 
-import com.scrm.api.wx.cp.dto.*;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import java.util.List;
 
 /**
@@ -22,7 +15,6 @@ import java.util.List;
  * @since 2022-06-07
  */
 public interface IBrCommonConfService extends IService<BrCommonConf> {
-
 
     /**
      * 分页查询
@@ -47,6 +39,13 @@ public interface IBrCommonConfService extends IService<BrCommonConf> {
      * @param id 主键
      */
     BrCommonConfVO findById(String id);
+
+    /**
+     * 根据code查询
+     * @author ouyang
+     * @date 2022-06-07
+     */
+    BrCommonConfVO findByCode(String extCorpId, String typeCode, Integer code);
 
 
     /**
@@ -92,5 +91,7 @@ public interface IBrCommonConfService extends IService<BrCommonConf> {
      * @return com.scrm.server.wx.cp.entity.BrCommonConf
      */
     BrCommonConf checkExists(String id);
+
+    void updateSort(BrCommonConfUpdateSortDTO brCommonConfUpdateSortDTO);
 
 }

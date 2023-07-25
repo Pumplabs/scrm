@@ -1,6 +1,7 @@
 package com.scrm.server.wx.cp.mapper;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.scrm.api.wx.cp.dto.JoinWayConditionDTO;
 import com.scrm.api.wx.cp.dto.WxGroupChatMemberExportDTO;
 import com.scrm.api.wx.cp.dto.WxGroupChatMemberPageDTO;
 import com.scrm.api.wx.cp.entity.WxGroupChatMember;
@@ -42,4 +43,9 @@ public interface WxGroupChatMemberMapper extends BaseMapper<WxGroupChatMember> {
     List<WxGroupChatMemberVO> queryList(@Param("dto") WxGroupChatMemberExportDTO dto);
 
     List<String> queryTodayQuitIds(@Param("extCorpId") String extCorpId, @Param("extChatId") String extChatId);
+
+    List<String> queryTodayQuitExtIds(@Param("extCorpId") String extCorpId, @Param("extChatId") String extChatId);
+
+    List<WxGroupChatMember> listByCondition(@Param("dto") JoinWayConditionDTO conditionDTO);
+
 }

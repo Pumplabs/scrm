@@ -17,7 +17,7 @@ export default ({ value = {}, onChange, editorRef }) => {
   const handleEditorChange = (val) => {
     changeData('content', val)
   }
-
+ 
   return (
     <div className={cls({
       [styles['article-editor']]: true,

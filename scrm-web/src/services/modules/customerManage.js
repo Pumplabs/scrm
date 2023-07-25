@@ -1,6 +1,6 @@
 import { get, post } from '../request'
 import { handleTimes } from 'utils/times'
-import { handlePageParams,handleObj, handleTable } from '../utils'
+import { handlePageParams,saveFileByRes, handleTable } from '../utils'
 
 /**
  * 获取客户列表
@@ -72,7 +72,10 @@ export const ExportCustomer = async (formVals = {}) => {
     createdAtEnd,
     ...rest
   }
-  return get(`/api/wxCustomer/export`, params).then(res => handleObj(res))
+  return get(`/api/wxCustomer/export`, params, {
+    needHandleResponse: true,
+    responseType: 'blob'
+  }).then(res => saveFileByRes(res))
 }
 
 // 编辑客户企业标签
@@ -106,4 +109,8 @@ export const GetCustomerMoment = async (pager, formVals = {}) => {
 // 批量打标
 export const BatchMarkTag = async (params) => {
   return post('/api/wxCustomer/batchMarking', params, {needJson: true})
+}
+// 修改客户资料
+export const EditCustomerWxInfo = async(params) => {
+   return post('/api/wxCustomer/updateCustomerData', params, { needJson: true})
 }

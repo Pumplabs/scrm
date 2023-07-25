@@ -11,6 +11,7 @@ import com.scrm.server.wx.cp.vo.BrOrderVO;
 import com.scrm.common.log.annotation.Log;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.scrm.common.constant.R;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import com.scrm.api.wx.cp.dto.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * 订单 控制器
@@ -94,6 +96,14 @@ public class BrOrderController {
     public R<Void> batchDelete(@RequestBody @Valid BatchDTO<String> dto){
         BrOrderService.batchDelete(dto);
         return R.success("删除成功");
+    }
+
+
+    @GetMapping("/getLastNDaysCountDaily")
+    @ApiOperation(value = "获取每天新增订单数量")
+    @Log(modelName = "企业微信客户", operatorType = "获取每天新增订单数量")
+    public R<List<DailyTotalVO>> getLastNDaysCountDaily(@NotNull Integer days) {
+        return R.data(BrOrderService.getLastNDaysCountDaily(days));
     }
 
 }

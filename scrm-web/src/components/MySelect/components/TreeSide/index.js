@@ -19,10 +19,10 @@ const loopConverData = (arr, options) => {
       keysMap,
     }
   }
-  const { disabledDep, disableArr = [], valueKey } = options
-  arr.forEach((ele) => {
+  const { disabledDep, disableArr = [], valueKey, treeLevel = 0 } = options
+  arr.forEach((ele, depIdx) => {
     const depKey = `dep_${ele[valueKey]}`
-    const depTreeKey =`${depKey}_${ele.pkey}`
+    const depTreeKey =`${depKey}_${ele.pkey}_${treeLevel}_${depIdx}`
     const depItem = {
       id: ele.id,
       extId: ele.extId,
@@ -35,9 +35,9 @@ const loopConverData = (arr, options) => {
     opt[depKey] = [depTreeKey]
     let childArr = []
     if (Array.isArray(ele.staffList) && ele.staffList.length) {
-      ele.staffList.forEach((staffItem) => {
+      ele.staffList.forEach((staffItem, staffIdx) => {
         const staffKey = `user_${staffItem[valueKey]}`
-        const treeKey = `${staffKey}_${ele.pkey}`
+        const treeKey = `${staffKey}__${ele.pkey}_${treeLevel}_${depIdx}_${staffIdx}`
         const staffData = {
           avatarUrl: staffItem.avatarUrl,
           name: staffItem.name,
@@ -63,7 +63,10 @@ const loopConverData = (arr, options) => {
         arr: childRes,
         opt: childOpt,
         keysMap: childKeysMap,
-      } = loopConverData(ele.children, options)
+      } = loopConverData(ele.children, {
+        ...options,
+        treeLevel: treeLevel + 1,
+      })
       childArr = [...childArr, ...childRes]
       opt = mergeWith(opt, childOpt, (arr1 = [], arr2 = []) => [
         ...arr1,

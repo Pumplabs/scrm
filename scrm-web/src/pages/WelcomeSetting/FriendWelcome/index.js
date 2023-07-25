@@ -118,6 +118,7 @@ export default () => {
     const actionName = modalInfo.type === 'add' ? '新增' : '编辑'
     runAddOrEditWelCome(params, actionName)
   }
+  
   const columns = [
     {
       title: '内容',

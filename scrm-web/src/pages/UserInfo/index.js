@@ -37,7 +37,7 @@ const ListItem = ({ label, value }) => {
         手机号
       </p>
       <div className={styles['list-item-content']}>
-        18877572922
+        xxx
       </div>
     </div>
   )

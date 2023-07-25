@@ -37,4 +37,13 @@ public interface CpTpFeign {
 
     @RequestMapping(value = "/cgi-bin/auth/getuserinfo", method = RequestMethod.GET)
     GetUserInfoRes getUserInfo(@RequestParam(name = "code") String code, @RequestParam(name = "access_token") String accessToken);
+
+
+    @RequestMapping(value = "/cgi-bin/auth/getuserdetail", method = RequestMethod.POST)
+    GetUserDetailRes getUserDetail(@RequestBody String user_ticket, @RequestParam(name = "access_token") String accessToken);
+
+
+
+
+
 }

@@ -29,7 +29,7 @@ export default ({ data = {} }) => {
           />
         )}
         <span className={styles['cell-title']}>
-          <OpenEle type={type} openid={userData.name} />
+          <OpenEle type={type} openid={name} />
         </span>
       </Tooltip>
     </div>

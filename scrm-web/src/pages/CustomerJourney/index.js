@@ -7,10 +7,11 @@ import { get } from 'lodash'
 import { PageContent } from 'layout'
 import GroupSide from 'components/GroupSide'
 import OpenEle from 'components/OpenEle'
-import AddJourneyDrawer from './components/AddJourneyDrawer'
+import AddJourneyDrawer from './components/AddJourneyDrawerV2'
 import JourneyStages from './JourneyStages'
 import StageContext from './StageContext'
 import { useModalHook, useInfiniteHook } from 'src/hooks'
+import useGetWindowInfo from 'src/hooks/useGetWindowInfo'
 import {
   AddJourney,
   GetJourneyList,
@@ -31,7 +32,13 @@ export default () => {
     setConfirm,
     confirmLoading,
   } = useModalHook(['addJourney', 'editJourney'])
+  const { screenHeight } = useGetWindowInfo()
   const [selectedJourney, setSelectedJourney] = useState({})
+
+
+
+
+  // 获取全部阶段
   const {
     run: runGetAllStage,
     loading: journeyStageLoading,
@@ -43,8 +50,10 @@ export default () => {
     manual: true,
   })
 
+  // 全部旅程
   const {
     tableProps: journeyProps,
+    params: searchParams,
     run: runGetJourneyList,
   } = useInfiniteHook({
     request: GetJourneyList,
@@ -58,7 +67,6 @@ export default () => {
       }
     },
   })
-
   const { run: runAddJourney } = useRequest(AddJourney, {
     manual: true,
     onBefore() {
@@ -116,6 +124,15 @@ export default () => {
     setSelectedJourney(item)
   }
 
+  const onCloseUpdate = () => {
+    closeModal()
+    runGetJourneyList()
+    runGetAllStage({
+      journeyId: selectedJourney.id,
+    })
+  }
+
+
   const onRemoveJourney = (item) => {
     Modal.confirm({
       title: '提示',
@@ -146,8 +163,8 @@ export default () => {
         journeyStageList: stages.map((ele) =>
           ele.isNew
             ? {
-                name: ele.name,
-              }
+              name: ele.name,
+            }
             : ele
         ),
       })
@@ -192,10 +209,11 @@ export default () => {
           onCancel={closeModal}
           data={modalInfo.data}
           onOk={onAddJourneyOk}
+          onCloseUpdate={onCloseUpdate}
         />
         <Row gutter={20}>
-          <Col span={6} className={styles['journeyListWrap']}>
-            <GroupSide
+          {/* <Col span={6} className={styles['journeyListWrap']}> */}
+          {/* <GroupSide
               title={`旅程列表(${journeyProps.pagination.total})`}
               selectedKey={selectedJourney.id}
               onSelect={onSelectJourney}
@@ -214,8 +232,8 @@ export default () => {
                   />
                 )
               }}
-            />
-            {/* <Empty
+            /> */}
+          {/* <Empty
                     description={
                       <div>
                         <p>没有创建任何旅程哦</p>
@@ -225,13 +243,14 @@ export default () => {
                       </div>
                     }
                   /> */}
-          </Col>
-          <Col span={18} className={styles['journeyDetailWrap']}>
-          <JourneyStages
-                selectedJourney={selectedJourney}
-                stageList={stageList}
-                getAllJourney={runGetAllStage}
-              />
+          {/* </Col> */}
+          <Col span={24} className={styles['journeyDetailWrap']}>
+            <JourneyStages
+              selectedJourney={selectedJourney}
+              stageList={stageList}
+              onStageConfig={onEditJourney}
+              getAllJourney={runGetAllStage}
+            />
           </Col>
         </Row>
       </StageContext.Provider>

@@ -1,16 +1,8 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import {
-  Tabs,
-  Row,
-  Col,
-  DatePicker,
-  message,
-  Tag,
-  Select,
-  Modal,
-} from 'antd'
+import { useState, useEffect, useRef, useMemo, Fragment } from 'react'
+import { Tabs, Row, Col, DatePicker, message, Tag, Select, Modal } from 'antd'
 import { useRequest } from 'ahooks'
-import moment from 'moment'
+import { isEmpty } from 'lodash'
+
 import CustomerDrawer from 'components/CommonDrawer'
 import { WeChatEle } from 'components/WeChatCell'
 import TagCell from 'components/TagCell'
@@ -22,6 +14,7 @@ import {
   GetCustomerDetail,
   EditCustomerCompanyTag,
   UpdateCustomer,
+  EditCustomerWxInfo,
 } from 'services/modules/customerManage'
 import { EditJourneyCustomer } from 'services/modules/customerJourney'
 import { actionRequestHookOptions, getRequestError } from 'services/utils'
@@ -29,16 +22,14 @@ import { useModalHook } from 'src/hooks'
 import { SUCCESS_CODE } from 'utils/constants'
 import { compareArray } from 'src/utils'
 import InfoSection from '../InfoSection'
-import EditItem from '../EditItem'
+import EditDescModal from '../EditDescModal'
 import StateItem from '../StateItem'
 import { getTagsByStaffId } from '../../utils'
+import EditCustomerInfo from '../EditCustomerInfo'
+
 import styles from './index.module.less'
-import { isEmpty } from 'lodash'
 
 const { TabPane } = Tabs
-const EMAIL_REG =
-  /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/g
-const TEL_REG = /^1\d{10}$/
 /**
  * @param {Object} params 参数
  * * @param {String} customerId 客户id
@@ -55,7 +46,6 @@ export default (props) => {
     staff = {},
     ...rest
   } = props
-  const [baseData, setBaseData] = useState({})
   const [activeKey, setActiveKey] = useState('overview')
   const {
     openModal,
@@ -63,8 +53,7 @@ export default (props) => {
     confirmLoading,
     requestConfirmProps,
     visibleMap,
-  } = useModalHook(['tags'])
-  const birthDateRef = useRef(null)
+  } = useModalHook(['tags', 'desc', 'info'])
   const hasEdit = useRef(false)
   const stateListRef = useRef(null)
   const {
@@ -75,13 +64,6 @@ export default (props) => {
     refresh,
   } = useRequest(GetCustomerDetail, {
     manual: true,
-    onSuccess: (res) => {
-      const info = res.customerInfo ? res.customerInfo : {}
-      setBaseData({
-        ...info,
-        birthday: info.birthday ? moment(info.birthday, 'YYYY-MM-DD') : '',
-      })
-    },
     onError: (e) => getRequestError(e, '查询客户信息失败'),
   })
   const { run: runEditCustomerCompanyTag } = useRequest(
@@ -116,6 +98,7 @@ export default (props) => {
       },
     }),
   })
+  // 修改客户资料
   const { run: runUpdateCustomer } = useRequest(UpdateCustomer, {
     manual: true,
     ...requestConfirmProps,
@@ -128,36 +111,34 @@ export default (props) => {
       },
     }),
   })
+  // 修改客户企微资料
+  const { run: runEditCustomerWxInfo } = useRequest(EditCustomerWxInfo, {
+    manual: true,
+    ...requestConfirmProps,
+    ...actionRequestHookOptions({
+      actionName: '编辑',
+      successFn: () => {
+        closeModal()
+        refresh()
+      },
+    }),
+  })
+
   useEffect(() => {
     if (!rest.visible) {
       hasEdit.current = false
       setActiveKey('overview')
-      setBaseData({})
       if (!detailLoading) {
         cancel()
       }
     } else {
       runGetCustomerDetail({
         id: params.customerId,
-        staffId: params.staffId
+        staffId: params.staffId,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rest.visible])
-
-  const baseInfoParams = useMemo(() => {
-    const info = customerData.customerInfo ? customerData.customerInfo : {}
-    return {
-      address: info.address || '',
-      birthday: info.birthday || '',
-      corpName: info.corpName || '',
-      customerId: params.customerId,
-      staffId: params.staffId,
-      email: info.email || '',
-      phoneNumber: info.phoneNumber || '',
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customerData])
   const customerTags = getTagsByStaffId(customerData)
   const avatarData = useMemo(() => {
     return isEmpty(customerAvatar) && customerData.name
@@ -173,60 +154,30 @@ export default (props) => {
     setActiveKey(key)
   }
 
-  const updateBaseData = (key, val) => {
-    setBaseData((vals) => ({
-      ...vals,
-      [key]: val,
-    }))
-  }
-
-  const onPhoneChange = (val) => {
-    runUpdateCustomer({
-      ...baseInfoParams,
-      phoneNumber: val,
-    })
-    updateBaseData('phone', val)
-  }
-
-  const onEmailChange = (val) => {
-    runUpdateCustomer({
-      ...baseInfoParams,
-      email: val,
-    })
-    updateBaseData('email', val)
-  }
-
-  const onCorpNameChange = (val) => {
-    runUpdateCustomer({
-      ...baseInfoParams,
-      corpName: val,
-    })
-    updateBaseData('corpName', val)
-  }
-
-  const onAddressChange = (val) => {
-    runUpdateCustomer({
-      ...baseInfoParams,
-      address: val,
-    })
-    updateBaseData('address', val)
-  }
-
-  const onDateChange = (val) => {
-    runUpdateCustomer({
-      ...baseInfoParams,
-      birthday: val.format('YYYY-MM-DD'),
-    })
-    updateBaseData('date', val)
-    if (birthDateRef.current) {
-      birthDateRef.current.onCancel()
-    }
-  }
-
   const onEditTags = () => {
     openModal('tags')
   }
 
+  const onEditDescOk = (vals) => {
+    runEditCustomerWxInfo({
+      ...vals,
+      customerExtId: params.customerExtId,
+      staffExtId: customerData?.creatorStaff?.extId,
+    })
+  }
+
+  const onEditCustomerInfoOk = (vals) => {
+    const { phoneNumber, email, birthday, corpName, address } = vals
+    runUpdateCustomer({
+      customerId: params.customerId,
+      staffId: params.staffId,
+      phoneNumber,
+      email,
+      corpName,
+      birthday: birthday ? birthday.format('YYYY-MM-DD') : '',
+      address
+    })
+  }
   const onChooseTagOk = (vals) => {
     const { addArr: addTags, removeArr: removeTags } = compareArray(
       customerTags,
@@ -239,22 +190,6 @@ export default (props) => {
       id: params.customerId,
       staffId: params.staffId,
     })
-  }
-
-  const disabledDate = (current) => {
-    return current.isAfter(moment(), 'days')
-  }
-
-  const validPhone = (text) => {
-    if (!TEL_REG.test(text)) {
-      return '电话格式不正确'
-    }
-  }
-
-  const validEmail = (text) => {
-    if (!EMAIL_REG.test(text)) {
-      return '邮箱格式不正确'
-    }
   }
 
   const handleCancel = () => {
@@ -272,6 +207,10 @@ export default (props) => {
         })
       },
     })
+  }
+
+  const onEditCustomerInfo = () => {
+    openModal('info')
   }
 
   const columns = [
@@ -309,25 +248,25 @@ export default (props) => {
   const journeyList = Array.isArray(customerData.journeyList)
     ? customerData.journeyList
     : []
+  const baseData = customerData.customerInfo ? customerData.customerInfo : {}
   return (
-    <CustomerDrawer
-      footer={false}
-      {...rest}
-      width={800}
-      onCancel={handleCancel}>
-      <div className={styles['user-info']}>
-        <div style={{ marginBottom: 12 }}>
-          <WeChatEle
-            size="small"
-            corpName={avatarData.corpName}
-            avatarUrl={avatarData.avatarUrl}
-            userName={data.name}
-            extra={<RemarkTag remark={customerData.remark} />}
-          />
-        </div>
-        所属员工：{' '}
-        <UserTag data={isEmpty(staff) ? customerData.creatorStaff : staff} />
-      </div>
+    <Fragment>
+      <EditCustomerInfo
+        title="编辑客户信息"
+        // visible={true}
+        data={baseData}
+        visible={visibleMap.infoVisible}
+        onCancel={closeModal}
+        onOk={onEditCustomerInfoOk}
+        confirmLoading={confirmLoading}
+      />
+      <EditDescModal
+        data={customerData}
+        visible={visibleMap.descVisible}
+        onCancel={closeModal}
+        onOk={onEditDescOk}
+        confirmLoading={confirmLoading}
+      />
       <ChooseTagModal
         data={{
           tags: customerTags,
@@ -338,119 +277,121 @@ export default (props) => {
         onOk={onChooseTagOk}
         confirmLoading={confirmLoading}
       />
-      <div>
-        <Tabs activeKey={activeKey} onChange={onChange}>
-          <TabPane tab="客户总览" key="overview">
-            <div>
-              <InfoSection title="客户标签">
-                <TagCell
-                  dataSource={customerTags}
-                  maxHeight="auto"
-                  empty="无"
-                />
-                <p>
-                  <span
-                    onClick={onEditTags}
-                    className={styles['edit-tag-action']}>
-                    编辑标签
-                  </span>
-                </p>
-              </InfoSection>
-              <InfoSection title="关联旅程信息">
-                {journeyList.length
-                  ? journeyList.map((item) => (
-                      <JourneyItem
-                        key={item.id}
-                        data={item}
-                        onChange={onStageChange}
-                        stageLocalList={customerStageList}
-                      />
-                    ))
-                  : '无'}
-              </InfoSection>
-              <InfoSection title="客户信息">
-                <DescriptionsList mode="wrap">
-                  <Row>
-                    <Col span={8}>
-                      <DescriptionsList.Item label="电话">
-                        <EditItem
-                          onChange={onPhoneChange}
-                          inputProps={{
-                            validMsg: validPhone,
-                          }}
-                          defaultValue={baseData.phoneNumber}
-                        />
-                      </DescriptionsList.Item>
-                    </Col>
-                    <Col span={8}>
-                      <DescriptionsList.Item label="生日">
-                        <EditItem
-                          ref={(r) => (birthDateRef.current = r)}
-                          defaultValue={
-                            baseData.birthday
-                              ? baseData.birthday.format('YYYY-MM-DD')
-                              : '-'
-                          }>
-                          <DatePicker
-                            value={baseData.birthday}
-                            format="YYYY-MM-DD"
-                            disabledDate={disabledDate}
-                            onChange={onDateChange}
-                          />
-                        </EditItem>
-                      </DescriptionsList.Item>
-                    </Col>
-                    <Col span={8}>
-                      <DescriptionsList.Item label="邮箱">
-                        <EditItem
-                          onChange={onEmailChange}
-                          inputProps={{
-                            validMsg: validEmail,
-                          }}
-                          defaultValue={baseData.email}
-                        />
-                      </DescriptionsList.Item>
-                    </Col>
-                  </Row>
-                  <DescriptionsList.Item label="企业">
-                    <EditItem
-                      onChange={onCorpNameChange}
-                      inputProps={{
-                        maxLength: 50,
-                      }}
-                      defaultValue={baseData.corpName}
-                    />
-                  </DescriptionsList.Item>
-                  <DescriptionsList.Item label="地址">
-                    <EditItem
-                      inputProps={{
-                        maxLength: 200,
-                        type: 'TextArea',
-                      }}
-                      onChange={onAddressChange}
-                      defaultValue={baseData.address}
-                    />
-                  </DescriptionsList.Item>
-                </DescriptionsList>
-              </InfoSection>
-              <InfoSection title="关联信息">
-                <Table
-                  columns={columns}
-                  dataSource={customerData.followStaffList}
-                />
-              </InfoSection>
-            </div>
-          </TabPane>
-          <TabPane tab="客户动态" key="dynamic">
-            <StateItem
-              data={params}
-              ref={(r) => (stateListRef.current = r)}
-              avatarData={avatarData}
+      <CustomerDrawer
+        footer={false}
+        {...rest}
+        width={800}
+        onCancel={handleCancel}>
+        <div className={styles['user-info']}>
+          <div style={{ marginBottom: 12 }}>
+            <WeChatEle
+              size="small"
+              corpName={avatarData.corpName}
+              avatarUrl={avatarData.avatarUrl}
+              userName={data.name}
+              extra={<RemarkTag remark={customerData.remark} />}
             />
-          </TabPane>
-        </Tabs>
-      </div>
-    </CustomerDrawer>
+          </div>
+          <div>
+            所属员工：
+            <UserTag
+              data={isEmpty(staff) ? customerData.creatorStaff : staff}
+            />
+          </div>
+          <div>
+            <p style={{ marginBottom: 12 }}>{customerData.description}</p>
+            <span
+              onClick={() => {
+                openModal('desc')
+              }}
+              className={styles['edit-text-action']}>
+              编辑资料
+            </span>
+          </div>
+        </div>
+        <div>
+          <Tabs activeKey={activeKey} onChange={onChange}>
+            <TabPane tab="客户总览" key="overview">
+              <div>
+                <InfoSection title="客户标签">
+                  <TagCell
+                    dataSource={customerTags}
+                    maxHeight="auto"
+                    empty="无"
+                  />
+                  <p>
+                    <span
+                      onClick={onEditTags}
+                      className={styles['edit-text-action']}>
+                      编辑标签
+                    </span>
+                  </p>
+                </InfoSection>
+                <InfoSection title="关联旅程信息">
+                  {journeyList.length
+                    ? journeyList.map((item) => (
+                        <JourneyItem
+                          key={item.id}
+                          data={item}
+                          onChange={onStageChange}
+                          stageLocalList={customerStageList}
+                        />
+                      ))
+                    : '无'}
+                </InfoSection>
+                <InfoSection title="客户信息">
+                    <DescriptionsList mode="wrap">
+                      <div style={{ background: '#FBFBFD', padding: 24 }}>
+                        <Row>
+                          <Col span={8}>
+                            <DescriptionsList.Item label="电话">
+                              {baseData.phoneNumber}
+                            </DescriptionsList.Item>
+                          </Col>
+                          <Col span={8}>
+                            <DescriptionsList.Item label="生日">
+                              {baseData.birthday}
+                            </DescriptionsList.Item>
+                          </Col>
+                          <Col span={8}>
+                            <DescriptionsList.Item label="邮箱">
+                              {baseData.email}
+                            </DescriptionsList.Item>
+                          </Col>
+                        </Row>
+                        <DescriptionsList.Item label="企业">
+                          {baseData.corpName}
+                        </DescriptionsList.Item>
+                        <DescriptionsList.Item label="地址">
+                          {baseData.address}
+                        </DescriptionsList.Item>
+                      </div>
+                    </DescriptionsList>
+                    <span
+                      onClick={onEditCustomerInfo}
+                      className={styles['edit-text-action']}>
+                      编辑客户信息
+                    </span>
+                  </InfoSection>
+                <InfoSection title="关联信息">
+                  <Table
+                    columns={columns}
+                    dataSource={customerData.followStaffList}
+                  />
+                </InfoSection>
+              </div>
+            </TabPane>
+            <TabPane tab="客户动态" key="dynamic">
+              <StateItem
+                data={params}
+                ref={(r) => (stateListRef.current = r)}
+                avatarData={avatarData}
+              />
+            </TabPane>
+          </Tabs>
+        </div>
+      </CustomerDrawer>
+    </Fragment>
   )
 }
 

@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { Popover } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import cls from 'classnames'
+import OpenEle from "components/OpenEle"
 import {
   LogoutOutlined,
   MenuOutlined,
@@ -21,13 +22,14 @@ const UserSideBar = observer(() => {
 
   const content = (
     <div className={styles['user-popover-content']}>
+      <div style={{ fontWeight: 500, fontSize: 18, paddingLeft: 12, paddingRight: 12 }}><OpenEle type="userName" openid={userData.name} /></div>
       <p className={styles['menu-item']} onClick={UserStore.logout}>
         <LogoutOutlined className={styles['menu-item-icon']} />
         退出
       </p>
     </div>
   )
-  
+
   return (
     <div className={styles.userSideBar}>
       <img

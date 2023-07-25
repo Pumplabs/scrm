@@ -45,7 +45,6 @@ export default ({
     manual: true,
     fixedParams: {
       status,
-      groupId: activeGroup.id,
     },
   })
   const {
@@ -264,8 +263,8 @@ export default ({
       render: (val) =>
         val > 0
           ? `${formatNumber(val, {
-              padPrecision: 2,
-            })}`
+            padPrecision: 2,
+          })}`
           : '-',
     },
     {

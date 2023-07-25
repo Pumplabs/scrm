@@ -1,21 +1,27 @@
 @import "style/theme.less";
+
 .statics-card {
-  border: 1px solid #eaeaea;
+  // border: 1px solid #eaeaea;
   padding: 16px;
   border-radius: 4px;
+
   .statics-card-header {
     margin-bottom: 10px;
-    border-bottom: 1px solid #eaeaea;
+    // border-bottom: 1px solid #eaeaea;
   }
+
   .statics-card-title {
     position: relative;
     margin-bottom: 22px;
+
+
     .title-text {
       color: @heading-color;
-      font-weight: 600;
-      font-size: 16px;
+      font-size: 1.17rem;
+      font-weight: 700;
     }
   }
+
   .detail-icon {
     position: absolute;
     right: 0px;
@@ -23,11 +29,16 @@
     color: @primary-color;
     cursor: pointer;
   }
+
+  // 数字
   .num-item {
     font-family: 'HarmonyBold';
     font-size: 24px;
+    color: #333;
   }
+
   .index-statics {
+    color: #333;
     margin-bottom: 12px;
   }
 }

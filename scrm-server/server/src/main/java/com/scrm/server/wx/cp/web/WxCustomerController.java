@@ -13,6 +13,7 @@ import com.scrm.common.vo.FailResultVO;
 import com.scrm.server.wx.cp.dto.WxCustomerAssistPageDTO;
 import com.scrm.server.wx.cp.service.IWxCustomerService;
 import com.scrm.server.wx.cp.vo.BatchMarkRes;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -23,9 +24,9 @@ import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -42,7 +43,6 @@ public class WxCustomerController {
     @Autowired
     private IWxCustomerService wxCustomerService;
 
-
     @GetMapping("/sync")
     @ApiOperation(value = "同步企业微信数据")
     @Log(modelName = "企业微信客户", operatorType = "同步企业微信数据")
@@ -50,7 +50,6 @@ public class WxCustomerController {
     public R<Void> sync(String extCorpId) {
         Assert.isTrue(StringUtils.isNotBlank(extCorpId), "外部企业ID不能为空");
         List<RLock> lockList = wxCustomerService.getCustomerSyncLock(extCorpId, true);
-
         try {
             boolean lockAll = true;
             for (RLock rLock : lockList) {
@@ -97,6 +96,13 @@ public class WxCustomerController {
     @Log(modelName = "企业微信客户", operatorType = "修改客户详情")
     public R<WxCustomerVO> updateCustomerInfo(@RequestBody @Valid WxCustomerInfoUpdateDTO dto) {
         return R.data(wxCustomerService.updateCustomerInfo(dto));
+    }
+
+    @PostMapping("/updateCustomerData")
+    @ApiOperation(value = "修改客户资料，备注和描述")
+    @Log(modelName = "企业微信客户", operatorType = "修改客户资料")
+    public R<WxCustomerVO> updateCustomerData(@RequestBody @Valid WxCustomerDataUpdateDTO dto) {
+        return R.data(wxCustomerService.updateCustomerData(dto));
     }
 
     @GetMapping("/{id}")
@@ -183,6 +189,13 @@ public class WxCustomerController {
         return R.data(wxCustomerService.getPullNewStatisticsInfo(dto));
     }
 
+    @GetMapping("/getLastNDaysCountDaily")
+    @ApiOperation(value = "获取每天新增客户数量")
+    @Log(modelName = "企业微信客户", operatorType = "获取每天新增客户数量")
+    public R<List<DailyTotalVO>> getLastNDaysCountDaily(@NotNull Integer days) {
+        return R.data(wxCustomerService.getLastNDaysCountDaily(days));
+    }
+
 
     @PostMapping("/editTag")
     @ApiOperation(value = "编辑标签")
@@ -198,7 +211,6 @@ public class WxCustomerController {
     public R<BatchMarkRes> batchMarking(@RequestBody @Valid WxCustomerBatchMarkingDTO dto) {
         return R.data(wxCustomerService.batchMarking(dto));
     }
-
 
 
 }

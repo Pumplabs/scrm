@@ -1,5 +1,7 @@
 import { isEmpty } from 'lodash'
 import moment from 'moment'
+import { Toast } from 'antd-mobile'
+
 import { createUrlSearchParams } from './paths'
 
 export const createSearchUrl = (baseUrl, params = {}) => {
@@ -19,7 +21,7 @@ export const formatNumber = (num = 0) => {
     let len = 0
     for (let i = intNum.length - 1; i >= 0; i--) {
       const item = intNum[i]
-      len++;
+      len++
       const splitCode = len % 3 === 0 && i !== 0 ? ',' : ''
       str = `${splitCode}${item}${str}`
     }
@@ -41,7 +43,7 @@ export const formatNumber = (num = 0) => {
  */
 export const createSysUrlsByType = (options = {}) => {
   // 只能是默认端口
-  const baseUrl = 'https://app.yourdomain.pro'
+  const baseUrl = 'https://scrm.pumplabs.cn'
   const { type, data = {} } = options
   if (type === 'file') {
     return createSearchUrl(`${baseUrl}/api/common/downloadByFileId`, {
@@ -60,7 +62,7 @@ export const createSysUrlsByType = (options = {}) => {
   } else if (type === 'product') {
     return createSearchUrl(`${baseUrl}/h5/product/index.html`, {
       staffId: data.staffId,
-      productId: data.productId
+      productId: data.productId,
     })
   } else {
     return ''
@@ -164,12 +166,14 @@ export const compareArray = (oldArr, newArr, handleItem) => {
   let removeIdData = {}
   let addArr = []
   let noChangeArr = []
-  oldList.forEach(item => {
-    const value = typeof handleItem === 'function' ? handleItem(item, 'old') : item
+  oldList.forEach((item) => {
+    const value =
+      typeof handleItem === 'function' ? handleItem(item, 'old') : item
     removeIdData[value] = true
   })
-  newList.forEach(item => {
-    const value = typeof handleItem === 'function' ? handleItem(item, 'new') : item
+  newList.forEach((item) => {
+    const value =
+      typeof handleItem === 'function' ? handleItem(item, 'new') : item
     if (removeIdData[value]) {
       Reflect.deleteProperty(removeIdData, value)
       noChangeArr = [...noChangeArr, value]
@@ -180,7 +184,7 @@ export const compareArray = (oldArr, newArr, handleItem) => {
   return {
     addArr,
     noChangeArr,
-    removeArr: Object.keys(removeIdData)
+    removeArr: Object.keys(removeIdData),
   }
 }
 
@@ -192,4 +196,19 @@ export function checkIsWxwork() {
   var ua = navigator.userAgent.toLowerCase()
   var iswxwork = ua.indexOf('wxwork') > -1
   return ua.indexOf('micromessenger') > -1 && iswxwork
+}
+
+export const callPhone = (phoneNumber) => {
+  if (!phoneNumber) {
+    Toast.show({
+      icon: 'fail',
+      content: '没有电话信息，无法拨打电话',
+    })
+    return
+  }
+  let a = document.createElement('a')
+  a.href = `tel:${phoneNumber}`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
 }

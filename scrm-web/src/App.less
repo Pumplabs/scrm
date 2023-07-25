@@ -24,10 +24,12 @@ li {
 li {
   list-style: none;
 }
+
 #root {
   min-width: 1200px;
   overflow-x: auto;
 }
+
 #root,
 html,
 body {
@@ -41,4 +43,19 @@ body {
   clear: both;
   zoom: 1;
   visibility: hidden;
+}
+
+.row-dragging {
+  background: #fafafa;
+  border: 1px solid #ccc;
+  z-index: 9999;
+  color: #333;
+}
+
+.row-dragging td {
+  padding: 16px;
+}
+
+.row-dragging .drag-visible {
+  visibility: visible;
 }

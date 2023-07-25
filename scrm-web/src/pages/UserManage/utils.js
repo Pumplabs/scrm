@@ -8,7 +8,6 @@ export const converTreeData = (list, fieldNames) => {
     const { surplusList: remainder, data } = opt;
     item._order = item.order
     item[childKey] = data.sort((a, b) => a.order - b.order);
-    console.log("remainder", data)
     return converTreeData(remainder, fieldNames);
   }
   return list;

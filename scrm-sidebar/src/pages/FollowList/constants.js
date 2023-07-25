@@ -5,6 +5,8 @@ export const TASK_STATUS = {
 }
 // 跟进类型
 export const FOLLOW_TYPES = {
+  // 客户
   CUSTOMER: 1,
-  BUSINESS_OPP: 2
+  // 商机
+  BUSINESS_OPP: 2,
 }

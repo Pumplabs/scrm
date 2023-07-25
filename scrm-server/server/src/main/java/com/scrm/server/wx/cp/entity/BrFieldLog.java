@@ -35,7 +35,7 @@ public class BrFieldLog implements Serializable{
     @ApiModelProperty(value = "数据库表名")
     private String tableName;
 
-    @ApiModelProperty(value = "操作类型 1:字段更新 2:添加跟进 3:任务完成 4:任务逾期")
+    @ApiModelProperty(value = "操作类型 1:字段更新 2:添加跟进 3:任务完成 4:任务逾期 5:分配线索 6:回收线索 7:关闭线索 8:激活线索 9:退回线索 10:创建")
     private Integer method;
 
     @ApiModelProperty(value = "操作时间")
@@ -68,6 +68,9 @@ public class BrFieldLog implements Serializable{
     //商机表名
     public static final String OPPORTUNITY_TABLE_NAME = "br_opportunity";
 
+    //线索表名
+    public static final String CLUE_TABLE_NAME = "br_clue";
+
     //跟进表名
     public static final String FOLLOW_TABLE_NAME = "br_customer_follow";
 
@@ -81,5 +84,11 @@ public class BrFieldLog implements Serializable{
     public static final Integer ADD_FOLLOW = 2;
     public static final Integer TASK_DONE = 3;
     public static final Integer TASK_OVERDUE = 4;
+    public static final Integer FOLLOW_CLUE = 5;
+    public static final Integer RECOVER_CLUE = 6;
+    public static final Integer CLOSE_CLUE = 7;
+    public static final Integer OPEN_CLUE = 8;
+    public static final Integer BACK_CLUE = 9;
+    public static final Integer SAVE_NEW = 10;
 
 }

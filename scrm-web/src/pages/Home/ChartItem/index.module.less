@@ -1,19 +1,45 @@
 @import "style/theme.less";
+
 .chart-item {
+
+  flex: 1;
+  border-radius: 16px;
+  background-color: #fbfbfd;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: start;
+  padding: 15px;
+
+
+
   .chart-item-header {
+    flex: 1;
     position: relative;
+
     .chart-options {
       position: absolute;
       right: 0px;
       top: 0px;
     }
+
     margin-bottom: 12px;
   }
+
   .chart-item-name {
     color: @heading-color;
-    font-weight: 600;
-    font-size: 16px;
+    font-weight: 500;
+    font-size: 18px;
     line-height: 16px;
     margin-bottom: 4px;
   }
+
+  .chart-item-subTitle {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 16px;
+    padding-top: 16px;
+  }
+
+  .chart-item-body {}
 }

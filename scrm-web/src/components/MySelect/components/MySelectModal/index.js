@@ -5,6 +5,7 @@ import UserModal from './UserModal'
 import CustomerModal from './CustomerModal'
 import AllCustomerModal from './AllCustomerModal'
 import StaffCustomerModal from './StaffCustomerModal'
+import AdministratorModal from './AdministratorModal'
 import requestConfig from '../../requestUrls'
 import { DEFAULT_VALUE_KEY, TYPES } from '../../constants'
 
@@ -42,5 +43,8 @@ export default ({ type = 'user', request, ...props }) => {
   }
   if (type === TYPES.STAFF_CUSTOMER) {
     return <StaffCustomerModal {...modalProps} />
+  }
+  if (type === TYPES.ADMIN_STAFF) {
+    return <AdministratorModal {...modalProps} />
   }
 }

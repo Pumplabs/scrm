@@ -67,6 +67,7 @@ export const downloadFile = (url, opt = {}) => {
 }
 
 export const exportByLink = (url, opt) => {
+  console.log(url);
   const a = document.createElement('a')
   a.href = url
   if (opt) {
@@ -120,7 +121,7 @@ export const actionRequestHookOptions = ({
           successFn(res, params)
         }
       } else {
-        if (typeof onFail === 'function') {
+        if (isDefinedFail) {
           onFail(params)
           return
         }
@@ -134,18 +135,18 @@ export const actionRequestHookOptions = ({
       }
     },
     onError: (e, params) => {
+      const { response } = e
       const actionPrefix = handleActionName(getActionName, actionName, params)
       const errorMsg = getRequestError(
         e,
         actionPrefix ? `${actionPrefix}失败` : '',
         false
       )
-      
-      // !isDefinedFail
-      if (errorMsg && !isDefinedFail) {
+      // 如果没有定义onFail且异常码不为500，则提示错误信息
+      if (errorMsg && !isDefinedFail && response.status !== 500) {
         message.error(errorMsg)
       }
-      if (typeof onFail === 'function') {
+      if (isDefinedFail) {
         onFail(params)
         return
       }
@@ -161,7 +162,7 @@ export const convertUrl = (baseUrl, params = {}) => {
     const searchStr = Object.keys(params).map(key => {
       return `${key}=${params[key]}`
     }).join('&')
-    return searchStr && baseUrl ?  `${baseUrl}?${searchStr}` : `${baseUrl}${searchStr}`
+    return searchStr && baseUrl ? `${baseUrl}?${searchStr}` : `${baseUrl}${searchStr}`
   } else {
     return baseUrl
   }

@@ -5,7 +5,7 @@ import loadable from "@loadable/component"
 const Login = loadable(() => import('routes/wrap/WrapLogin'))
 const LoginCallbackPage = loadable(() => import('routes/wrap/WrapLoginMiddle'))
 // 首页
-const Home = loadable(() => import('pages/Home'))
+const Home = loadable(() => import('pages/HomeV2'))
 // 用户管理
 const UserManage = loadable(() => import('pages/UserManage'))
 // 群标签
@@ -38,13 +38,13 @@ const GroupDetail = loadable(() => import('pages/CustomerGroup/GroupDetail'))
 const CustomerGroup = loadable(() => import('pages/CustomerGroup'))
 // 渠道码
 const ChannelCode = loadable(() => import('pages/ChannelCode'))
+
 // 客户旅程
 const CustomerJourney = loadable(() => import('pages/CustomerJourney'))
 // 在职转接
 const IncumbencyTransfer = loadable(() => import('pages/IncumbencyTransfer/index'))
 // 离职继承
 const DimissionInherit = loadable(() => import('pages/DimissionInherit'))
-
 
 // 轨迹素材
 const TrackMaterial = loadable(() => import('pages/SaleOperations/TrackMaterial'))
@@ -58,7 +58,6 @@ const MaterialTags = loadable(() => import('pages/SaleOperations/MaterialTags'))
 const OrdinaryMaterial = loadable(() =>
   import('pages/SaleOperations/OrdinaryMaterial')
 )
-
 // 欢迎语设置
 const WelcomeSetting = loadable(() => import('pages/WelcomeSetting'))
 // 话术
@@ -73,14 +72,13 @@ const CommercialOpportunity = loadable(() => import('pages/CommercialOpportunity
 const CommercialOpportunityConfiguration = loadable(() => import('pages/CommercialOpportunityConfiguration'))
 // 销售目标
 const SaleTarget = loadable(() => import('pages/SaleTarget'))
+
 // 产品分类
 const ProductCategory = loadable(() => import('pages/ProductCategory'))
 // 产品列表
 const ProductList = loadable(() => import('pages/ProductList'))
 // 订单列表
 const OrderList = loadable(() => import('pages/OrderList'))
-
-
 
 const config = [
   {
@@ -174,6 +172,7 @@ const config = [
         path: 'channelQrCode',
         element: <ChannelCode />,
       },
+
       {
         path: 'customerJourney',
         element: <CustomerJourney />,
@@ -206,8 +205,6 @@ const config = [
         path: 'saleOperation/ordinaryMaterial',
         element: <OrdinaryMaterial />,
       },
-
-
       {
         path: 'welcomeSetting',
         element: <WelcomeSetting />,

@@ -18,7 +18,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class}, scanBasePackages = "com.scrm.*")
 @MapperScan("com.scrm.server.wx.cp.mapper")
 @EnableAsync
-@EnableDiscoveryClient
+@EnableDiscoveryClient(autoRegister = false)
 @EnableFeignClients(basePackages = {"com.scrm"})
 public class MaxScrmWxCpServerApplication {
     public static void main(String[] args) {

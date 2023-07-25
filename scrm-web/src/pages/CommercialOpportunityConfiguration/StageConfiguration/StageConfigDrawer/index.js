@@ -3,21 +3,47 @@ import { Modal, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useRequest } from 'ahooks'
 import CommonDrawer from 'components/CommonDrawer'
-import { Table } from 'components/TableContent'
 import StatusItem from './StatusItem'
 import EditStatusModal from './EditStatusModal'
 import { useModalHook, useTable } from 'src/hooks'
 import { formatColorStr } from 'components/MyColorPicker/utils'
+import cls from "classnames"
 import {
   AddStatus,
   EditStatus,
   RemoveStatus,
   GetConfigList,
+  UpdateSort,
 } from 'services/modules/commercialOpportunityConfiguration'
 import { actionRequestHookOptions } from 'services/utils'
+
+
+
+
+import { MenuOutlined } from '@ant-design/icons';
+import { Table } from 'antd';
+import { arrayMoveImmutable } from 'array-move';
+import React, { useState } from 'react';
+import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
+import styles from '../../index.module.less';
+
+
 const TYPE_CODE = 'OPPORTUNITY_STAGE'
 
+const DragHandle = SortableHandle(() => (
+  <MenuOutlined
+    style={{
+      cursor: 'grab',
+      color: '#999',
+    }}
+  />
+));
+
+const SortableItem = SortableElement((props) => <tr {...props} />);
+const SortableBody = SortableContainer((props) => <tbody {...props} />);
+
 export default (props) => {
+  const [dataSource, setDataSource] = useState([]);
   const { visible, data = {}, ...rest } = props
   const { openModal, closeModal, visibleMap, modalInfo, confirmLoading, requestConfirmProps, } = useModalHook([
     'add',
@@ -30,13 +56,41 @@ export default (props) => {
     tableProps
   } = useTable(GetConfigList, {
     manual: true,
+    onSuccess: (data) => {
+      const list = data.list.map((item) => {
+        item.index = item.sort
+        item.key = item.id
+        return item;
+      })
+      setDataSource(list)
+    }
   })
+
+  const {
+    run: runUpdateSort,
+  } = useRequest(UpdateSort, {
+    manual: true,
+    onSuccess: () => {
+      runGetConfigList({}, {
+        groupId: data.id,
+        typeCode: TYPE_CODE,
+      })
+    }
+  })
+
+
+
+
+
+
+
+
   const { run: runAddStatus } = useRequest(AddStatus, {
     manual: true,
     ...requestConfirmProps,
     ...actionRequestHookOptions({
       actionName: '新增',
-      successFn: ()=> {
+      successFn: () => {
         refresh()
         closeModal()
       },
@@ -47,7 +101,7 @@ export default (props) => {
     ...requestConfirmProps,
     ...actionRequestHookOptions({
       actionName: '编辑',
-      successFn: ()=> {
+      successFn: () => {
         refresh()
         closeModal()
       },
@@ -93,22 +147,35 @@ export default (props) => {
   }
 
   const onEditRecord = (record) => {
-    openModal('edit',record)
+    return () => {
+      openModal('edit', record)
+    }
+
   }
 
   const onRemoveRecord = (record) => {
-    Modal.confirm({
-      title: '提示',
-      content: `确定要删除阶段"${record.name}"吗`,
-      onOk: () => {
-        runRemoveStatus({
-          id: record.id
-        })
-      },
-    })
+    return () => {
+      Modal.confirm({
+        title: '提示',
+        content: `确定要删除阶段"${record.name}"吗`,
+        onOk: () => {
+          runRemoveStatus({
+            id: record.id
+          })
+        },
+      })
+    }
   }
 
+
   const columns = [
+    {
+      title: 'Sort',
+      dataIndex: 'sort',
+      width: 30,
+      className: 'drag-visible',
+      render: () => <DragHandle />,
+    },
     {
       title: '阶段名称',
       dataIndex: 'name',
@@ -130,7 +197,54 @@ export default (props) => {
       dataIndex: 'relateCount',
       render: (val) => val || 0,
     },
-  ]
+    {
+      title: '操作',
+      dataIndex: 'action',
+      render: (_, record) => {
+        const isEditDisabled = record.isSystem ? true : false;
+        const isDeleteDisabled = record.isSystem || record.relateCount > 0 ? true : false
+        return (<><span className={cls({ [styles['actionItem']]: true, [styles['disabled']]: isEditDisabled })} onClick={record.isSystem ? null : onEditRecord(record)}>修改</span>
+          <span className={cls({ [styles['actionItem']]: true, [styles['disabled']]: isDeleteDisabled })} onClick={record.isSystem || record.relateCount > 0 ? null : onRemoveRecord(record)}>删除</span></>)
+      }
+    }
+  ];
+
+
+
+
+
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    if (oldIndex !== newIndex) {
+      const newData = arrayMoveImmutable(dataSource.slice(), oldIndex, newIndex).filter(
+        (el) => !!el,
+      );
+      const params = { groupId: data.id, brCommonConfList: newData }
+      setDataSource(newData);
+      runUpdateSort(params)
+
+    }
+  };
+
+  const DraggableContainer = (props) => (
+    <SortableBody
+      useDragHandle
+      disableAutoscroll
+      helperClass="row-dragging"
+      onSortEnd={onSortEnd}
+      {...props}
+    />
+  );
+  const DraggableBodyRow = ({ className, style, ...restProps }) => {
+    // function findIndex base on Table rowKey props and should always be a right array index
+    const index = dataSource.findIndex((x) => x.index === restProps['data-row-key']);
+    return <SortableItem index={index} {...restProps} />;
+  };
+
+
+
+
+
+
   return (
     <CommonDrawer visible={visible} {...rest}>
       <EditStatusModal
@@ -145,21 +259,19 @@ export default (props) => {
         添加阶段
       </Button>
       <Table
-        {...tableProps}
+        pagination={false}
+        dataSource={dataSource}
         columns={columns}
-        actions={[
-          {
-            title: '编辑',
-            disabled: (record) => record.isSystem,
-            onClick: onEditRecord,
+        rowKey="index"
+        components={{
+          body: {
+            wrapper: DraggableContainer,
+            row: DraggableBodyRow,
           },
-          {
-            title: '删除',
-            disabled: (record) => record.isSystem || record.relateCount > 0,
-            onClick: onRemoveRecord,
-          },
-        ]}
+        }}
       />
+
+
     </CommonDrawer>
   )
 }

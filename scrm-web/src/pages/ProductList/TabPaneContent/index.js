@@ -32,6 +32,8 @@ const coverTableList = async (dataSource) => {
       fileIds = [...fileIds, fileItem.id]
     }
   })
+
+
   fileUrls = await getFileUrl({
     ids: fileIds,
   })

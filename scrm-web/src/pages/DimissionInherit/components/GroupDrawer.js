@@ -8,9 +8,9 @@ import TagCell from 'components/TagCell'
 import { MySelectModal } from 'components/MySelect'
 import { useTableRowSelect, useModalHook } from 'src/hooks'
 import { GetWaitTransferGroup, TransferGroup } from 'services/modules/dimissionInherit'
-import { actionRequestHookOptions } from 'services/utils'
+import { transferRequestData } from 'src/pages/IncumbencyTransfer/utils'
 
-export default ({ visible, onCancel, data = {}, ...rest }) => {
+export default ({ visible, onCancel, data = {}, refreshChatList, ...rest }) => {
   const { tableProps, run: runGetTableList } = useAntdTable(GetWaitTransferGroup, {
     manual: true
   })
@@ -21,29 +21,32 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
         pageSize: 10,
       },
       {
-        keyword: '',
-        staffId: data.staffId,
+        handoverStaffExtId: data.handoverStaffExtId,
       }
     )
   }
   const { openModal ,closeModal, confirmLoading, visibleMap, requestConfirmProps } = useModalHook(['user'])
-  const { selectedProps, clearSelected, selectedKeys, selectedStatStr } = useTableRowSelect()
+  const { selectedProps, clearSelected, selectedKeys } = useTableRowSelect()
   const { run: runTransferGroup } = useRequest(TransferGroup, {
     manual: true,
     ...requestConfirmProps,
-    ...actionRequestHookOptions({
-      actionName: '分配',
+    ...transferRequestData({
       successFn: () => {
         clearSelected()
-        refreshTable()
         closeModal()
+        refreshChatList()
+        refreshTable()
       }
     })
   })
 
   useEffect(() => {
-    if (visible && data.staffId) {
+    if (visible && data.handoverStaffExtId) {
       refreshTable()
+    } else {
+      if (selectedKeys.length) {
+        clearSelected()
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, data])
@@ -53,30 +56,35 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
   }
 
   const onChooseOk = (users = []) => {
-    const [{id} = {}] = users
+    const [{extId } = {}] = users
     runTransferGroup({
-      "groupChatIds": selectedKeys,
-      "takeoverStaffId": id,
+      "groupChatExtIds": selectedKeys,
+      "takeoverStaffExtId": extId,
     })
   }
 
   const columns = [
     {
       title: '群聊名称',
-      dataIndex: 'name'
+      dataIndex: 'groupChat',
+      render: val => val?.name
     },
     {
       title: '群标签',
       dataIndex: 'tags',
-      render:val => <TagCell dataSource={val}/>
+      render:(val, record) => {
+        const tags = record.groupChat?.tags
+        return tags?.length ?  <TagCell dataSource={tags}/> : null
+      }
     },
     {
       title: '群人数',
-      dataIndex: 'total'
+      dataIndex: 'total',
+      render: (_, record) => record.groupChat?.total
     },
     {
       title: '创建时间',
-      dataIndex: 'createdAt'
+      dataIndex: 'createTime'
     }
   ]
   return (
@@ -103,6 +111,7 @@ export default ({ visible, onCancel, data = {}, ...rest }) => {
       <Table
         columns={columns}
         {...selectedProps}
+        rowKey="groupChatExtId"
         name={selectedKeys.length ? `已选择${selectedKeys.length}条数据` : ''}
         toolBar={
           [

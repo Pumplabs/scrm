@@ -69,8 +69,9 @@ public class JwtUtil {
         LoginInfo loginInfo;
         try {
             loginInfo = getLoginInfo();
-            log.info("in",loginInfo);
-            //校验token是否过期
+            log.info("logininfo:staffid={},extid={},hasWeb={},isAdimin={}",
+                    loginInfo.staffId,loginInfo.staffExtId,loginInfo.hasWeb,loginInfo.isAdmin);
+            //校验token是否过期,
             if (!checkTokenExpire(token)) {
                 return false;
             }
@@ -91,7 +92,6 @@ public class JwtUtil {
             return false;
         }
 
-        
     }
 
     private static boolean checkAdmin(LoginInfo loginInfo) {

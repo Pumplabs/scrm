@@ -2,10 +2,7 @@ package com.scrm.server.wx.cp.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberExportDTO;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberPageDTO;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberQueryDTO;
-import com.scrm.api.wx.cp.dto.WxGroupChatMemberSaveDTO;
+import com.scrm.api.wx.cp.dto.*;
 import com.scrm.api.wx.cp.entity.WxGroupChatMember;
 import com.scrm.api.wx.cp.vo.WxGroupChatMemberVO;
 import com.scrm.common.dto.BatchDTO;
@@ -96,4 +93,21 @@ public interface IWxGroupChatMemberService extends IService<WxGroupChatMember> {
      * @return
      */
     List<String> queryTodayQuitIds(String extCorpId, String chatId);
+
+
+    /**
+     * 获取今天退出的成员id列表（去重）
+     * @param extCorpId
+     * @param chatId
+     * @return
+     */
+    List<String> queryTodayQuitExtIds(String extCorpId, String chatId);
+
+    /**
+     * 条件查询群成员列表
+     * @param paramsVO
+     * @return
+     */
+    List<WxGroupChatMember> listByCondition(JoinWayConditionDTO paramsVO);
+
 }

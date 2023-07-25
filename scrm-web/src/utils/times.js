@@ -13,7 +13,7 @@ export const handleTimes = (times, options = {}) => {
  * @returns 
  */
 export const handleTime = (time, options = {}) => {
-  const { format = 'YYYY-MM-DD', suffix } = options
+  const { format = 'YYYY-MM-DD', suffix = '' } = options
   return time ? time.format(format) + suffix : ''
 }
 

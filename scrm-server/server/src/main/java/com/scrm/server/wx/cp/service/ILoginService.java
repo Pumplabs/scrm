@@ -65,5 +65,5 @@ public interface ILoginService {
      * @param code
      * @return
      */
-    WxStaffResVo getStaffByCodeV2(String code);
+    WxStaffResVo getStaffByCodeV2(String code,boolean isLoginFromWeb);
 }

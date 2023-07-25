@@ -1,5 +1,5 @@
 import { post } from '../request'
-import { handleTable, handlePageParams, handleArray } from '../utils'
+import { handleTable, handlePageParams, handleArray, handleObj } from '../utils'
 
 // 获取分组列表
 export const GetGroupList = async (params) => {
@@ -8,17 +8,17 @@ export const GetGroupList = async (params) => {
 
 // 增加状态
 export const AddStatus = async (params) => {
-  return post('/api/brCommonConf/save', params, {needJson: true})
+  return post('/api/brCommonConf/save', params, { needJson: true })
 }
 
 // 修改状态
 export const EditStatus = async (params) => {
-  return post('/api/brCommonConf/update', params, {needJson: true})
+  return post('/api/brCommonConf/update', params, { needJson: true })
 }
 
 // 删除状态
 export const RemoveStatus = async (params) => {
-  return post('/api/brCommonConf/delete', params, {needForm: true})
+  return post('/api/brCommonConf/delete', params, { needForm: true })
 }
 // 配置
 export const GetConfigList = async (pager, formVals = {}) => {
@@ -26,8 +26,13 @@ export const GetConfigList = async (pager, formVals = {}) => {
     ...handlePageParams(pager),
     ...formVals
   }
-  return post('/api/brCommonConf/pageList', params, {needJson: true}).then(res => handleTable(res))
+  return post('/api/brCommonConf/pageList', params, { needJson: true }).then(res => handleTable(res))
 }
 export const GetConfigAllList = async (params) => {
-  return post('/api/brCommonConf/list', params, {needJson: true}).then(res => handleArray(res))
+  return post('/api/brCommonConf/list', params, { needJson: true }).then(res => handleArray(res))
+}
+
+// 配置
+export const UpdateSort = async (params) => {
+  return post('/api/brCommonConf/updateSort', params, { needJson: true }).then(res => handleObj(res))
 }

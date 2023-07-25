@@ -149,6 +149,9 @@ export default forwardRef((props, ref) => {
     </ModalContext.Provider>
   )
 })
+
+
+
 const InputEle = (props) => {
   const {
     className,
@@ -184,7 +187,7 @@ const InputEle = (props) => {
         <div className={styles['mySelect-content']}>
           {tags.map((item) => (
             <TagItem
-              key={item.id}
+              key={item[valueKey]}
               onClose={() => onCloseTag(item)}
               closeable={true}>
               <TagItemContent data={item} type={type} />
@@ -196,10 +199,12 @@ const InputEle = (props) => {
   )
 }
 export const TagItemContent = ({ type, data = {} }) => {
-  if (type === 'user') {
+  if (type === TYPES.USER) {
     return <UserOrDepItem data={data} />
   } else if (type === 'group') {
     return <GroupChatCell data={data} />
+  } else if (type === TYPES.ADMIN_STAFF) {
+    return <UserItem data={data.staff} />
   } else {
     return <UserItem data={data}>{data.name}</UserItem>
   }

@@ -1,3 +1,4 @@
+import { FILE_UNITS } from './constants'
 // 校验文件大小
 export const validateFileSize = (currentSize, maxSize, unit = 'M') => {
   const curFileSize = calcSize(currentSize, unit);
@@ -137,9 +138,8 @@ export const uploadRules = {
  * @returns {number} 计算后的文件大小
  */
 export const calcSize = (val = 0, targetUnit = 'M', curUnit = 'B') => {
-  const units = ['B', 'KB', 'M', 'G'];
-  const curIndx = units.indexOf(curUnit);
-  const targetIndx = units.indexOf(targetUnit);
+  const curIndx = FILE_UNITS.indexOf(curUnit);
+  const targetIndx = FILE_UNITS.indexOf(targetUnit);
   const sub = (curIndx > -1) && (targetIndx > -1) ? (targetIndx - curIndx) : 0;
   const value = Number.isNaN(val * 1) ? 0 : val * 1;
   let res = 0;

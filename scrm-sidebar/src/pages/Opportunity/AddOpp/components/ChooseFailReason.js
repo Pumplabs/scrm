@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import MyPopup from 'components/MyPopup'
 import { useRequest } from 'ahooks'
-import RadioGroupList from './RadioGroupList'
+import RadioGroupList from 'components/RadioGroupList'
 import { GetConfigAllList } from 'services/modules/opportunity'
 
 export default (props) => {

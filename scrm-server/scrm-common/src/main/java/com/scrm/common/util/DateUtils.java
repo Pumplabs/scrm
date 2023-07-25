@@ -209,7 +209,6 @@ public class DateUtils {
             log.error("获取日期异常:[{}]", e.getMessage());
             throw new BaseException("获取日期失败");
         }
-
     }
 
     /**
@@ -392,5 +391,36 @@ public class DateUtils {
         String str2 = dateToFullStr(date2);
 
         return str1.equals(str2);
+    }
+
+    public static Date getYesterdayTime(Boolean isStart) {
+        try {
+            String time = isStart ? "00:00:00" : "23:59:59";
+            Date yesterday = getYesterday();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            return sdf2.parse(sdf.format(yesterday) + " " + time);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new BaseException("时间转化失败");
+        }
+
+    }
+
+    public  static Date getTodayStartTime(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            return sdf2.parse(sdf.format(new Date()) + " " + "00:00:00");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new BaseException("时间转化失败");
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getTodayStartTime());
+        System.out.println(getDate(-30));
+        System.out.println(getDate(new Date(),-29,"00:00"));
     }
 }

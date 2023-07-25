@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author ouyang
@@ -22,6 +23,7 @@ public class BrTodoPageDTO extends BasePageDTO{
     private String extCorpId;
 
     @ApiModelProperty(value = "状态 1:已完成 0:未完成 2:已逾期")
+    @NotNull(message = "待办状态不能为空")
     private Integer status;
 
 }

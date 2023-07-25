@@ -28,7 +28,7 @@ import {
 import { MATERIAL_TYPE_EN_VALS } from '../../../constants'
 import { COVER_IMG_TYPES } from 'src/utils/constants'
 import styles from './index.module.less'
-
+import { findAllImgFileIds, updateAllImgUrl } from '../ArticleDetailDrawer/ArticlePreview/utils'
 const refillFormByData = async (data) => {
   const fileUrl = await getFileUrl(data.mediaId)
   return {
@@ -51,7 +51,11 @@ const refillFormByData = async (data) => {
     ],
   }
 }
-
+const refillArticleContent = async (richText) => {
+  const imgFileIds = findAllImgFileIds(richText)
+  const imgUrls = await getFileUrl({ ids: imgFileIds })
+  return updateAllImgUrl(richText, imgUrls)
+}
 export default () => {
   const [form] = Form.useForm()
   const editorRef = useRef()
@@ -97,9 +101,10 @@ export default () => {
           backToList()
         } else {
           const formVals = await refillFormByData(data)
+          const articleRichContent = await refillArticleContent(data.richText)
           form.setFieldsValue(formVals)
           if (editorRef.current) {
-            editorRef.current.editorRef.txt.setJSON(data.richText)
+            editorRef.current.editorRef.txt.setJSON(articleRichContent)
           }
         }
       },

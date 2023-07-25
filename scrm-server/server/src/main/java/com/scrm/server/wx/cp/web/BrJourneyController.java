@@ -2,14 +2,10 @@ package com.scrm.server.wx.cp.web;
 
 import com.scrm.common.log.annotation.Log;
 import com.scrm.common.dto.BatchDTO;
+import com.scrm.server.wx.cp.dto.*;
 import com.scrm.server.wx.cp.service.IBrJourneyService;
 import com.scrm.api.wx.cp.entity.BrJourney;
 
-import com.scrm.server.wx.cp.dto.BrJourneyPageDTO;
-import com.scrm.server.wx.cp.dto.BrJourneySaveDTO;
-import com.scrm.server.wx.cp.dto.BrJourneyUpdateDTO;
-
-import com.scrm.server.wx.cp.dto.BrJourneyQueryDTO;
 import com.scrm.server.wx.cp.vo.BrJourneyStatisticsInfoVO;
 import com.scrm.server.wx.cp.vo.BrJourneyVO;
 
@@ -109,5 +105,17 @@ public class BrJourneyController {
         brJourneyService.batchDelete(dto);
         return R.success("删除成功");
     }
+
+
+
+
+    @PostMapping(value = "/updateJourneyStageSort")
+    @ApiOperation(value = "修改旅程阶段排序")
+    @Log(modelName = "旅程信息", operatorType = "修改")
+    public R<BrJourney> updateJourneyStageSort(@RequestBody @Valid BrJourneyUpdateSortDTO dto) {
+        brJourneyService.updateSort(dto);
+        return R.success();
+    }
+
 
 }

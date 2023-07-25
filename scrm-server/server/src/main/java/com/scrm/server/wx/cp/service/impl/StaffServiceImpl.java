@@ -1,6 +1,7 @@
 package com.scrm.server.wx.cp.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -118,18 +119,11 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
     @Override
     public IPage<StaffVO> pageList(StaffPageDTO dto) {
 
-        List<String> extIds = null;
-        if (StringUtils.isNotBlank(dto.getName())) {
-            extIds = contactSearch(dto.getExtCorpId(), dto.getName());
-            if (ListUtils.isEmpty(extIds)) {
-                return new Page<>();
-            }
-        }
 
         LambdaQueryWrapper<Staff> wrapper = new QueryWrapper<Staff>().lambda()
                 .eq(Staff::getExtCorpId, dto.getExtCorpId())
                 .eq(dto.getStatus() != null, Staff::getStatus, dto.getStatus())
-                .in(ListUtils.isNotEmpty(extIds), Staff::getExtId, extIds)
+                .like(StringUtils.isNotBlank(dto.getName()), Staff::getName, dto.getName())
                 .ne(dto.getExcludeMyself() != null && dto.getExcludeMyself(), Staff::getId, JwtUtil.getUserId())
                 .like(StringUtils.isNotBlank(dto.getAlias()), Staff::getAlias, dto.getAlias())
                 .orderByDesc(Staff::getCreatedAt);
@@ -385,6 +379,8 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
      * @param staffList
      */
     private void deleteCustomerAssociate(String extCorpId, List<Staff> staffList) {
+        Date deleteAt = new Date();
+
         if (ListUtils.isEmpty(staffList)) {
             return;
         } else {
@@ -398,11 +394,19 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         if (ListUtils.isNotEmpty(staffExtIds)) {
 
             //员工-客户-详情
+            customerInfoService.update(new LambdaUpdateWrapper<WxCustomerInfo>()
+                    .eq(WxCustomerInfo::getExtCorpId, extCorpId)
+                    .in(WxCustomerInfo::getExtStaffId, staffExtIds)
+                    .set(WxCustomerInfo::getDeletedAt, deleteAt));
             customerInfoService.remove(new LambdaQueryWrapper<WxCustomerInfo>()
                     .eq(WxCustomerInfo::getExtCorpId, extCorpId)
                     .in(WxCustomerInfo::getExtStaffId, staffExtIds));
 
             //员工-客户标签
+            customerStaffTagService.update(new LambdaUpdateWrapper<WxCustomerStaffTag>()
+                    .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
+                    .in(WxCustomerStaffTag::getExtStaffId, staffExtIds)
+                    .set(WxCustomerStaffTag::getDeletedAt, deleteAt));
             customerStaffTagService.remove(new LambdaQueryWrapper<WxCustomerStaffTag>()
                     .eq(WxCustomerStaffTag::getExtCorpId, extCorpId)
                     .in(WxCustomerStaffTag::getExtStaffId, staffExtIds));
@@ -415,6 +419,9 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
                 List<String> customerStaffIds = customerStaffs.stream().map(WxCustomerStaff::getId).collect(Collectors.toList());
 
                 //删除员工-客户关联
+                customerStaffService.update(new LambdaUpdateWrapper<WxCustomerStaff>()
+                        .in(WxCustomerStaff::getId, customerStaffIds)
+                        .set(WxCustomerStaff::getDeletedAt, deleteAt));
                 customerStaffService.removeByIds(customerStaffIds);
 
                 //如果这个客户跟进人小于1，则把这个客户移除
@@ -424,6 +431,10 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
                             .in(WxCustomerStaff::getExtCustomerId, extCustomerIds))).orElse(0) < 1) {
                         WxCustomer customer = customerService.checkExists(extCorpId, extCustomerId);
                         if (customer != null) {
+
+                            customerService.update(new LambdaUpdateWrapper<WxCustomer>()
+                                    .eq(WxCustomer::getId, customer.getId())
+                                    .set(WxCustomer::getDeletedAt, deleteAt));
                             customerService.removeById(customer.getId());
                         }
 
@@ -657,6 +668,7 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
 
             //同步员工数据
             WxCpUserService userService = new WxCpUserServiceImpl(wxCpConfiguration.getAddressBookWxCpService());
+            WxCpUserService userDetailService = new WxCpUserServiceImpl(wxCpConfiguration.getWxCpService());
             WxCpDeptUserResult userListId = userService.getUserListId(null, 10000);
             Map<String, List<Long>> userDeptMap = userListId.getDeptUser().stream().collect(Collectors.groupingBy(WxCpDeptUserResult.DeptUserList::getUserId, Collectors.mapping(WxCpDeptUserResult.DeptUserList::getDepartment, Collectors.toList())));
             log.info("【同步员工】部门数量：{}，员工数量：{}", departments.size(), userListId.getDeptUser().size());
@@ -724,6 +736,8 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
                             staffDepartmentList.add(staffDepartment);
                         });
 
+                        WxCpUser userDetails = userDetailService.getById(staff.getExtId());
+                        BeanUtils.copyProperties(userDetails, staff);
                         if (old != null) {
                             updateById(staff);
                             //删除旧的关联
@@ -894,6 +908,8 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
     @Override
     public void deleteByCorpId(String extCorpId) {
 
+        Date deleteAt = new Date();
+
         //删除员工-部门关联
         staffDepartmentService.remove(new LambdaQueryWrapper<StaffDepartment>().eq(StaffDepartment::getExtCorpId, extCorpId));
 
@@ -901,15 +917,19 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
         remove(new QueryWrapper<Staff>().lambda().eq(Staff::getExtCorpId, extCorpId));
 
         //删除员工-客户关联
+        customerStaffService.update(new LambdaUpdateWrapper<WxCustomerStaff>().eq(WxCustomerStaff::getExtCorpId, extCorpId).set(WxCustomerStaff::getDeletedAt, deleteAt));
         customerStaffService.remove(new LambdaQueryWrapper<WxCustomerStaff>().eq(WxCustomerStaff::getExtCorpId, extCorpId));
 
         //删除员工-客户-详情
+        customerInfoService.update(new LambdaUpdateWrapper<WxCustomerInfo>().eq(WxCustomerInfo::getExtCorpId, extCorpId).set(WxCustomerInfo::getDeletedAt, deleteAt));
         customerInfoService.remove(new LambdaQueryWrapper<WxCustomerInfo>().eq(WxCustomerInfo::getExtCorpId, extCorpId));
 
         //删除员工-客户标签
+        customerStaffTagService.update(new LambdaUpdateWrapper<WxCustomerStaffTag>().eq(WxCustomerStaffTag::getExtCorpId, extCorpId).set(WxCustomerStaffTag::getDeletedAt, deleteAt));
         customerStaffTagService.remove(new LambdaQueryWrapper<WxCustomerStaffTag>().eq(WxCustomerStaffTag::getExtCorpId, extCorpId));
 
         //删除客户
+        customerService.update(new LambdaUpdateWrapper<WxCustomer>().eq(WxCustomer::getExtCorpId, extCorpId).set(WxCustomer::getDeletedAt, deleteAt));
         customerService.remove(new LambdaQueryWrapper<WxCustomer>().eq(WxCustomer::getExtCorpId, extCorpId));
     }
 
@@ -961,7 +981,7 @@ public class StaffServiceImpl extends ServiceImpl<StaffMapper, Staff> implements
             StringBuilder sb = new StringBuilder();
             exportVOS.add(staffExportVO);
         });
-
+        log.info("{}", JSONObject.toJSONString(exportVOS));
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String title = "员工列表(导出时间: %s)";
         title = String.format(title, dateFormat.format(new Date()));

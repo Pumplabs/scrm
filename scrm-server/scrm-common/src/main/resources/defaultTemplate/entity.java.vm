@@ -1,0 +1,47 @@
+package ${package.Entity};
+
+import java.io.Serializable;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableId;
+import org.springframework.format.annotation.DateTimeFormat;
+
+/**
+ * $!{table.comment}
+ * @author ${author}
+ * @since ${date}
+ */
+@Data
+@Accessors(chain = true)
+@ApiModel(value = "$!{table.comment}")
+@TableName("$!{table.name}")
+public class ${entity} implements Serializable{
+
+    private static final long serialVersionUID=1L;
+
+## ----------  BEGIN 字段循环遍历  ----------
+#foreach($field in ${table.fields})
+    #if(${field.keyFlag})
+        #set($keyPropertyName=${field.propertyName})
+    #end
+    #if("$!field.comment" != "")
+    @ApiModelProperty(value = "${field.comment}")
+    #end
+    #if(${field.keyFlag})
+    @TableId
+    #end
+    #if($field.propertyType == "Date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    #end
+    private ${field.propertyType} ${field.propertyName};
+
+#end
+
+}

@@ -8,7 +8,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.scrm.server.wx.cp.vo.BrOpportunityVO;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
+
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商机 服务类
@@ -94,5 +98,10 @@ public interface IBrOpportunityService extends IService<BrOpportunity> {
      * @param dto 请求参数
      */
     void updateStage(BrOpportunityUpdateStageDTO dto);
+    Long getAddedCountByDate(Date date, String extCorpId);
+    List<Map<String,Object>> countByDateAndCorp (Date date);
 
+    Long countByDateAndStaff();
+    Long countByToday();
+    List<DailyTotalVO> getLastNDaysCountDaily(Integer days);
 }

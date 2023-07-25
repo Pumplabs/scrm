@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 /**
  * 销售目标 服务实现类
+ *
  * @author xxh
  * @since 2022-07-20
  */
@@ -41,23 +42,23 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
 
     @Autowired
     private IStaffService staffService;
-    
+
     @Autowired
     private IBrOrderService productOrderService;
-    
+
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
 
     @Override
-    public List<BrSaleTargetVO> queryList(BrSaleTargetQueryDTO dto){
+    public List<BrSaleTargetVO> queryList(BrSaleTargetQueryDTO dto) {
         LambdaQueryWrapper<BrSaleTarget> wrapper = new QueryWrapper<BrSaleTarget>()
-        .lambda().eq(BrSaleTarget::getExtCorpId, dto.getExtCorpId())
+                .lambda().eq(BrSaleTarget::getExtCorpId, dto.getExtCorpId())
                 .eq(StringUtils.isNotBlank(dto.getMonth()), BrSaleTarget::getMonth, dto.getMonth());
         return Optional.ofNullable(list(wrapper)).orElse(new ArrayList<>()).stream().map(this::translation).collect(Collectors.toList());
     }
 
 
     @Override
-    public List<BrSaleTargetVO> findById(String id){
+    public List<BrSaleTargetVO> findById(String id) {
         BrSaleTarget saleTarget = checkExists(id);
         LambdaQueryWrapper<BrSaleTarget> wrapper = new QueryWrapper<BrSaleTarget>()
                 .lambda().eq(BrSaleTarget::getExtCorpId, saleTarget.getExtCorpId())
@@ -78,14 +79,30 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
 
 
     @Override
-    public BrSaleTarget save(BrSaleTargetSaveDTO dto){
+    public BrSaleTargetVO getStaffCurrentMonthSalesTarget() {
+        String extStaffId = JwtUtil.getExtUserId();
+        String extCorpId = JwtUtil.getExtCorpId();
+        String currentMonth = null;
+        currentMonth = sdf.format(new Date());
+        log.debug(currentMonth);
+        BrSaleTarget brSaleTarget = getOne(new QueryWrapper<BrSaleTarget>().lambda().eq(BrSaleTarget::getExtCorpId, extCorpId)
+                .eq(BrSaleTarget::getStaffExtId, extStaffId).eq(BrSaleTarget::getMonth, currentMonth));
+        //TODO 返回null不是最佳实践
+        if (brSaleTarget == null) {
+            return null;
+        }
+        return this.translation(brSaleTarget);
+    }
 
-        checkDate(null, dto.getExtCorpId(), 
+    @Override
+    public BrSaleTarget save(BrSaleTargetSaveDTO dto) {
+
+        checkDate(null, dto.getExtCorpId(),
                 dto.getMonth(), dto.getStaffExtId());
-        
+
         //封装数据
         BrSaleTarget brSaleTarget = new BrSaleTarget();
-        BeanUtils.copyProperties(dto,brSaleTarget);
+        BeanUtils.copyProperties(dto, brSaleTarget);
         brSaleTarget.setId(UUID.get32UUID())
                 .setCreatorExtId(JwtUtil.getExtUserId())
                 .setCreatedAt(new Date())
@@ -97,11 +114,11 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
         return brSaleTarget;
     }
 
-    private void checkDate(String id, String extCorpId, 
-                             String month, String staffExtId) {
+    private void checkDate(String id, String extCorpId,
+                           String month, String staffExtId) {
 
         staffService.checkExists(staffExtId, extCorpId);
-        
+
         //检查是否重复
         if (count(new QueryWrapper<BrSaleTarget>().lambda()
                 .ne(StringUtils.isNotBlank(id), BrSaleTarget::getId, id)
@@ -110,7 +127,7 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
                 .eq(BrSaleTarget::getStaffExtId, staffExtId)) > 0) {
             throw new BaseException("该员工该月已有销售目标！");
         }
-        
+
         //检查月份是否是后面的月份
         String[] arr = month.split("-");
         Calendar now = Calendar.getInstance();
@@ -118,7 +135,7 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
             throw new BaseException("不能选择以前的年份！");
         }
 
-        if (Integer.parseInt(arr[0]) == now.get(Calendar.YEAR) 
+        if (Integer.parseInt(arr[0]) == now.get(Calendar.YEAR)
                 && Integer.parseInt(arr[1]) < now.get(Calendar.MONTH) + 1) {
             throw new BaseException("不能选择以前的月份！");
         }
@@ -126,11 +143,11 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
 
 
     @Override
-    public BrSaleTarget update(BrSaleTargetUpdateDTO dto){
+    public BrSaleTarget update(BrSaleTargetUpdateDTO dto) {
 
         checkDate(dto.getId(), dto.getExtCorpId(),
                 dto.getMonth(), dto.getStaffExtId());
-        
+
         //校验参数
         BrSaleTarget old = checkExists(dto.getId());
 
@@ -147,7 +164,7 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
 
 
     @Override
-    public void delete(String id){
+    public void delete(String id) {
 
         //校验参数
         BrSaleTarget brSaleTarget = checkExists(id);
@@ -156,21 +173,22 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
         removeById(id);
 
     }
-    
+
     /**
      * 翻译
+     *
      * @param brSaleTarget 实体
      * @return BrSaleTargetVO 结果集
      * @author xxh
      * @date 2022-07-20
      */
-    private BrSaleTargetVO translation(BrSaleTarget brSaleTarget){
+    private BrSaleTargetVO translation(BrSaleTarget brSaleTarget) {
         BrSaleTargetVO vo = new BrSaleTargetVO();
         BeanUtils.copyProperties(brSaleTarget, vo);
-        
+
         vo.setCreator(staffService.find(brSaleTarget.getExtCorpId(), brSaleTarget.getCreatorExtId()));
         vo.setStaff(staffService.find(brSaleTarget.getExtCorpId(), brSaleTarget.getStaffExtId()));
-        
+
         //查询状态是2和3的
         List<Integer> statusList = new ArrayList<>(2);
         statusList.add(BrOrder.STATUS_HAS_IDENTIFIED);
@@ -202,17 +220,32 @@ public class BrSaleTargetServiceImpl extends ServiceImpl<BrSaleTargetMapper, BrS
 
         if (ListUtils.isEmpty(orderList)) {
             vo.setFinish(0d);
-        }else{
+        } else {
             vo.setFinish(orderList.stream().mapToDouble((s) -> Double.parseDouble(s.getOrderAmount())).sum());
         }
 
-        vo.setFinishPercent(String.format("%.2f", vo.getFinish() / (double)vo.getTarget() * 100));
+        vo.setFinishPercent(String.format("%.2f", vo.getFinish() / (double) vo.getTarget() * 100));
         return vo;
     }
 
+    public static void main(String[] args) throws ParseException {
+
+       /* String s = "2022-07";
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(new SimpleDateFormat("yyyy-MM").parse(s));
+
+        System.out.println(instance.getTime());
+
+        instance.add(Calendar.MONTH, 1);
+        System.out.println(instance.getTime());*/
+
+        Integer s = 8;
+        int s1 = 8;
+        System.out.println(s.equals(s1));
+    }
 
     @Override
-    public BrSaleTarget checkExists(String id){
+    public BrSaleTarget checkExists(String id) {
         if (StringUtils.isBlank(id)) {
             return null;
         }

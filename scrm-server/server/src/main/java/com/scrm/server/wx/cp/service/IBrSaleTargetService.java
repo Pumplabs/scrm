@@ -69,4 +69,6 @@ public interface IBrSaleTargetService extends IService<BrSaleTarget> {
      */
     BrSaleTarget checkExists(String id);
 
+    BrSaleTargetVO getStaffCurrentMonthSalesTarget();
+
 }

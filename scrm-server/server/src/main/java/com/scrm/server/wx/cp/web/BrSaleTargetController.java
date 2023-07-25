@@ -49,6 +49,15 @@ public class BrSaleTargetController {
     }
 
 
+    @GetMapping("/getStaffCurrentMonthSalesTarget")
+    @ApiOperation(value = "获取员工本月销售目标")
+    @Log(modelName = "销售目标", operatorType = "获取员工本月销售目标")
+    public R<BrSaleTargetVO> getStaffCurrentMonthSalesTarget(){
+        return R.data(brSaleTargetService.getStaffCurrentMonthSalesTarget());
+    }
+
+
+
     @PostMapping(value = "/save")
     @ApiOperation(value = "新增")
     @Log(modelName = "销售目标", operatorType = "新增")
@@ -74,5 +83,7 @@ public class BrSaleTargetController {
         brSaleTargetService.delete(id);
         return R.success("删除成功");
     }
+
+
 
 }

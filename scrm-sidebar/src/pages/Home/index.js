@@ -1,13 +1,11 @@
 import { useMemo } from 'react'
 import cls from 'classnames'
 import { useNavigate, Outlet, useLocation } from 'react-router-dom'
-import Icon, { SettingFilled, UserOutlined } from '@ant-design/icons'
+import Icon, { SettingFilled, UserOutlined, AppstoreOutlined } from '@ant-design/icons'
 import HomeIcon from './WorkbenchIcon'
 import styles from './index.module.less'
 
 export default () => {
-
-  console.log("home");
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -22,6 +20,9 @@ export default () => {
       case 'notice':
         navigate('/home/notice')
         break
+      case 'apps':
+        navigate('/home/apps')
+        break
       default:
         break
     }
@@ -33,6 +34,8 @@ export default () => {
         return 'customer'
       case '/home/notice':
         return 'notice'
+      case '/home/apps':
+        return 'apps'
       default:
         return 'workbench'
     }
@@ -64,6 +67,16 @@ export default () => {
             onClick={() => onSelectedMenu('customer')}>
             <UserOutlined className={styles['menu-icon']} />
             <p className={styles['menu-name']}>客户</p>
+          </li>
+
+          <li
+            className={cls({
+              [styles['menu-item']]: true,
+              [styles['menu-active-item']]: activeKey === 'apps',
+            })}
+            onClick={() => onSelectedMenu('apps')}>
+            <AppstoreOutlined className={styles['menu-icon']} />
+            <p className={styles['menu-name']}>功能</p>
           </li>
           <li
             className={cls({

@@ -67,7 +67,7 @@ public class BrCommonConf implements Serializable{
     @ApiModelProperty(value = "编码")
     private Integer code;
 
-    @ApiModelProperty(value = "类型编码")
+    @ApiModelProperty(value = "类型编码 OPPORTUNITY_STAGE:商机阶段 OPPORTUNITY_FAIL_REASON:商机输单原因 CLUE_SOURCE:线索来源")
     private String typeCode;
 
     @ApiModelProperty(value = "所属分组id")
@@ -86,4 +86,13 @@ public class BrCommonConf implements Serializable{
      */
     public static final String OPPORTUNITY_FAIL_REASON = "OPPORTUNITY_FAIL_REASON";
 
+    /**
+     * 类型编码，线索来源
+     */
+    public static final String CLUE_SOURCE = "CLUE_SOURCE";
+
+    /**
+     * 类型编码，线索状态
+     */
+//    public static final String CLUE_STATUS = "CLUE_STATUS";
 }

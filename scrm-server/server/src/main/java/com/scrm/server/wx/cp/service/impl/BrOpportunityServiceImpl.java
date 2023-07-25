@@ -1,13 +1,16 @@
 package com.scrm.server.wx.cp.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.scrm.api.wx.cp.dto.WxMsgAttachmentDTO;
 import com.scrm.api.wx.cp.entity.Staff;
+import com.scrm.api.wx.cp.entity.WxCustomer;
 import com.scrm.common.dto.BatchDTO;
 import com.scrm.common.exception.BaseException;
+import com.scrm.common.util.DateUtils;
 import com.scrm.common.util.JwtUtil;
 import com.scrm.common.util.ListUtils;
 import com.scrm.common.util.UUID;
@@ -15,9 +18,11 @@ import com.scrm.server.wx.cp.dto.*;
 import com.scrm.server.wx.cp.entity.*;
 import com.scrm.server.wx.cp.mapper.BrOpportunityMapper;
 import com.scrm.server.wx.cp.service.*;
+import com.scrm.server.wx.cp.utils.ReportUtil;
 import com.scrm.server.wx.cp.vo.BrCustomerFollowVO;
 import com.scrm.server.wx.cp.vo.BrFollowTaskVO;
 import com.scrm.server.wx.cp.vo.BrOpportunityVO;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -146,7 +151,7 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
         updateById(brOpportunity);
 
         //记录字段更新日志
-        fieldLogService.save(old, brOpportunity, BrFieldLog.OPPORTUNITY_TABLE_NAME, brOpportunity.getId());
+        fieldLogService.save(old, brOpportunity, BrFieldLog.OPPORTUNITY_TABLE_NAME, brOpportunity.getId(), brOpportunity.getExtCorpId());
 
         //处理协作人数据
         handlerCooperatorList(brOpportunity, dto.getOpportunityCooperatorList());
@@ -225,6 +230,8 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
         //删除商机-协作人关联
         cooperatorService.remove(new LambdaQueryWrapper<BrOpportunityCooperator>().eq(BrOpportunityCooperator::getOpportunityId, id));
 
+        //删除动态
+        fieldLogService.deleteByDataIds(BrFieldLog.OPPORTUNITY_TABLE_NAME, Arrays.asList(id));
     }
 
 
@@ -240,6 +247,8 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
 
         //批量删除商机-协作人关联
         ListUtils.execute(opportunityIds -> cooperatorService.remove(new LambdaQueryWrapper<BrOpportunityCooperator>().in(BrOpportunityCooperator::getOpportunityId, opportunityIds)), dto.getIds(), 999);
+        //删除动态
+        fieldLogService.deleteByDataIds(BrFieldLog.OPPORTUNITY_TABLE_NAME, dto.getIds());
     }
 
 
@@ -284,7 +293,7 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
                 .setExtCustomerId(brOpportunity.getId());
         List<BrCustomerFollowVO> followVOS = followService.list(dto);
         vo.setFollowList(followVOS);
-        if (ListUtils.isNotEmpty(followVOS)){
+        if (ListUtils.isNotEmpty(followVOS)) {
             vo.setLastFollowAt(followVOS.get(0).getCreatedAt());
         }
 
@@ -304,7 +313,7 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
 
         vo.setGroupName(opportunityGroupService.getById(brOpportunity.getGroupId()).getName());
         //商机失败原因
-        if (StringUtils.isNotBlank(brOpportunity.getFailReasonId())){
+        if (StringUtils.isNotBlank(brOpportunity.getFailReasonId())) {
             vo.setFailReasonCN(confService.findById(brOpportunity.getFailReasonId()).getName());
         }
 
@@ -321,10 +330,10 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
         List<String> followIds = followVOS.stream().map(e -> e.getId()).collect(Collectors.toList());
         List<BrFollowTaskVO> brFollowTaskVOS = followTaskService.queryList(new BrFollowTaskQueryDTO()
                 .setExtCorpId(brOpportunity.getExtCorpId()).setFollowIds(followIds));
-        if (ListUtils.isNotEmpty(brFollowTaskVOS)){
-            brFollowTaskVOS.forEach(e->e.setCreatorCN(vo.getCreatorCN()));
+        if (ListUtils.isNotEmpty(brFollowTaskVOS)) {
+            brFollowTaskVOS.forEach(e -> e.setCreatorCN(vo.getCreatorCN()));
             vo.setTaskList(brFollowTaskVOS);
-        }else {
+        } else {
             vo.setTaskList(new ArrayList<>());
         }
 
@@ -351,7 +360,7 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
         }
         BrOpportunity byId = getById(id);
         if (byId == null) {
-            throw new BaseException("商机不存在");
+            throw new BaseException("商机不存在" );
         }
         return byId;
     }
@@ -366,7 +375,7 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
                     .setOldValue(confService.findById(opportunity.getStageId()).getName())
                     .setNewValue(confService.findById(dto.getStageId()).getName())
                     .setOperId(JwtUtil.getExtUserId()).setExtCorpId(JwtUtil.getExtCorpId())
-                    .setOperTime(opportunity.getUpdatedAt()).setFieldName("阶段").setDataId(opportunity.getId());
+                    .setOperTime(opportunity.getUpdatedAt()).setFieldName("阶段" ).setDataId(opportunity.getId());
             fieldLogService.save(brFieldLog);
         }
 
@@ -375,4 +384,51 @@ public class BrOpportunityServiceImpl extends ServiceImpl<BrOpportunityMapper, B
                 .setFailReasonId(dto.getFailReasonId());
         updateById(opportunity);
     }
+
+    @Override
+    public Long getAddedCountByDate(Date date, String extCorpId) {
+        return baseMapper.addedByDate(date, extCorpId);
+    }
+
+    @Override
+    public List<Map<String, Object>> countByDateAndCorp(Date date) {
+        return this.baseMapper.countByDateAndCorp(date);
+    }
+
+
+    @Override
+    public Long countByDateAndStaff() {
+        String extStaffId = JwtUtil.getExtUserId();
+        String extCorpId = JwtUtil.getExtCorpId();
+        Date startTime = DateUtils.getYesterdayTime(true);
+        Date endTime = DateUtils.getYesterdayTime(false);
+        return count(new QueryWrapper<BrOpportunity>().lambda()
+                .eq(BrOpportunity::getExtCorpId, extCorpId)
+                .eq(BrOpportunity::getOwner, extStaffId)
+                .ge(BrOpportunity::getCreatedAt, startTime).le(BrOpportunity::getCreatedAt, endTime));
+    }
+
+
+    @Override
+    public Long countByToday() {
+        Date startTime = DateUtils.getTodayStartTime();
+        Date endTime = new Date();
+        return count(new QueryWrapper<BrOpportunity>().lambda()
+                .eq(BrOpportunity::getExtCorpId, JwtUtil.getExtCorpId())
+                .ge(BrOpportunity::getCreatedAt, startTime).le(BrOpportunity::getCreatedAt, endTime)
+                .eq(!staffService.isAdmin(), BrOpportunity::getCreator, JwtUtil.getUserId())
+                .or(w -> {
+                    w.eq(BrOpportunity::getOwner, JwtUtil.getExtUserId());
+                }));
+    }
+
+
+    @Override
+    public List<DailyTotalVO> getLastNDaysCountDaily(Integer days) {
+        Date startTime = DateUtils.getDate(new Date(), -days + 1, "00:00" );
+        Date endTime = new Date();
+        List<DailyTotalVO> list = this.baseMapper.getLastNDaysCountDaily(startTime, endTime,JwtUtil.getExtCorpId());
+        return ReportUtil.composeResultToEchart(days,list);
+    }
+
 }

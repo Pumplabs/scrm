@@ -46,7 +46,9 @@ export default (props) => {
       width: 160,
       title: '客户标签',
       render: (val, record) => {
-        return <TagCell dataSource={val} />
+        const { customer = {}, handoverStaffExtId } = record
+        const tags = customer?.followStaffList?.find(ele => ele.extId === handoverStaffExtId)?.tags
+        return <TagCell dataSource={tags} />
       },
     },
     {
@@ -64,6 +66,7 @@ export default (props) => {
     {
       title: '接替员工所属部门',
       ellipsis: true,
+      width: 140,
       dataIndex: 'takeover1',
       render: (_, record) => (
         <DepNames
@@ -80,6 +83,7 @@ export default (props) => {
     {
       title: '原添加人所属部门',
       ellipsis: true,
+      width: 140,
       dataIndex: 'handover1',
       render: (_, record) => (
         <DepNames
@@ -98,6 +102,7 @@ export default (props) => {
       <TableContent
         {...tableProps}
         columns={columns}
+        scroll={{y: true}}
       />
     </CommonDrawer>
   )

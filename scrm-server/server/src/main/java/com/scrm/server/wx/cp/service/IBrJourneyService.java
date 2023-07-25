@@ -4,11 +4,8 @@ import com.scrm.common.dto.BatchDTO;
 import com.scrm.api.wx.cp.entity.BrJourney;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import com.scrm.server.wx.cp.dto.BrJourneyPageDTO;
-import com.scrm.server.wx.cp.dto.BrJourneySaveDTO;
-import com.scrm.server.wx.cp.dto.BrJourneyUpdateDTO;
+import com.scrm.server.wx.cp.dto.*;
 
-import com.scrm.server.wx.cp.dto.BrJourneyQueryDTO;
 import com.scrm.server.wx.cp.vo.BrJourneyStatisticsInfoVO;
 import com.scrm.server.wx.cp.vo.BrJourneyVO;
 
@@ -98,4 +95,6 @@ public interface IBrJourneyService extends IService<BrJourney> {
      * @return
      */
     List<BrJourneyStatisticsInfoVO> getStatistics(String extCorpId);
+
+    void updateSort(BrJourneyUpdateSortDTO journeyUpdateSortDTO);
 }

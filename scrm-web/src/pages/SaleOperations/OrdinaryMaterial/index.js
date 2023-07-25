@@ -1,8 +1,10 @@
 import { Tabs } from 'antd';
+
 import { PageContent } from 'layout';
 import Poster from './Poster'
 import Images from './Images'
 import Text from './Text'
+import MiniApp from './MiniApp'
 import styles from './index.module.less'
 
 const { TabPane } = Tabs;
@@ -33,12 +35,12 @@ export default () => {
         >
           <Text />
         </TabPane>
-        {/* <TabPane
+        <TabPane
           tab="小程序"
           key="miniApp"
         >
           <MiniApp />
-        </TabPane> */}
+        </TabPane>
       </Tabs>
     </PageContent>
   );

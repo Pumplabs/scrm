@@ -11,12 +11,10 @@ export default ({ data = {}, onDetail, status }) => {
     }
   }
   const todoTypeName = useMemo(() => {
-    if (TODO_TYPE.GROUP_SOP === data.type) {
-      return '群SOP'
-    }  else if (TODO_TYPE.OPP_FOLLOW === data.type) {
+   if (TODO_TYPE.OPP_FOLLOW === data.type) {
       return '商机任务'
-    }else {
-      return '客户SOP'
+    } else {
+      return ''
     }
   }, [data.type])
   return (
@@ -26,9 +24,6 @@ export default ({ data = {}, onDetail, status }) => {
         <span
           className={cls({
             [styles['todo-type']]: true,
-            [styles['todo-customer-type']]:
-              TODO_TYPE.CUSTOMER_SOP === data.type,
-            [styles['todo-group-type']]: TODO_TYPE.GROUP_SOP === data.type,
             [styles['todo-opp-type']]: TODO_TYPE.OPP_FOLLOW === data.type
           })}>
           {todoTypeName}

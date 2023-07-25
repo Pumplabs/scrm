@@ -93,11 +93,10 @@ public class WxCustomerStaff implements Serializable{
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updatedAt;
 
-//    @ApiModelProperty(value = "'删除时间'")
-//    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-//    @TableLogic
-//    private Date deletedAt;
+    @ApiModelProperty(value = "'删除时间'")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date deletedAt;
 
     @TableLogic(value = "0", delval = "null")
     private Boolean hasDelete;

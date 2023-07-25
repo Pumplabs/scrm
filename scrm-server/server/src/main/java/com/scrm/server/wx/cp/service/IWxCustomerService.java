@@ -14,6 +14,7 @@ import com.scrm.server.wx.cp.dto.WxCustomerAssistPageDTO;
 import com.scrm.server.wx.cp.dto.WxStaffCustomerTransferFailDTO;
 import com.scrm.server.wx.cp.feign.dto.UserInfoRes;
 import com.scrm.server.wx.cp.vo.BatchMarkRes;
+import com.scrm.server.wx.cp.vo.DailyTotalVO;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.cp.bean.external.WxCpUpdateRemarkRequest;
 import me.chanjar.weixin.cp.bean.external.WxCpWelcomeMsg;
@@ -22,7 +23,9 @@ import me.chanjar.weixin.cp.bean.external.contact.WxCpExternalContactInfo;
 import org.apache.ibatis.annotations.Param;
 import org.redisson.api.RLock;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -90,21 +93,22 @@ public interface IWxCustomerService extends IService<WxCustomer> {
      * 同步员工客户数据
      *
      * @param extCorpId 外包企业id
-     * @return com.scrm.api.wx.cp.entity.WxCustomer
-     * @author xxh
-     * @date 2021-12-22
-     */
-    void sync(String extCorpId);
-    /**
-     * 同步员工客户数据
-     *
-     * @param extCorpId 外包企业id
      * @param isSync 是否已经从微信同步
      * @return com.scrm.api.wx.cp.entity.WxCustomer
      * @author xxh
      * @date 2021-12-22
      */
     void sync(String extCorpId, boolean isSync);
+
+    /**
+     * 同步员工客户数据
+     *
+     * @param extCorpId 外包企业id
+     * @return com.scrm.api.wx.cp.entity.WxCustomer
+     * @author xxh
+     * @date 2021-12-22
+     */
+    void sync(String extCorpId);
 
     /**
      * 修改客户详情
@@ -214,6 +218,16 @@ public interface IWxCustomerService extends IService<WxCustomer> {
      */
     WxCustomerVO translation(WxCustomer wxCustomer);
 
+    /**
+     * 翻译
+     *
+     * @param wxCustomer 实体
+     * @param hasDetail  是否详情
+     * @return WxCustomerVO 结果集
+     * @author xxh
+     * @date 2021-12-22
+     */
+    WxCustomerVO translation(WxCustomer wxCustomer, boolean hasDetail);
 
     /**
      * 删除客户
@@ -362,6 +376,16 @@ public interface IWxCustomerService extends IService<WxCustomer> {
      */
     List<RLock> getCustomerSyncLock(String extCorpId);
 
+
+    /**
+     * 获取客户同步信息的锁
+     *
+     * @param extCorpId
+     * @param needCache 是否需要缓存
+     * @return
+     */
+    List<RLock> getCustomerSyncLock(String extCorpId, boolean needCache);
+
     /**
      * 尝试锁
      *
@@ -376,14 +400,6 @@ public interface IWxCustomerService extends IService<WxCustomer> {
      * @param rLock
      */
     void releaseSyncLock(RLock rLock);
-    /**
-     * 获取客户同步信息的锁
-     *
-     * @param extCorpId
-     * @param needCache 是否需要缓存
-     * @return
-     */
-    List<RLock> getCustomerSyncLock(String extCorpId, boolean needCache);
 
     /**
      * 获取所有客户的extId
@@ -421,15 +437,28 @@ public interface IWxCustomerService extends IService<WxCustomer> {
 
     /**
      * 移交客户失败
+     *
      * @param dto 请求参数
      */
     void transferFail(WxStaffCustomerTransferFailDTO dto);
 
     /**
      * 处理移交客户数据（新增标签，详情，跟原来的跟进人保持一致,不用更数据库，后续会更新）
-     * @param extCorpId 企业id
-     * @param staffExtId 员工extId
+     *
+     * @param extCorpId     企业id
+     * @param staffExtId    员工extId
      * @param customerExtId 客户extId
      */
     void handlerTransfer(String extCorpId, String staffExtId, String customerExtId);
+
+
+    Long getAddedCountByDate(Date date, String extCoprId);
+
+    List<Map<String, Object>> countByDateAndCorp(Date date);
+
+    WxCustomerVO updateCustomerData(WxCustomerDataUpdateDTO dto);
+
+    Long countByToday();
+
+    List<DailyTotalVO> getLastNDaysCountDaily(Integer days);
 }

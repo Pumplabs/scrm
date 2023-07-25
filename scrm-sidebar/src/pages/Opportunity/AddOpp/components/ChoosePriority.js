@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import MyPopup from 'components/MyPopup'
-import RadioGroupList from './RadioGroupList'
+import RadioGroupList from 'components/RadioGroupList'
 import { PRIORITY_OPTIONS } from '../constants'
 
 export default (props) => {

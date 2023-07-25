@@ -1,0 +1,95 @@
+package ${package.Service};
+
+import ${package.Entity}.${entity};
+import ${superServiceClassPackage};
+
+import ${package.Entity.replace("entity","dto")}.${entity}PageDTO;
+import ${package.Entity.replace("entity","dto")}.${entity}SaveDTO;
+import ${package.Entity.replace("entity","dto")}.${entity}UpdateDTO;
+
+import ${package.Entity.replace("entity","dto")}.${entity}QueryDTO;
+import ${package.Entity.replace("entity","vo")}.${entity}VO;
+
+import com.scrm.api.wx.cp.dto.*;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import java.util.List;
+
+/**
+ * $!{table.comment} 服务类
+ * @author ${author}
+ * @since ${date}
+ */
+public interface ${table.serviceName} extends ${superServiceClass}<${entity}> {
+
+
+    /**
+     * 分页查询
+     * @author ${author}
+     * @date ${date}
+     * @param dto 请求参数
+     */
+    IPage<${entity}VO> pageList(${entity}PageDTO dto);
+
+    /**
+     * 查询列表
+     * @author ${author}
+     * @date ${date}
+     * @param dto 请求参数
+     */
+    List<${entity}VO> queryList(${entity}QueryDTO dto);
+
+    /**
+     * 根据id查询
+     * @author ${author}
+     * @date ${date}
+     * @param id 主键
+     */
+    ${entity}VO findById(String id);
+
+
+    /**
+     * 新增
+     * @author ${author}
+     * @date ${date}
+     * @param dto 请求参数
+     * @return ${package.Entity}.${entity}
+     */
+    ${entity} save(${entity}SaveDTO dto);
+
+     /**
+      * 修改
+      * @author ${author}
+      * @date ${date}
+      * @param dto 请求参数
+      * @return ${package.Entity}.${entity}
+      */
+    ${entity} update(${entity}UpdateDTO dto);
+
+
+    /**
+     * 删除
+     * @author ${author}
+     * @date ${date}
+     * @param id $!{table.comment}id
+     */
+    void delete(String id);
+
+    /**
+     * 批量删除
+     * @author ${author}
+     * @date ${date}
+     * @param dto 请求参数
+     */
+    void batchDelete(BatchDTO<String> dto);
+
+    /**
+     * 校验是否存在
+     * @author ${author}
+     * @date ${date}
+     * @param id $!{table.comment}id
+     * @return ${package.Entity}.${entity}
+     */
+    ${entity} checkExists(String id);
+
+}

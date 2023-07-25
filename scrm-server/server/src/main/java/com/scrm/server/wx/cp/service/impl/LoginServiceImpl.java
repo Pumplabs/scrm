@@ -3,6 +3,8 @@ package com.scrm.server.wx.cp.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.scrm.api.wx.cp.entity.BrJourney;
+import com.scrm.api.wx.cp.entity.BrJourneyStage;
 import com.scrm.api.wx.cp.entity.Role;
 import com.scrm.api.wx.cp.entity.Staff;
 import com.scrm.api.wx.cp.vo.WxLoginParamsResVo;
@@ -21,12 +23,15 @@ import com.scrm.server.wx.cp.config.WxCpConfiguration;
 import com.scrm.server.wx.cp.config.WxCpTpConfiguration;
 import com.scrm.common.entity.SysRole;
 import com.scrm.server.wx.cp.feign.CpTpFeign;
+import com.scrm.server.wx.cp.feign.dto.GetUserDetailRes;
 import com.scrm.server.wx.cp.feign.dto.GetUserInfoRes;
 import com.scrm.server.wx.cp.service.*;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import me.chanjar.weixin.cp.api.WxCpOAuth2Service;
+import me.chanjar.weixin.cp.api.WxCpService;
 import me.chanjar.weixin.cp.api.impl.WxCpOAuth2ServiceImpl;
+import me.chanjar.weixin.cp.api.impl.WxCpServiceImpl;
 import me.chanjar.weixin.cp.bean.WxCpOauth2UserInfo;
 import me.chanjar.weixin.cp.bean.WxCpTpUserDetail;
 import me.chanjar.weixin.cp.bean.WxTpLoginInfo;
@@ -41,10 +46,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * @author ：qiuzl
@@ -92,11 +96,21 @@ public class LoginServiceImpl implements ILoginService {
     @Autowired
     private RedissonClient redissonClient;
 
+
+    @Autowired
+    private IBrJourneyService journeyService;
+
+
+    @Autowired
+    private IBrJourneyStageService journeyStageService;
+
+
     @Override
     public WxLoginParamsResVo login() {
         WxLoginParamsResVo resVo = new WxLoginParamsResVo();
         resVo.setAppId(ScrmConfig.getExtCorpID());
         resVo.setAgentId(ScrmConfig.getMainAgentID());
+        log.info("main agent id is = {}",ScrmConfig.getMainAgentID()) ;
         resVo.setRedirectUri(ScrmConfig.getLoginRedirectUrl());
         resVo.setState(CharacterUtils.getRandomString(10));
         resVo.setLocationUrl(String.format("https://open.work.weixin.qq.com/wwopen/sso/qrConnect?appid=%s&agentid=%d&redirect_uri=%s&state=%s", resVo.getAppId(), resVo.getAgentId(), resVo.getRedirectUri(), resVo.getState()));
@@ -137,17 +151,17 @@ public class LoginServiceImpl implements ILoginService {
             return;
         }
         try {
-            WxCpTpService wxCpTpService = new WxCpTpServiceImpl();
-            wxCpTpService.setWxCpTpConfigStorage(wxCpTpConfiguration.getBaseConfig());
-
-            WxCpTpUserDetail detail = wxCpTpService.getUserDetail3rd(userTicket);
-
+            GetUserDetailRes detail = cpTpFeign.getUserDetail(userTicket, WxCpConfiguration.getWxCpService().getAccessToken());
+            log.info("detail", JSON.toJSONString(detail));
+            detail.checkNoZero();
             staffService.update(new UpdateWrapper<Staff>().lambda()
                     .set(Staff::getAvatarUrl, detail.getAvatar())
-                    .eq(Staff::getExtCorpId, detail.getCorpId())
-                    .eq(Staff::getExtId, detail.getUserId()));
+                    .set(Staff::getGender, detail.getGender())
+                    .set(Staff::getEmail, detail.getEmail())
+                    .eq(Staff::getExtCorpId, ScrmConfig.getExtCorpID())
+                    .eq(Staff::getExtId, detail.getUserid()));
         } catch (Exception e) {
-            log.error("尝试获取头像一场，[{}],", userTicket, e);
+            log.error("尝试获取头像异常，[{}],", userTicket, e);
         }
     }
 
@@ -157,23 +171,8 @@ public class LoginServiceImpl implements ILoginService {
         if (staff == null) {
             return null;
         }
-        WxStaffResVo result = new WxStaffResVo().setStaff(staff)
-                .setCorpName(ScrmConfig.getCorpName())
-                .setToken(staffService.change2Token(staff, JwtUtil.getHasWeb()));
-
-        SysRoleStaff sysRoleStaff = sysRoleStaffService.getOne(new QueryWrapper<SysRoleStaff>().lambda()
-                .eq(SysRoleStaff::getExtStaffId, staff.getExtId()).eq(SysRoleStaff::getExtCorpId, staff.getExtCorpId()));
-        if (sysRoleStaff == null) {
-            return result;
-        }
-        SysRole sysRole = sysRoleService.getOne(new QueryWrapper<SysRole>().lambda().eq(SysRole::getId, sysRoleStaff.getRoleId()));
-        if (sysRole != null) {
-           return result.setSysRole(sysRole);
-        } else {
-          return result;
-        }
+        return getStaffByExtId(staff.getExtId(), JwtUtil.getHasWeb());
     }
-
 
     private void initialize(String extId) {
         Staff staff = new Staff()
@@ -195,11 +194,49 @@ public class LoginServiceImpl implements ILoginService {
         sysRoleStaff.setRoleId(sysRole.getId()).setExtStaffId(staff.getExtId()).setId(UUID.get32UUID())
                 .setCreatedAt(new Date()).setExtCorpId(staff.getExtCorpId());
         sysRoleStaffService.save(sysRoleStaff);
+        initCustomerJourney(ScrmConfig.getExtCorpID(),staff.getId());
 
     }
 
-    private WxStaffResVo getStaffByExtId(String extId) {
-        if (sysRoleService.count() == 0) {
+    private void initCustomerJourney(String extCorpId,String userId) {
+        Long count = journeyService.count(new QueryWrapper<BrJourney>().lambda().eq(BrJourney::getExtCorpId, extCorpId));
+        if (count == 0) {
+            Date date = new Date();
+            BrJourney brJourney = new BrJourney()
+                    .setCreatedAt(date)
+                    .setUpdatedAt(date)
+                    .setExtCorpId(extCorpId)
+                    .setName("系统默认")
+                    .setCreator(userId)
+                    .setId(UUID.get32UUID());
+            journeyService.save(brJourney);
+            String[] stageNames = new String[]{"关注", "意向", "商机", "购买", "粉丝"};
+            AtomicReference<Integer> n = new AtomicReference<>(0);
+            List<BrJourneyStage> brJourneyStageList = Arrays.stream(stageNames).map((stageName) -> {
+                n.set(n.get() + 1);
+                BrJourneyStage brJourneyStage = new BrJourneyStage()
+                        .setJourneyId(brJourney.getId())
+                        .setName(stageName)
+                        .setExtCorpId(extCorpId)
+                        .setSort(n.get())
+                        .setCreator(userId)
+                        .setCreatedAt(date)
+                        .setUpdatedAt(date)
+                        .setId(UUID.get32UUID());
+                return brJourneyStage;
+            }).collect(Collectors.toList());
+            journeyStageService.saveBatch(brJourneyStageList);
+        }
+    }
+
+
+    private boolean isFirstTimeLogin() {
+        return sysRoleService.count() == 0;
+    }
+
+
+    private WxStaffResVo getStaffByExtId(String extId, boolean isLoginFromWeb) {
+        if (isFirstTimeLogin()) {
             initialize(extId);
         }
 
@@ -210,11 +247,19 @@ public class LoginServiceImpl implements ILoginService {
 
         SysRoleStaff sysRoleStaff = sysRoleStaffService.getOne(new QueryWrapper<SysRoleStaff>().lambda()
                 .eq(SysRoleStaff::getExtStaffId, staff.getExtId()).eq(SysRoleStaff::getExtCorpId, staff.getExtCorpId()));
+
+        // hasWeb  means  login from web
+        // 没有角色的员工是普通员工
         if (sysRoleStaff == null) {
-            return new WxStaffResVo()
-                    .setStaff(staff)
-                    .setToken(staffService.change2Token(staff, false));
+            if (isLoginFromWeb) {
+                throw new BaseException(CommonExceptionCode.STAFF_NO_ADMIN, "您不是管理员，无法登录后台系统！");
+            } else {
+                return new WxStaffResVo()
+                        .setStaff(staff)
+                        .setToken(staffService.change2Token(staff, false));
+            }
         }
+
         SysRole sysRole = sysRoleService.getOne(new QueryWrapper<SysRole>().lambda().eq(SysRole::getId, sysRoleStaff.getRoleId()));
         if (sysRole != null) {
             staff.setIsAdmin(true);
@@ -222,9 +267,13 @@ public class LoginServiceImpl implements ILoginService {
                     .setStaff(staff).setSysRole(sysRole)
                     .setToken(staffService.change2Token(staff, true));
         } else {
-            return new WxStaffResVo()
-                    .setStaff(staff)
-                    .setToken(staffService.change2Token(staff, false));
+            if (isLoginFromWeb) {
+                throw new BaseException(CommonExceptionCode.STAFF_NO_ADMIN, "您不是管理员，无法登录后台系统！");
+            } else {
+                return new WxStaffResVo()
+                        .setStaff(staff)
+                        .setToken(staffService.change2Token(staff, false));
+            }
         }
     }
 
@@ -236,7 +285,7 @@ public class LoginServiceImpl implements ILoginService {
         }
 
         String userId = userMap.get(state);
-        return getStaffByExtId(userId);
+        return getStaffByExtId(userId, true);
     }
 
     @Override
@@ -252,7 +301,7 @@ public class LoginServiceImpl implements ILoginService {
             throw new BaseException("获取用户信息失败");
         }
 
-        return getStaffByExtId(userId);
+        return getStaffByExtId(userId, true);
     }
 
     @Override
@@ -309,13 +358,14 @@ public class LoginServiceImpl implements ILoginService {
      * @return
      */
     @Override
-    public WxStaffResVo getStaffByCodeV2(String code) {
+    public WxStaffResVo getStaffByCodeV2(String code, boolean isLoginFromWeb) {
 
         String userId;
         try {
             GetUserInfoRes getUserInfoRes = cpTpFeign.getUserInfo(code, WxCpConfiguration.getWxCpService().getAccessToken());
             getUserInfoRes.checkNoZero();
             userId = getUserInfoRes.getUserid();
+            tryAvatar(getUserInfoRes.getUser_ticket());
             if (StringUtils.isBlank(userId)) {
                 throw new BaseException("不是企业授权人员");
             }
@@ -324,7 +374,8 @@ public class LoginServiceImpl implements ILoginService {
             throw new BaseException("获取用户信息失败");
         }
 
-        return getStaffByExtId(userId);
+        return getStaffByExtId(userId, isLoginFromWeb);
     }
+
 
 }

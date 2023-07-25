@@ -83,6 +83,7 @@ public class GlobalExceptionHandler {
         R<Map<String, String>> result = new R<>();
         result.setCode(ResultCode.FAILURE.getCode())
                 .setMsg(ResultCode.FAILURE.getMsg())
+                .setTraceId(R.getThreadTraceId())
                 .setData(dataMap);
         log.error("发生系统异常：", e);
         return result;

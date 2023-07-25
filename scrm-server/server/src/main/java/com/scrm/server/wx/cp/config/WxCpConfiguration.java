@@ -137,7 +137,7 @@ public class WxCpConfiguration extends ScrmConfig {
         newRouter.rule().handler(this.logHandler).next();
 
         // 默认
-        newRouter.rule().async(false).handler(this.msgHandler).end();
+        newRouter.rule().async(false).handler(this.logHandler).end();
 
         return newRouter;
     }

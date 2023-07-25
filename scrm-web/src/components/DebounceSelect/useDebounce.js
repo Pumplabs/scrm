@@ -20,8 +20,8 @@ const useDebounce = (config = {}) => {
   const { debounceTimeout = 200, request } = config
   const [fetching, setFetching] = React.useState(false);
   const [optionList, setOptionList] = React.useState([]);
-  const fetchRef = React.useRef(0);
-  const { run: runGetUser, tableProps: { pagination }, params: searchParams } = useAntdTable(request, {
+
+  const { run: runGetUser, tableProps: { pagination }, params: searchParams, loading: getUerLoading, cancel: cacelGetUser, mutate } = useAntdTable(request, {
     manual: true,
     onFinally: ([{ current }], resData) => {
       setFetching(false)
@@ -39,7 +39,7 @@ const useDebounce = (config = {}) => {
   }, [pagination])
 
   const onPopupScroll = () => {
-    if (hasMore) {
+    if (hasMore && !getUerLoading) {
       const [pager, { name }] = searchParams
       runGetUser({
         ...pager,
@@ -56,6 +56,13 @@ const useDebounce = (config = {}) => {
   }, [])
 
   const getOptions = (searchText = '') => {
+    if (getUerLoading) {
+      cacelGetUser()
+    }
+    mutate({
+      list: [],
+      total: 0
+    })
     runGetUser({
       current: 1,
       pageSize: 10
@@ -66,7 +73,6 @@ const useDebounce = (config = {}) => {
 
   const debounceFetcher = React.useMemo(() => {
     const loadOptions = (value) => {
-      fetchRef.current += 1;
       setOptionList([]);
       setFetching(true);
       getOptions(value)

@@ -20,7 +20,9 @@ export const validFileType = ({ file }, options = {}) => {
   const { acceptTypeList = [], excludeTypeList = [] } = options;
   // acceptTypeList优先级大于excludeTypeList，传入了acceptTypeList,excludeTypeList无效
   //正则表达式获取后缀
-  const { fileType } = getFileParams(file.name)
+  let { fileType } = getFileParams(file.name)
+  console.log(acceptTypeList, fileType);
+  fileType = fileType.toLowerCase();
   // 如果存在可接受类型
   if (acceptTypeList.length) {
     return acceptTypeList.includes(fileType)
@@ -30,6 +32,7 @@ export const validFileType = ({ file }, options = {}) => {
     return true
   }
 }
+
 
 /**
  * 校验文件名称是否已重复

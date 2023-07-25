@@ -14,12 +14,13 @@
         <result column="join_scene" property="joinScene"/>
         <result column="invitor" property="invitor"/>
         <result column="union_id" property="unionId"/>
+        <result column="state" property="state"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         id
-        , ext_corp_id, ext_creator_id, ext_chat_id, user_id, type, join_time, join_scene, invitor, union_id
+        , ext_corp_id, ext_creator_id, ext_chat_id, user_id, type, join_time, join_scene, invitor, union_id, state
     </sql>
     <select id="pageList" resultType="com.scrm.api.wx.cp.vo.WxGroupChatMemberVO">
         select m.*, if(m.type = 1, s.name ,if(m.type = 2, c.name, null )) as memberName,
@@ -98,5 +99,34 @@
         where ext_corp_id = #{extCorpId} and ext_chat_id = #{extChatId} and TO_DAYS(quit_time) = TO_DAYS(NOW())
     </select>
 
+    <select id="queryTodayQuitExtIds" resultType="java.lang.String">
+        select distinct user_id
+        from wx_group_chat_member
+        where ext_corp_id = #{extCorpId} and ext_chat_id = #{extChatId} and TO_DAYS(quit_time) = TO_DAYS(NOW())
+    </select>
 
+    <select id="listByCondition" resultType="com.scrm.api.wx.cp.entity.WxGroupChatMember">
+        SELECT user_id,quit_time,join_time,ext_chat_id
+        from wx_group_chat_member
+        where ext_corp_id = #{dto.extCorpId}
+        and state = #{dto.state}
+        <if test="dto.chatExtids != null and dto.chatExtids.size >0">
+            and ext_chat_id IN
+            <foreach collection="dto.chatExtids" item="item" index="" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="dto.joinStart != null ">
+            and join_time >= #{dto.joinStart}
+        </if>
+        <if test="dto.joinEnd != null ">
+            and join_time &lt;= #{dto.joinEnd}
+        </if>
+        <if test="dto.quitStart != null ">
+            and quit_time >= #{dto.quitStart}
+        </if>
+        <if test="dto.quitEnd != null ">
+            and quit_time &lt;= #{dto.quitEnd}
+        </if>
+    </select>
 </mapper>

@@ -24,7 +24,7 @@ export const RemoveGroup = async (params) => {
 }
 // 新增分组
 export const AddGroup = async (params) => {
-  return post('/api/contactWayGroup/save', { ...params,  }, { needJson: true })
+  return post('/api/contactWayGroup/save', { ...params, }, { needJson: true })
 }
 // 编辑分组
 export const EditGroup = async (params) => {
@@ -51,8 +51,8 @@ export const batchRemoveChannelCode = async (params) => {
   return post("/api/contactWay/batchDelete", params, { needJson: true })
 }
 // 导出二维码图片
-export async function ExportCodeImg (url, name = '渠道码图片') {
-  return get('/api/common/downloadFile', {url}, {
+export async function ExportCodeImg(url, name = '渠道码图片') {
+  return get('/api/common/downloadFile', { url }, {
     needHandleResponse: true,
     responseType: 'blob'
   }).then(res => saveFileByRes(res, `${name}.png`))
@@ -88,7 +88,7 @@ export const ExportUser = async (params) => {
 }
 
 export const ExportDate = async (params) => {
-  return get('/api/contactWay/exportUrlByDate',params, {
+  return get('/api/contactWay/exportUrlByDate', params, {
     needHandleResponse: true,
     responseType: 'blob'
   }).then(res => saveFileByRes(res))
@@ -96,6 +96,8 @@ export const ExportDate = async (params) => {
 
 export const ExportCustomer = async (params) => {
   return post('/api/contactWay/getExportUrlByCustomer', params, {
+    needHandleResponse: true,
+    responseType: 'blob',
     needJson: true,
-  }).then(res => handleObj(res))
+  }).then(res => saveFileByRes(res))
 }
