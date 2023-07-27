@@ -27,6 +27,7 @@ const JS_API_LIST = [
   'openEnterpriseChat',
   'shareToExternalContact',
   'shareToExternalMoments',
+  'previewFile',
 ]
 
 const wxConfigFn = async (cropInfo, cb) => {

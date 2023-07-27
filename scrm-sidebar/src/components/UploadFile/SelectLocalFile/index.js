@@ -1,28 +1,19 @@
-import { useRef, useEffect, useMemo } from 'react'
+import { useMemo, forwardRef } from 'react'
 import { uniqueId } from 'lodash'
+import { useGetPlatform } from 'src/hooks/wxhook'
 
-export default ({ visible, acceptTypes, onCancel, onOk }) => {
-  const fileRef = useRef(null)
-  // 已经处理过文件
-  const hasHandleFile = useRef(false)
+export default forwardRef((props, ref) => {
+  const { onChange, acceptTypes = []} = props
+  const { platform } = useGetPlatform()
   const acceptFileStr = useMemo(
     () => acceptTypes.map((item) => item).join(),
     [acceptTypes]
   )
-
-  useEffect(() => {
-    if (visible && fileRef.current) {
-      hasHandleFile.current = false
-      fileRef.current.click()
-    }
-  }, [visible])
-
   const onFilesChange = (e) => {
     const files = e.target.files
-    hasHandleFile.current = true
-    if (files.length && typeof onOk === 'function') {
+    if (files.length && typeof onChange === 'function') {
       const file = files[0]
-      onOk({
+      onChange({
         file: {
           uid: uniqueId('file_'),
           name: file.name,
@@ -30,18 +21,19 @@ export default ({ visible, acceptTypes, onCancel, onOk }) => {
           size: file.size,
         },
       })
-    } else {
-      onCancel()
     }
   }
   return (
     <input
-      name="files"
-      type="file"
-      hidden
-      ref={fileRef}
-      onChange={onFilesChange}
-      accept={acceptFileStr}
-    />
+        ref={ref}
+        type="file"
+        hidden
+        onChange={onFilesChange}
+        {...(platform === 'pc'
+          ? {
+              accept: acceptFileStr,
+            }
+          : {})}
+      />
   )
-}
+})

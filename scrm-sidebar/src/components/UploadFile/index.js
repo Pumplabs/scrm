@@ -86,6 +86,7 @@ const UploadFileItem = forwardRef(
   ) => {
     const [files, setFiles] = useState([])
     const currentFileListRef = useRef(fileList)
+    const localFileRef = useRef(null)
     const { openModal, closeModal, visibleMap } = useModalHook([
       'material',
       'file',
@@ -205,8 +206,7 @@ const UploadFileItem = forwardRef(
     const onSelectFile = () => {
       const type = shouldShowSelectModal ? 'file' : openModalType
       if (type === 'localFile') {
-        closeModal()
-        openModal(type)
+        showLocalFile()
       } else {
         openModal(type)
       }
@@ -245,11 +245,33 @@ const UploadFileItem = forwardRef(
       const files = Array.isArray(file) ? file : [file]
       updateFiles((arr) => [...arr, ...files])
     }
+    const showLocalFile = () => {
+      localFileRef.current.click()
+    }
     const currentCount = currentFileList.length
     const selectActions = [
-      { text: '从素材库选择', key: 'material' },
-      { text: '从本地选择', key: 'file' },
-      { text: '取消', key: 'cancel' },
+      {
+        text: '从素材库选择',
+        key: 'material',
+        onClick: () => {
+          openModal('material')
+        },
+      },
+      {
+        text: '从本地选择',
+        key: 'file',
+        onClick: () => {
+          closeModal()
+          showLocalFile()
+        },
+      },
+      {
+        text: '取消',
+        key: 'cancel',
+        onClick: () => {
+          closeModal()
+        },
+      },
     ]
     return (
       <div ref={ref}>
@@ -260,10 +282,9 @@ const UploadFileItem = forwardRef(
           onClose={closeModal}
         />
         <SelectLocalFile
-          visible={visibleMap.localFileVisible}
-          acceptTypes={acceptTypeList}
-          onOk={onLocalFileOk}
-          onCancel={closeModal}
+             ref={localFileRef}
+             acceptTypes={acceptTypeList}
+             onChange={onLocalFileOk}
         />
         <SelectMaterialFilesModal
           visible={visibleMap.materialVisible}

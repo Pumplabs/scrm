@@ -11,6 +11,7 @@ import com.scrm.api.wx.cp.enums.BrCustomerDynamicModelEnum;
 import com.scrm.api.wx.cp.enums.BrCustomerDynamicTypeEnum;
 import com.scrm.common.dto.BatchDTO;
 import com.scrm.common.exception.BaseException;
+import com.scrm.common.util.JwtUtil;
 import com.scrm.common.util.ListUtils;
 import com.scrm.common.util.UUID;
 import com.scrm.server.wx.cp.dto.BrCustomerDynamicPageDTO;
@@ -65,6 +66,7 @@ public class BrCustomerDynamicServiceImpl extends ServiceImpl<BrCustomerDynamicM
         LambdaQueryWrapper<BrCustomerDynamic> wrapper = new LambdaQueryWrapper<BrCustomerDynamic>()
                 .eq(BrCustomerDynamic::getExtCorpId, dto.getExtCorpId())
                 .in(BrCustomerDynamic::getExtCustomerId, allExtId)
+                .eq(!Boolean.TRUE.equals(JwtUtil.getLoginInfo().getIsAdmin()), BrCustomerDynamic::getExtStaffId, JwtUtil.getExtUserId())
                 .eq(StringUtils.isNotBlank(dto.getExtCustomerId()), BrCustomerDynamic::getExtCustomerId, dto.getExtCustomerId())
                 .orderByDesc(BrCustomerDynamic::getCreatedAt);
         IPage<BrCustomerDynamic> page = page(new Page<>(dto.getPageNum(), dto.getPageSize()), wrapper);
@@ -78,6 +80,7 @@ public class BrCustomerDynamicServiceImpl extends ServiceImpl<BrCustomerDynamicM
         LambdaQueryWrapper<BrCustomerDynamic> wrapper = new QueryWrapper<BrCustomerDynamic>()
                 .lambda().eq(BrCustomerDynamic::getExtCorpId, dto.getExtCorpId())
                 .in(BrCustomerDynamic::getExtCustomerId, allExtId)
+                .eq(!Boolean.TRUE.equals(JwtUtil.getLoginInfo().getIsAdmin()), BrCustomerDynamic::getExtStaffId, JwtUtil.getExtUserId())
                 .orderByDesc(BrCustomerDynamic::getCreatedAt);
         return Optional.ofNullable(list(wrapper)).orElse(new ArrayList<>()).stream().map(this::translation).collect(Collectors.toList());
     }
