@@ -21,6 +21,9 @@ Pumplabs scrm 是一款开源、基于企业微信、简洁便捷、高效协作
 <a href="https://doc.pumplabs.cn/docs/development/deploy/">部署文档</a>
 
 # 体验地址
+
+> 需要企微扫码体验
+
 <a href="https://pumplabs.cn/app/login">体验地址</a>
 
 ## 主要技术栈
