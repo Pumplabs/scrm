@@ -3,9 +3,9 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
     druid:
-      url: ####数据库连接
-      username:  ####
-      password:  ####
+      url: jdbc:mysql://121.33.33.33:3306/scrm?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+      username: root
+      password: 123456
       # 初始连接数
       initialSize: 5
       # 最小连接池数量
@@ -32,6 +32,9 @@ spring:
         # 设置白名单，不填则允许所有访问
         allow:
         url-pattern: /druid/*
+        # 控制台管理用户名和密码
+        #login-username: scrm
+        #login-password: 123456
       filter:
         stat:
           enabled: true
@@ -50,12 +53,12 @@ spring:
       max-file-size: 10MB
       # 设置总上传的文件大小
       max-request-size: 20MB
-  
+
   rabbitmq:
-    host: #### server ip
-    port: #### 5672
-    username: ####username
-    password: ####username
+    host: 8.8.8.8
+    port: 5672
+    username: guest
+    password: 123456
     # 是否开启
     listener:
       type: simple
@@ -68,6 +71,16 @@ spring:
           initial-interval: 2000 # 初始重试间隔时间
           multiplier: 2 # 间隔时间乘子，间隔时间 * 乘子 = 下一次的间隔时间
 # 开发环境配置
+# 异步线程配置 自定义使用参数
+async:
+  executor:
+    thread:
+      core_pool_size:  10  # 配置核心线程数 默认8个 核数*2+2
+      max_pool_size:  100   # 配置最大线程数
+      queue_capacity:  99988  # 配置队列大小
+      keep_alive_seconds:  20  #设置线程空闲等待时间秒s
+      name:
+        prefix: async-thread-  # 配置线程池中的线程的名称前缀
 server:
   servlet:
     # 应用的访问路径
@@ -85,27 +98,29 @@ server:
       # Tomcat启动初始化的线程数，默认值25
       min-spare: 30
 
+
 # redis
 redis:
-  ip: ####redis://ip
-  host: ####
-  port: ####
-  password: ####
+  ip: redis://8.8.8.8
+  host: 8.8.8.8
+  port: 6379
+  password: 123456
 # 腾讯云
 tq:
   cos:
-    # 改了存储桶要改企微应用宝那里海报文件夹的权限为私有写公有读，新增默认是私有读，会读不到海报的
-    bucket: ####
-    secretId: ####
-    secretKey: ####
-    region: ####
-    # 可以随便填写，唯一即可，腾讯云文件预览需要的id
-    queueId: ####
+    #私有写公有读
+    bucket: examplebucket-123456
+    secretId: 123456
+    secretKey: 123456
+    region: ap-guangzhou
+    queueId: pd4f40b3384c04f6ba02c109a9e77102b
 # 日志配置
 logging:
   level:
     com.scrm: debug
-    org.springframework: warn
+    org.springframework.web: debug
+
+
 
 # PageHelper分页插件
 pagehelper:
@@ -139,47 +154,44 @@ mybatis-plus:
       logic-delete-value: now(6) # 逻辑已删除值
       logic-not-delete-value: 'null' # 逻辑未删除值
 
+# 企微访问链接，通过http://124.71.105.113跳到https://qyapi.weixin.qq.com，让本地调试可以绕过ip白名单的限制
+serviceApiUrl: http://127.0.0.1:9903
+baseApiUrl: http://yourip:8080
+# 项目相关配置
 scrm:
-  # 项目相关配置
+  deployMode: private
+  baseApiUrl: http://yourip:8080
   # * 企业ID，https://work.weixin.qq.com/wework_admin/frame#profile
-  extCorpID: ####
-  # 企业名称
-  corpName: #### BlueFlower
+  extCorpID: wwa09cbf5461343434
+  corpName: 蓬勃来客私有化开发版
   # * 企业微信通讯录API Secret https://work.weixin.qq.com/wework_admin/frame#apps/contactsApi
-  contactSecret: ####
+  contactSecret: VqWbFh4aSi_7WmWGm434343n9EF5bOu7CxiF18ewL54
   # * 企业微信客户联系API Secret https://work.weixin.qq.com/wework_admin/frame#customer/analysis
-  customerSecret: ####
+  customerSecret: PNYmk20tOUGs2BJTyfC4343R0BtoMycnYPFSw7_Nyc
   # * 企业自建主应用ID https://work.weixin.qq.com/wework_admin/frame#apps
-  mainAgentID: ####
-  # * 会话存档Secret
-  msgAuditSecret: ####
+  mainAgentID: 1000026
   # * 企业自建主应用Secret
-  mainAgentSecret: ####
+  mainAgentSecret: BozpN-bxD0Nznhy09_amQ2434-G3MvkmEn0bgM4I
+  # * 会话存档Secret
+  msgAuditSecret: lKsVXPtqGm3jGpW3Q6JiQtcC1pE6Y8TAxxgA
   # * 客户联系的回调token，下面那个长度超限制
-  shortCallbackToken: ####
+  shortCallbackToken: v5C434HYD61
   # * 客户联系的回调AesKey
-  customerAesKey: ####
+  customerAesKey: EvZAKLC43KVXZiJ2E9i9a432eGDOJ0aYvFgpRVr6f
   # * 同步通讯录回调地址的token，客户联系共用此配置，https://work.weixin.qq.com/wework_admin/frame#apps/contactsApi，https://work.weixin.qq.com/wework_admin/frame#customer/analysis
-  callbackToken: ####
+  callbackToken: ul4dxG
   # * 同步通讯录回调地址的AesKey, 客户联系共用此配置
-  callbackAesKey: ####
-  # 可信域名
-  domainName: ####
-  # api 代理，填写企微白名单ip，方便调试，生产环境换成企微接口的url https://qyapi.weixin.qq.com
-  baseApiUrl: ####
+  callbackAesKey: AbfpcbcX9GOBSQinPp8CrT4343hjb9aqBqzJFCy8t2ASOQQ
+  # * 会话存档服务私钥，企业微信需开通此功能并设置好对应公钥，https://work.weixin.qq.com/wework_admin/frame#financial/corpEncryptData
+  priKeyPath: /usr/local/scrm/conf/private-dev.key
+  # 域名
+  domainName: https://local.creatortimes.pro
   # 微信开放平台的appId
-  mpAppId: #####
+  mpAppId: wxaeeb3c435c1bb2f490
   # 微信开放平台的密钥
-  mpAppSecret: ####
-  # 微信开放平台的token
-  mpAppToken: ####
-  # 微信开放平台的AesKey
-  mpAppAesKey: ####
+  mpAppSecret: eeeb93775de3ac876d39730eda4b54fb
 
-  # 名称
-  name: max-scrm-server
-  # 版本
-  version: 0.8.2
+
   # 前端登录回调地址
   loginRedirectUrl: /scrm-wx-cp/api/staff-login/login-callback
   # 客户详情地址
@@ -192,10 +204,12 @@ scrm:
   saleReportUrl: /sidebar/saleReport?id=
   # 企微应用宝，参与活动地址
   fissionEventUrl: /h5-poster
+  # 收集表地址
+  customerForm: /customerForm
   # windows上传文件保存路径
-  windowsFilePath: #### D:\scrm\
+  windowsFilePath: D:\scrm\
   # linux上传文件保存路径
-  linuxFilePath: #### /data/scrm/
+  linuxFilePath: /Users/lyon/Desktop/
   # 文件下载地址
   downloadUrl: /api/common/downloadByFileId
   # 临时授权回调
@@ -208,14 +222,21 @@ scrm:
   followDetailUrl: /sidebar/followDetail
 
 
+
+
+
+
 #xxl-job配置
 xxl:
   job:
-    accessToken: ####
+    accessToken: xxxxxxxxxx
     admin:
-      addresses: ####http://xxxx:xxxx/xxl-job-admin
-      username: ####
-      password: ####
+      # 调度中心地址"http://address" or "http://address01,http://address02"
+      addresses: http://127.0.0.1:9100/xxl-job-admin
+      # addresses: http://116.205.186.228:9100/xxl-job-admin
+      # 登陆调度中心
+      username: admin
+      password: 123456
     executor:
       # 执行器名称
       appname: scrm-job-executor
@@ -224,6 +245,6 @@ xxl:
       ip:
       port: 9999
       # 任务执行日志存放地址
-      logpath: #### /var/log/scrm/xxl-job/jobhandler
+      logpath: /usr/local/scrm/xxl-job/jobhandler
       # 日志保留时间
       logretentiondays: 30
