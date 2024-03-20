@@ -18,7 +18,10 @@ Pumplabs scrm 是一款开源、基于企业微信、简洁便捷、高效协作
 
 
 # 应用部署文档 
-<a href="https://lyonru29.notion.site/782f62c8784344d6af3a61afa499d0ab">部署文档</a>
+<a href="https://doc.pumplabs.cn/docs/development/deploy/">部署文档</a>
+
+# 体验地址
+<a href="https://pumplabs.cn/app/login">体验地址</a>
 
 ## 主要技术栈
 **后端**
@@ -40,9 +43,3 @@ Pumplabs scrm 是一款开源、基于企业微信、简洁便捷、高效协作
 
 # 问题与建议
 如果出现bug或者功能上有其他建议，欢迎提issue 或者邮件到pumplabs@163.com
-
-
-# 截图
-![img.png](docs/images/order.png)
-![img.png](docs/images/oppo.png)
-![img.png](docs/images/liebian.png)
